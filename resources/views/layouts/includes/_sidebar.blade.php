@@ -4,18 +4,18 @@
             <div class="nav accordion" id="accordionSidenav">
                 <!-- Sidenav Menu Heading (Core)-->
                 <div class="sidenav-menu-heading">Core</div>
-                <!-- Sidenav Link (Charts)-->
+                <!-- Sidenav Link (Home)-->
                 <a class="nav-link" href="{{url('/home')}}">
                     <div style="margin-left: -2px" class="nav-link-icon"><i class="fas fa-home"></i></div>
                     Home
                 </a>
-               <!-- Daily Report Press -->
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseDailyReportPress" aria-expanded="false" aria-controls="collapseDailyReportPress">
+                <!-- Daily Report Section -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseDailyReport" aria-expanded="false" aria-controls="collapseDailyReport">
                     <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
                     Daily Report 
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapseDailyReportPress" data-bs-parent="#accordionSidenav">
+                <div class="collapse" id="collapseDailyReport" data-bs-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav">
                         <a class="nav-link" href="{{ url('/daily-report/press') }}">Press</a>
                     </nav>
@@ -26,52 +26,81 @@
                         <a class="nav-link" href="{{ url('/daily-report/factory') }}">Factory B</a>
                     </nav>
                 </div>
-                <!-- Sidenav Menu Heading (Master)-->
+                <!-- Downtime Report Section -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseDowntimeReport" aria-expanded="false" aria-controls="collapseDowntimeReport">
+                    <div class="nav-link-icon"><i class="fas fa-clock"></i></div>
+                    Downtime Report 
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseDowntimeReport" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/downtime-report/press') }}">Press</a>
+                    </nav>
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/downtime-report/welding') }}">Welding</a>
+                    </nav>
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/downtime-report/factory') }}">Factory B</a>
+                    </nav>
+                </div>
+
+                <!-- Sidenav Menu Heading (View)-->
                 <div class="sidenav-menu-heading">View</div>
-                <!-- Sidenav Accordion (Master)-->
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapView" aria-expanded="false" aria-controls="collapView">
+                <!-- Sidenav Accordion (View)-->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseView" aria-expanded="false" aria-controls="collapseView">
                     <div class="nav-link-icon"><i class="fas fa-table"></i></div>
                     View
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapView" data-bs-parent="#accordionSidenav">
+                <div class="collapse" id="collapseView" data-bs-parent="#accordionSidenav">
                    <nav class="sidenav-menu-nested nav">
-                       <a class="nav-link" href="{{url('/view/planning')}}">Planning</a>
+                       <a class="nav-link" href="{{url('/view/production-summary')}}">Production Summary</a>
                     </nav>
                     <nav class="sidenav-menu-nested nav">
-                       <a class="nav-link" href="{{url('/view/actual')}}">Actual</a>
-                    </nav>
-                    <nav class="sidenav-menu-nested nav">
-                       <a class="nav-link" href="{{url('/view/ng')}}">Not Good</a>
-                    </nav>
-                    <nav class="sidenav-menu-nested nav">
-                       <a class="nav-link" href="{{url('/view/std')}}">STD</a>
+                       <a class="nav-link" href="{{url('/view/downtime-summary')}}">Downtime Summary</a>
                     </nav>
                 </div>
-                 <!-- Sidenav Menu Heading (Master)-->
-                 <div class="sidenav-menu-heading">Master</div>
-                 <!-- Sidenav Accordion (Master)-->
-                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsemaster" aria-expanded="false" aria-controls="collapsemaster">
-                     <div class="nav-link-icon"><i class="fas fa-database"></i></div>
-                     Master Data
-                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                 </a>
-                 <div class="collapse" id="collapsemaster" data-bs-parent="#accordionSidenav">
+                <!-- Sidenav Menu Heading (Master)-->
+                <div class="sidenav-menu-heading">Master</div>
+                <!-- Press Master Section -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsePressMaster" aria-expanded="false" aria-controls="collapsePressMaster">
+                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    Press
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapsePressMaster" data-bs-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{url('/mst/section')}}">Section</a>
-                     </nav>
-                     <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{url('/mst/shop')}}">Shop</a>
-                     </nav>
-                     <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{url('/mst/model')}}">Model</a>
-                     </nav>
-                     <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{url('/mst/downtime')}}">Downtime Cause</a>
-                     </nav>
-                 </div>
+                        <a class="nav-link" href="{{ url('/press/shop') }}">Shop</a>
+                        <a class="nav-link" href="{{ url('/press/model') }}">Model</a>
+                    </nav>
+                </div>
+                <!-- Welding Master Section -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseWeldingMaster" aria-expanded="false" aria-controls="collapseWeldingMaster">
+                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    Welding
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseWeldingMaster" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/welding/shop') }}">Shop</a>
+                        <a class="nav-link" href="{{ url('/welding/station') }}">Station</a>
+                        <a class="nav-link" href="{{ url('/welding/model') }}">Model</a>
+                    </nav>
+                </div>
+                <!-- Factory B Master Section -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseFactoryBMaster" aria-expanded="false" aria-controls="collapseFactoryBMaster">
+                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    Factory B
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseFactoryBMaster" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/factoryb/shop') }}">Shop</a>
+                        <a class="nav-link" href="{{ url('/factoryb/model') }}">Model</a>
+                    </nav>
+                </div>
                 @if(\Auth::user()->role === 'IT')
-                <!-- Sidenav Menu Heading (Core)-->
+                <!-- Sidenav Menu Heading (Configuration)-->
                 <div class="sidenav-menu-heading">Configuration</div>
                 <!-- Sidenav Accordion (Utilities)-->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseUtilities" aria-expanded="false" aria-controls="collapseUtilities">

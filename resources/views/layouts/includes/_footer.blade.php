@@ -5,7 +5,7 @@
                 <div class="row">
                     <div class="col-md-6 small"></div>
                     <div class="col-md-6 text-md-end small">
-                     Copyright PT Mitsubishi Krama Yudha Motors and Manufacturing&copy; 2023
+                     Copyright UIC Program X PT Mitsubishi Krama Yudha Motors and Manufacturing&copy; 2024
                     </div>
                 </div>
             </div>
