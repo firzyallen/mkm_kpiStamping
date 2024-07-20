@@ -7,7 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RulesController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PressController;
-
+use App\Http\Controllers\MstPressController;
 
 
 
@@ -52,15 +52,18 @@ Route::middleware(['auth'])->group(function () {
      Route::get('/user/revoke/{user}', [UserController::class, 'revoke'])->middleware(['checkRole:IT']);
      Route::get('/user/access/{user}', [UserController::class, 'access'])->middleware(['checkRole:IT']);
 
-     //Welding
+     //Press
      Route::get('daily-report/press', [PressController::class, 'index'])->middleware(['checkRole:IT']);
      Route::post('daily-report/press/store', [PressController::class, 'store'])->middleware(['checkRole:IT']);
      Route::patch('daily-report/press/update/{id}', [PressController::class, 'update'])->middleware(['checkRole:IT']);
      Route::delete('daily-report/press/delete/{id}', [PressController::class, 'delete'])->middleware(['checkRole:IT']);
 
-     //Press
+     //Welding
 
      //Factory B
+
+     //Master Press
+     Route::get('press/shop', [MstPressController::class, 'shopview'])->middleware(['checkRole:IT']);
 
 
 });
