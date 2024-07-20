@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Press;
 
-class MstPressController extends Controller
+class PressController extends Controller
 {
     public function index(){
         $item = Press::all();
