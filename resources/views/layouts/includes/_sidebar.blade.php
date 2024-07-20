@@ -99,6 +99,19 @@
                         <a class="nav-link" href="{{ url('/factoryb/model') }}">Model</a>
                     </nav>
                 </div>
+                <!-- Downtime Master Section -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseDowntimeMaster" aria-expanded="false" aria-controls="collapseDowntimeMaster">
+                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    Downtime
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseDowntimeMaster" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/downtime-master/press') }}">Press</a>
+                        <a class="nav-link" href="{{ url('/downtime-master/welding') }}">Welding</a>
+                        <a class="nav-link" href="{{ url('/downtime-master/factoryb') }}">Factory B</a>
+                    </nav>
+                </div>
                 @if(\Auth::user()->role === 'IT')
                 <!-- Sidenav Menu Heading (Configuration)-->
                 <div class="sidenav-menu-heading">Configuration</div>
