@@ -10,6 +10,7 @@ use App\Http\Controllers\PressController;
 use App\Http\Controllers\MstPressController;
 use App\Http\Controllers\MstFactoryBController;
 use App\Http\Controllers\MstWeldingController;
+use App\Http\Controllers\FormFactoryBController;
 
 
 /*
@@ -61,7 +62,14 @@ Route::middleware(['auth'])->group(function () {
 
      //Welding
 
-     //Factory B
+     //Factory B Form
+     Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
+     Route::post('/daily-report/factoryb/store/main', [FormFactoryBController::class, 'storeMain'])->middleware(['checkRole:IT']);
+     Route::get('/daily-report/factoryb/form/{id}', [FormFactoryBController::class, 'formChecksheet'])->middleware(['checkRole:IT'])->name('form.daily-report.factoryb');
+     Route::post('/daily-report/factoryb/detail/store', [FormFactoryBController::class, 'storeForm'])->middleware(['checkRole:IT']);
+     Route::get('/daily-report/factoryb/detail/{id}', [FormFactoryBController::class, 'showDetail'])->middleware(['checkRole:IT']);
+     Route::get('/daily-report/factoryb/update/{id}', [FormFactoryBController::class, 'updateDetail'])->middleware(['checkRole:IT']);
+     Route::post('/daily-report/factoryb/detail/update', [FormFactoryBController::class, 'updateForm'])->middleware(['checkRole:IT']);
 
      //Master Press
      Route::get('press/shop', [MstPressController::class, 'shopview'])->middleware(['checkRole:IT']);

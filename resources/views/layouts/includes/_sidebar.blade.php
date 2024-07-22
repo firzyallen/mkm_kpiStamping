@@ -23,7 +23,7 @@
                         <a class="nav-link" href="{{ url('/daily-report/welding') }}">Welding</a>
                     </nav>
                     <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ url('/daily-report/factory') }}">Factory B</a>
+                        <a class="nav-link" href="{{ url('/daily-report/factoryb') }}">Factory B</a>
                     </nav>
                 </div>
                 <!-- Downtime Report Section -->
