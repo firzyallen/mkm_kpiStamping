@@ -39,7 +39,7 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h3 class="card-title">Daily Report Form: {{ $item->document_no }}</h3>
+                                        <h3 class="card-title">Daily Report Form Welding: {{ $item->document_no }} ({{$item->shift}} Shift {{$item->date}})</h3>
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                     <div class="card-body">
@@ -104,7 +104,7 @@
 
                                                             <div class="row">
                                                                 <div class="mb-4 mt-4">
-                                                                    <table class="table table-bordered table-striped">
+                                                                    <table class="table table-bordered">
                                                                         <thead>
                                                                             <tr>
                                                                                 <th>Station</th>

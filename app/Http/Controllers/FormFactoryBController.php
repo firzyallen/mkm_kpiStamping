@@ -106,6 +106,15 @@ class FormFactoryBController extends Controller
                     $modelId = FactbMstModel::where('model_name', $modelName)->value('id');
                     $modelShopId = FactbMstModel::where('model_name', $modelName)->value('shop_id');
                     if ($modelShopId == $shopId) {
+                        $output8 = $production['output8'][0] ?? 0;
+                        $output2 = $production['output2'][0] ?? 0;
+                        $output1 = $production['output1'][0] ?? 0;
+                        $total_prod = $output8 + $output2 + $output1;
+
+                        $plan_prod = $production['plan_prod'][0] ?? $total_prod;
+                        if ($plan_prod == 0) {
+                            $plan_prod = $total_prod;
+                        }
                         $productionId = FactbActualFormProduction::create([
                             'details_id' => $detailId,
                             'model_id' => $modelId,
@@ -113,7 +122,7 @@ class FormFactoryBController extends Controller
                             'output8' => $production['output8'][0] ?? null,
                             'output2' => $production['output2'][0] ?? null,
                             'output1' => $production['output1'][0] ?? null,
-                            'plan_prod' => $production['plan_prod'][0] ?? null,
+                            'plan_prod' => $plan_prod,
                             'cabin' => $production['cabin'][0] ?? null,
                             'PPM' => $production['PPM'][0] ?? null,
                             'created_at' => now(),
@@ -293,6 +302,15 @@ class FormFactoryBController extends Controller
                     $modelShopId = FactbMstModel::where('model_name', $modelName)->value('shop_id');
 
                     if ($modelShopId == $shopId) {
+                        $output8 = $production['output8'][0] ?? 0;
+                        $output2 = $production['output2'][0] ?? 0;
+                        $output1 = $production['output1'][0] ?? 0;
+                        $total_prod = $output8 + $output2 + $output1;
+
+                        $plan_prod = $production['plan_prod'][0] ?? $total_prod;
+                        if ($plan_prod == 0) {
+                            $plan_prod = $total_prod;
+                        }
                         $productionRecord = FactbActualFormProduction::where('details_id', $detail->id)->where('model_id', $modelId)->first();
 
                         if ($productionRecord) {
@@ -301,7 +319,7 @@ class FormFactoryBController extends Controller
                                 'output8' => $production['output8'][0] ?? null,
                                 'output2' => $production['output2'][0] ?? null,
                                 'output1' => $production['output1'][0] ?? null,
-                                'plan_prod' => $production['plan_prod'][0] ?? null,
+                                'plan_prod' => $plan_prod,
                                 'cabin' => $production['cabin'][0] ?? null,
                                 'PPM' => $production['PPM'][0] ?? null,
                                 'updated_at' => now(),
@@ -314,7 +332,7 @@ class FormFactoryBController extends Controller
                                 'output8' => $production['output8'][0] ?? null,
                                 'output2' => $production['output2'][0] ?? null,
                                 'output1' => $production['output1'][0] ?? null,
-                                'plan_prod' => $production['plan_prod'][0] ?? null,
+                                'plan_prod' => $plan_prod,
                                 'cabin' => $production['cabin'][0] ?? null,
                                 'PPM' => $production['PPM'][0] ?? null,
                                 'created_at' => now(),
@@ -322,12 +340,15 @@ class FormFactoryBController extends Controller
                             ]);
                         }
 
+                        $totalProd = ($production['output8'][0] ?? 0) + ($production['output2'][0] ?? 0) + ($production['output1'][0] ?? 0);
+
                         // Update factb_actual_form_ngs
                         $ng = $request->production[$modelName];
                         $ngRecord = FactbActualFormNg::where('production_id', $productionRecord->id)->first();
-
+                        
                         if ($ngRecord) {
                             $ngRecord->update([
+                                'total_prod' => $totalProd,
                                 'reject' => $ng['reject'][0] ?? null,
                                 'rework' => $ng['rework'][0] ?? null,
                                 'remarks' => $ng['remarks'][0] ?? null,
@@ -338,6 +359,7 @@ class FormFactoryBController extends Controller
                             FactbActualFormNg::create([
                                 'production_id' => $productionRecord->id,
                                 'model_id' => $modelId,
+                                'total_prod' => $totalProd,
                                 'reject' => $ng['reject'][0] ?? null,
                                 'rework' => $ng['rework'][0] ?? null,
                                 'remarks' => $ng['remarks'][0] ?? null,

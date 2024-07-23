@@ -25,7 +25,7 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h3 class="card-title">Daily Report Form: {{ $header->document_no }} ({{$header->shift}})</h3>
+                                        <h3 class="card-title">Daily Report Form Factory B: {{ $header->document_no }} ({{$header->shift}} Shift {{$header->date}})</h3>
                                         <button type="submit" class="btn btn-primary">Submit</button>
                                     </div>
                                     <div class="card-body">

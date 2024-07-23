@@ -146,6 +146,15 @@ class FormWeldingController extends Controller
                     }
 
                     foreach ($request->production as $modelName => $production) {
+                        $output8 = $production['output8'][0] ?? 0;
+                        $output2 = $production['output2'][0] ?? 0;
+                        $output1 = $production['output1'][0] ?? 0;
+                        $total_prod = $output8 + $output2 + $output1;
+
+                        $plan_prod = $production['plan_prod'][0] ?? $total_prod;
+                        if ($plan_prod == 0) {
+                            $plan_prod = $total_prod;
+                        }
                         $modelId = WeldingMstModel::where('model_name', $modelName)->value('id');
                         $modelStationId = WeldingMstModel::where('model_name', $modelName)->value('station_id');
 
@@ -157,7 +166,7 @@ class FormWeldingController extends Controller
                                 'output8' => $production['output8'][0] ?? null,
                                 'output2' => $production['output2'][0] ?? null,
                                 'output1' => $production['output1'][0] ?? null,
-                                'plan_prod' => $production['plan_prod'][0] ?? null,
+                                'plan_prod' => $plan_prod,
                                 'cabin' => $production['cabin'][0] ?? null,
                                 'PPM' => $production['PPM'][0] ?? null,
                                 'created_at' => now(),
@@ -382,6 +391,15 @@ class FormWeldingController extends Controller
                     $stationDetailId = $stationDetail->id;
 
                     foreach ($request->production as $modelName => $production) {
+                        $output8 = $production['output8'][0] ?? 0;
+                        $output2 = $production['output2'][0] ?? 0;
+                        $output1 = $production['output1'][0] ?? 0;
+                        $total_prod = $output8 + $output2 + $output1;
+
+                        $plan_prod = $production['plan_prod'][0] ?? $total_prod;
+                        if ($plan_prod == 0) {
+                            $plan_prod = $total_prod;
+                        }
                         $modelId = WeldingMstModel::where('model_name', $modelName)->value('id');
                         $modelStationId = WeldingMstModel::where('model_name', $modelName)->value('station_id');
 
@@ -394,7 +412,7 @@ class FormWeldingController extends Controller
                                     'output8' => $production['output8'][0] ?? null,
                                     'output2' => $production['output2'][0] ?? null,
                                     'output1' => $production['output1'][0] ?? null,
-                                    'plan_prod' => $production['plan_prod'][0] ?? null,
+                                    'plan_prod' => $plan_prod,
                                     'cabin' => $production['cabin'][0] ?? null,
                                     'PPM' => $production['PPM'][0] ?? null,
                                     'updated_at' => now(),
@@ -417,9 +435,12 @@ class FormWeldingController extends Controller
 
                             $ng = $request->production[$modelName];
                             $ngRecord = WeldingActualFormNg::where('production_id', $productionRecord->id)->first();
+                            
+                            $totalProd = ($production['output8'][0] ?? 0) + ($production['output2'][0] ?? 0) + ($production['output1'][0] ?? 0);
 
                             if ($ngRecord) {
                                 $ngRecord->update([
+                                    'total_prod' => $totalProd,
                                     'reject' => $ng['reject'][0] ?? null,
                                     'rework' => $ng['rework'][0] ?? null,
                                     'remarks' => $ng['remarks'][0] ?? null,
@@ -430,6 +451,7 @@ class FormWeldingController extends Controller
                                 WeldingActualFormNg::create([
                                     'production_id' => $productionRecord->id,
                                     'model_id' => $modelId,
+                                    'total_prod' => $totalProd,
                                     'reject' => $ng['reject'][0] ?? null,
                                     'rework' => $ng['rework'][0] ?? null,
                                     'remarks' => $ng['remarks'][0] ?? null,

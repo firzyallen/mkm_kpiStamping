@@ -26,7 +26,7 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header d-flex justify-content-between align-items-center">
-                                        <h3 class="card-title">Daily Report: {{ $header->document_no }} ({{$header->shift}})</h3>
+                                        <h3 class="card-title">Daily Report Welding: {{ $header->document_no }} {{ $header->document_no }} ({{$header->shift}} Shift {{$header->date}})</h3>
                                     </div>
                                     <div class="card-body">
                                         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -91,7 +91,7 @@
 
                                                             <div class="row">
                                                                 <div class="mb-4 mt-4">
-                                                                    <table class="table table-bordered table-striped">
+                                                                    <table class="table table-bordered">
                                                                         <thead>
                                                                             <tr>
                                                                                 <th>Station</th>
