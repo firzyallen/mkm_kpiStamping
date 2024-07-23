@@ -19,7 +19,7 @@
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-header">
-                                    <h3 class="card-title">Factory B Daily Reports</h3>
+                                    <h3 class="card-title">Welding Daily Reports</h3>
                                 </div>
                                 <!-- Export Modal -->
                                 <div class="modal fade" id="modal-export" tabindex="-1" aria-labelledby="modal-export-label" aria-hidden="true">
@@ -29,7 +29,7 @@
                                                 <h5 class="modal-title" id="modal-export-label">Export to Excel</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <form action="{{ url('/daily-report/factoryb/export') }}" method="POST">
+                                            <form action="{{ url('/daily-report/welding/export') }}" method="POST">
                                                 @csrf
                                                 <div class="modal-body">
                                                     <div class="form-group mb-3">
@@ -65,7 +65,7 @@
                                                             <h5 class="modal-title" id="modal-add-label">Add Daily Report</h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                         </div>
-                                                        <form action="{{ url('/daily-report/factoryb/store/main') }}" method="POST">
+                                                        <form action="{{ url('/daily-report/welding/store/main') }}" method="POST">
                                                             @csrf
                                                             <div class="modal-body">
                                                                 <div class="form-group mb-3">
@@ -149,8 +149,8 @@
                                                         <td>{{ $data->pic }}</td>
 
                                                         <td>
-                                                            <a title="Detail Report" href="{{url('/daily-report/factoryb/detail/'.encrypt($data->id))}}" class="btn btn-info btn-sm me-2"><i class="fas fa-info"></i></a>
-                                                            <a title="Edit Report" href="{{url('/daily-report/factoryb/update/'.encrypt($data->id))}}" class="btn btn-primary btn-sm me-2"><i class="fas fa-edit"></i></a>
+                                                            <a title="Detail Report" href="{{url('/daily-report/welding/detail/'.encrypt($data->id))}}" class="btn btn-info btn-sm me-2"><i class="fas fa-info"></i></a>
+                                                            <a title="Edit Report" href="{{url('/daily-report/welding/update/'.encrypt($data->id))}}" class="btn btn-primary btn-sm me-2"><i class="fas fa-edit"></i></a>
                                                         </td>
                                                     </tr>
                                                 @endforeach

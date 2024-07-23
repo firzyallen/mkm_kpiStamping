@@ -83,7 +83,7 @@
                                                                     <textarea name="notes[{{ $data['shop_name'] }}][]" class="form-control form-control-sm" style="width: 390px;">{{ $data['notes'] }}</textarea>
                                                                 </div>
                                                                 <div class="col-md-3">
-                                                                    <label for="photo_shop">Photo Shop</label>
+                                                                    <label for="photo_shop">Documentation (if needed)</label>
                                                                     <input type="file" name="photo_shop[{{ $data['shop_name'] }}][]" class="form-control form-control-sm">
                                                                 </div>
                                                             </div>

@@ -27,9 +27,19 @@ class FormFactoryBController extends Controller
         // Validate the incoming request
         $request->validate([
             'shift' => 'required|string|max:255',
+            'date' => 'required|date',
             'pic' => 'required|string|max:255',
         ]);
-
+    
+        // Check for existing data with the same date and shift
+        $existingHeader = FactbActualHeader::where('date', $request->date)
+                                           ->where('shift', $request->shift)
+                                           ->first();
+    
+        if ($existingHeader) {
+            return redirect()->back()->withInput()->withErrors(['error' => 'Daily Report for this date and shift already exists.']);
+        }
+    
         // Create a new instance of the FactbActualHeader model
         $header = new FactbActualHeader();
         $header->date = $request->date;
@@ -37,14 +47,15 @@ class FormFactoryBController extends Controller
         $header->pic = $request->pic;
         $header->revision = 0;
         $header->created_by = auth()->user()->name;
-
+    
         // Save the new FactbActualHeader record to the database
         $header->save();
-
+    
         // Redirect back or return a response as needed
         $encryptedId = encrypt($header->id);
         return redirect()->route('form.daily-report.factoryb', ['id' => $encryptedId])->with('status', 'Daily Report header created successfully.');
     }
+    
 
     public function formChecksheet($id) {
         $id = decrypt($id);
@@ -186,54 +197,54 @@ class FormFactoryBController extends Controller
 
 
     public function updateDetail($id)
-{
-    $id = decrypt($id);
+    {
+        $id = decrypt($id);
 
-    $header = FactbActualHeader::findOrFail($id);
-    $details = FactbActualDetail::where('header_id', $id)->get();
-    $productions = FactbActualFormProduction::whereIn('details_id', $details->pluck('id'))->get();
-    $notGoods = FactbActualFormNg::whereIn('production_id', $productions->pluck('id'))->get();
+        $header = FactbActualHeader::findOrFail($id);
+        $details = FactbActualDetail::where('header_id', $id)->get();
+        $productions = FactbActualFormProduction::whereIn('details_id', $details->pluck('id'))->get();
+        $notGoods = FactbActualFormNg::whereIn('production_id', $productions->pluck('id'))->get();
 
-    $formattedData = [];
-    foreach ($details as $detail) {
-        $shop = FactbMstShop::find($detail->shop_id);
-        $models = $productions->where('details_id', $detail->id);
+        $formattedData = [];
+        foreach ($details as $detail) {
+            $shop = FactbMstShop::find($detail->shop_id);
+            $models = $productions->where('details_id', $detail->id);
 
-        $shopData = [
-            'shop_name' => $shop->shop_name,
-            'manpower' => $detail->manpower,
-            'manpower_plan' => $detail->manpower_plan,
-            'working_hour' => $detail->working_hour,
-            'ot_hour' => $detail->ot_hour,
-            'ot_hour_plan' => $detail->ot_hour_plan,
-            'notes' => $detail->notes,
-            'photo_shop' => $detail->photo_shop,
-            'models' => [],
-        ];
-
-        foreach ($models as $model) {
-            $shopData['models'][] = [
-                'model_id' => $model->model_id,
-                'model_name' => FactbMstModel::where('id', $model->model_id)->value('model_name'),
-                'hour' => $model->hour,
-                'output8' => $model->output8,
-                'output2' => $model->output2,
-                'output1' => $model->output1,
-                'plan_prod' => $model->plan_prod,
-                'cabin' => $model->cabin,
-                'PPM' => $model->PPM,
-                'reject' => $notGoods->where('production_id', $model->id)->first()->reject ?? null,
-                'rework' => $notGoods->where('production_id', $model->id)->first()->rework ?? null,
-                'remarks' => $notGoods->where('production_id', $model->id)->first()->remarks ?? null,
-                'photo_ng' => $notGoods->where('production_id', $model->id)->first()->photo_ng ?? null,
+            $shopData = [
+                'shop_name' => $shop->shop_name,
+                'manpower' => $detail->manpower,
+                'manpower_plan' => $detail->manpower_plan,
+                'working_hour' => $detail->working_hour,
+                'ot_hour' => $detail->ot_hour,
+                'ot_hour_plan' => $detail->ot_hour_plan,
+                'notes' => $detail->notes,
+                'photo_shop' => $detail->photo_shop,
+                'models' => [],
             ];
+
+            foreach ($models as $model) {
+                $shopData['models'][] = [
+                    'model_id' => $model->model_id,
+                    'model_name' => FactbMstModel::where('id', $model->model_id)->value('model_name'),
+                    'hour' => $model->hour,
+                    'output8' => $model->output8,
+                    'output2' => $model->output2,
+                    'output1' => $model->output1,
+                    'plan_prod' => $model->plan_prod,
+                    'cabin' => $model->cabin,
+                    'PPM' => $model->PPM,
+                    'reject' => $notGoods->where('production_id', $model->id)->first()->reject ?? null,
+                    'rework' => $notGoods->where('production_id', $model->id)->first()->rework ?? null,
+                    'remarks' => $notGoods->where('production_id', $model->id)->first()->remarks ?? null,
+                    'photo_ng' => $notGoods->where('production_id', $model->id)->first()->photo_ng ?? null,
+                ];
+            }
+
+            $formattedData[] = $shopData;
         }
 
-        $formattedData[] = $shopData;
+        return view('daily-report.factoryb.update', compact('header', 'formattedData', 'id'));
     }
-
-    return view('daily-report.factoryb.update', compact('header', 'formattedData', 'id'));
-}
 
 
     public function updateForm(Request $request)

@@ -19,7 +19,21 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                    <form action="{{ url('/daily-report/factoryb/detail/store') }}" method="POST">
+                    <!--alert success -->
+                    @if (session('status'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>{{ session('status') }}</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    @if (session('failed'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>{{ session('failed') }}</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
+                    <form action="{{ url('/daily-report/welding/detail/store') }}" method="POST">
                         @csrf
                         <div class="row">
                             <div class="col-12">
@@ -59,11 +73,11 @@
                                                         <div class="form-group mt-4">
                                                             <div class="row">
                                                                 <div class="col-md-3 mb-3">
-                                                                    <label for="man_power_planning">Man Power Plan</label>
+                                                                    <label for="manpower_plan">Man Power Total Plan</label>
                                                                     <input type="decimal" name="manpower_plan[{{ $data['shop_name'] }}][]" class="form-control form-control-sm" style="width: 100px;" value="0" min="0">
                                                                 </div>
                                                                 <div class="col-md-3 mb-3">
-                                                                    <label for="man_power_actual">Man Power Actual</label>
+                                                                    <label for="manpower">Man Power Total Actual</label>
                                                                     <input type="decimal" name="manpower[{{ $data['shop_name'] }}][]" class="form-control form-control-sm" style="width: 100px;" value="0" min="0">
                                                                 </div>
                                                                 <div class="col-md-3 mb-3">
@@ -93,21 +107,26 @@
                                                                     <table class="table table-bordered table-striped">
                                                                         <thead>
                                                                             <tr>
-                                                                                <th style="width: 100px;">Model</th>
-                                                                                <th style="width: 550px;">Production</th>
+                                                                                <th>Station</th>
+                                                                                <th>Manpower</th>
+                                                                                <th>Model</th>
+                                                                                <th>Production</th>
                                                                                 <th>NG</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
-                                                                            @foreach($formattedData as $model)
-                                                                                @if ($model['shop_name'] === $data['shop_name'])
+                                                                            @foreach($data['stations'] as $station)
+                                                                                <tr>
+                                                                                    <td style="width: 50px;" rowspan="{{ count($station['models']) + 1 }}">{{ $station['station_name'] }}</td>
+                                                                                    <td style="width: 75px;" rowspan="{{ count($station['models']) + 1 }}">
+                                                                                        <input type="decimal" name="manpower_station[{{ $station['station_name'] }}]" class="form-control form-control-sm" value="0" min="0">
+                                                                                    </td>
+                                                                                </tr>
+                                                                                @foreach($station['models'] as $model)
                                                                                     <tr>
-                                                                                        <input type="hidden" name="model[]" value="{{ $model['model_name'] }}">
-                                                                                        <input type="hidden" name="shopAll[]" value="{{ $model['shop_name'] }}">
-                                                                                        <td class="text-center">{{ $model['model_name'] }}
-                                                                                        </td>
+                                                                                        <td style="width: 100px;" class="text-center">{{ $model['model_name'] }}</td>
                                                                                         <td>
-                                                                                            <div style="width: 540px;" class="row">
+                                                                                            <div style="width: 400px;" class="row">
                                                                                                 <div class="col-md-4">
                                                                                                     <label>Hour Prod</label>
                                                                                                     <input type="decimal" name="production[{{ $model['model_name'] }}][hour][]" class="form-control form-control-sm" style="width: 80px;" value="0" min="0">
@@ -124,7 +143,7 @@
                                                                                                     <label>Output 2</label>
                                                                                                     <input type="number" name="production[{{ $model['model_name'] }}][output2][]" class="form-control form-control-sm" style="width: 80px;" value="0" min="0">
                                                                                                 </div>
-                                                                                                <div class="col-md-4">
+                                                                                                <div class="col-md-3">
                                                                                                     <label>Output 1</label>
                                                                                                     <input type="number" name="production[{{ $model['model_name'] }}][output1][]" class="form-control form-control-sm" style="width: 80px;" value="0" min="0">
                                                                                                 </div>
@@ -139,7 +158,7 @@
                                                                                             </div>
                                                                                         </td>
                                                                                         <td>
-                                                                                            <div class="row">
+                                                                                            <div style="width: 400px;" class="row">
                                                                                                 <div class="col-md-4">
                                                                                                     <label>Reject</label>
                                                                                                     <input type="number" name="production[{{ $model['model_name'] }}][reject][]" class="form-control form-control-sm" style="width: 80px;" value="0" min="0">
@@ -159,7 +178,7 @@
                                                                                             </div>
                                                                                         </td>
                                                                                     </tr>
-                                                                                @endif
+                                                                                @endforeach
                                                                             @endforeach
                                                                         </tbody>
                                                                     </table>

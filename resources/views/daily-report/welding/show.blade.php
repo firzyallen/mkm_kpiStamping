@@ -94,72 +94,78 @@
                                                                     <table class="table table-bordered table-striped">
                                                                         <thead>
                                                                             <tr>
-                                                                                <th style="width: 100px;">Model</th>
-                                                                                <th style="width: 550px;">Production</th>
+                                                                                <th>Station</th>
+                                                                                <th>Manpower</th>
+                                                                                <th>Model</th>
+                                                                                <th>Production</th>
                                                                                 <th>NG</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
-                                                                            @foreach($data['models'] as $model)
+                                                                            @foreach($data['stations'] as $station)
                                                                                 <tr>
-                                                                                    <input readonly type="hidden" name="model[]" value="{{ $model['model_id'] }}">
-                                                                                    <input readonly type="hidden" name="shopAll[]" value="{{ $data['shop_name'] }}">
-                                                                                    <td class="text-center">{{ $model['model_name'] }}
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <div style="width: 540px;" class="row">
-                                                                                            <div class="col-md-4">
-                                                                                                <label>Hour Prod</label>
-                                                                                                <input readonly type="decimal" name="production[{{ $model['model_name'] }}][hour][]" class="form-control form-control-sm" style="width: 80px;" value="{{ number_format($model['hour'], 2) }}" min="0">
-                                                                                            </div>
-                                                                                            <div class="col-md-8">
-                                                                                                <label>Plan Prod</label>
-                                                                                                <input readonly type="number" name="production[{{ $model['model_name'] }}][plan_prod][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['plan_prod'] }}" min="0">
-                                                                                            </div>
-                                                                                            <div class="col-md-4">
-                                                                                                <label>Output 8</label>
-                                                                                                <input readonly type="number" name="production[{{ $model['model_name'] }}][output8][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['output8'] }}" min="0">
-                                                                                            </div>
-                                                                                            <div class="col-md-4">
-                                                                                                <label>Output 2</label>
-                                                                                                <input readonly type="number" name="production[{{ $model['model_name'] }}][output2][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['output2'] }}" min="0">
-                                                                                            </div>
-                                                                                            <div class="col-md-4">
-                                                                                                <label>Output 1</label>
-                                                                                                <input readonly type="number" name="production[{{ $model['model_name'] }}][output1][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['output1'] }}" min="0">
-                                                                                            </div>
-                                                                                            <div class="col-md-4">
-                                                                                                <label>Cabin</label>
-                                                                                                <input readonly type="number" name="production[{{ $model['model_name'] }}][cabin][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['cabin'] }}" min="0">
-                                                                                            </div>
-                                                                                            <div class="col-md-4">
-                                                                                                <label>PPM</label>
-                                                                                                <input readonly type="number" name="production[{{ $model['model_name'] }}][PPM][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['PPM'] }}" min="0">
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </td>
-
-                                                                                    <td>
-                                                                                        <div class="row">
-                                                                                            <div class="col-md-4">
-                                                                                                <label>Reject</label>
-                                                                                                <input readonly type="number" name="production[{{ $model['model_name'] }}][reject][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['reject'] }}" min="0">
-                                                                                            </div>
-                                                                                            <div class="col-md-4">
-                                                                                                <label>Rework</label>
-                                                                                                <input readonly type="number" name="production[{{ $model['model_name'] }}][rework][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['rework'] }}" min="0">
-                                                                                            </div>
-                                                                                            <div class="col-md-4">
-                                                                                                <label>Remarks</label>
-                                                                                                <textarea readonly name="production[{{ $model['model_name'] }}][remarks][]" class="form-control form-control-sm" rows="2">{{ $model['remarks'] }}</textarea>
-                                                                                            </div>
-                                                                                            <div class="col-md-8">
-                                                                                                <label>Photo</label>
-                                                                                                <input readonly type="file" name="photo_ng[{{ $model['model_name'] }}][]" class="form-control form-control-sm" disabled>
-                                                                                            </div>
-                                                                                        </div>
+                                                                                    <td style="width: 50px;" rowspan="{{ count($station['models']) + 1 }}">{{ $station['station_name'] }}</td>
+                                                                                    <td style="width: 75px;" rowspan="{{ count($station['models']) + 1 }}">
+                                                                                        <input readonly type="decimal" name="manpower_station[{{ $station['station_name'] }}]" class="form-control form-control-sm" value="{{ $station['manpower_station'] }}" min="0">
                                                                                     </td>
                                                                                 </tr>
+                                                                                @foreach($station['models'] as $model)
+                                                                                    <tr>
+                                                                                        <td style="width: 100px;" class="text-center">{{ $model['model_name'] }}</td>
+                                                                                        <td>
+                                                                                            <div style="width: 400px;" class="row">
+                                                                                                <div class="col-md-4">
+                                                                                                    <label>Hour Prod</label>
+                                                                                                    <input readonly type="decimal" name="production[{{ $model['model_name'] }}][hour][]" class="form-control form-control-sm" style="width: 80px;" value="{{ number_format($model['hour'], 2) }}" min="0">
+                                                                                                </div>
+                                                                                                <div class="col-md-8">
+                                                                                                    <label>Plan Production</label>
+                                                                                                    <input readonly type="number" name="production[{{ $model['model_name'] }}][plan_prod][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['plan_prod'] }}" min="0">
+                                                                                                </div>
+                                                                                                <div class="col-md-4">
+                                                                                                    <label>Output 8</label>
+                                                                                                    <input readonly type="number" name="production[{{ $model['model_name'] }}][output8][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['output8'] }}" min="0">
+                                                                                                </div>
+                                                                                                <div class="col-md-4">
+                                                                                                    <label>Output 2</label>
+                                                                                                    <input readonly type="number" name="production[{{ $model['model_name'] }}][output2][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['output2'] }}" min="0">
+                                                                                                </div>
+                                                                                                <div class="col-md-3">
+                                                                                                    <label>Output 1</label>
+                                                                                                    <input readonly type="number" name="production[{{ $model['model_name'] }}][output1][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['output1'] }}" min="0">
+                                                                                                </div>
+                                                                                                <div class="col-md-4">
+                                                                                                    <label>Cabin</label>
+                                                                                                    <input readonly type="number" name="production[{{ $model['model_name'] }}][cabin][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['cabin'] }}" min="0">
+                                                                                                </div>
+                                                                                                <div class="col-md-4">
+                                                                                                    <label>PPM</label>
+                                                                                                    <input readonly type="number" name="production[{{ $model['model_name'] }}][PPM][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['PPM'] }}" min="0">
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <div style="width: 400px;" class="row">
+                                                                                                <div class="col-md-4">
+                                                                                                    <label>Reject</label>
+                                                                                                    <input readonly type="number" name="production[{{ $model['model_name'] }}][reject][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['reject'] }}" min="0">
+                                                                                                </div>
+                                                                                                <div class="col-md-4">
+                                                                                                    <label>Rework</label>
+                                                                                                    <input readonly type="number" name="production[{{ $model['model_name'] }}][rework][]" class="form-control form-control-sm" style="width: 80px;" value="{{ $model['rework'] }}" min="0">
+                                                                                                </div>
+                                                                                                <div class="col-md-4">
+                                                                                                    <label>Remarks</label>
+                                                                                                    <textarea readonly name="production[{{ $model['model_name'] }}][remarks][]" class="form-control form-control-sm" rows="2">{{ $model['remarks'] }}</textarea>
+                                                                                                </div>
+                                                                                                <div class="col-md-8">
+                                                                                                    <label>Photo</label>
+                                                                                                    <input readonly type="file" name="photo_ng[{{ $model['model_name'] }}][]" class="form-control form-control-sm" disabled>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                @endforeach
                                                                             @endforeach
                                                                         </tbody>
                                                                     </table>
