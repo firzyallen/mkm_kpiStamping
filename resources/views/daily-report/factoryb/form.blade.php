@@ -19,7 +19,7 @@
             <!-- Main content -->
             <section class="content">
                 <div class="container-fluid">
-                    <form action="{{ url('/daily-report/factoryb/detail/store') }}" method="POST">
+                    <form action="{{ url('/daily-report/factoryb/detail/store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-12">

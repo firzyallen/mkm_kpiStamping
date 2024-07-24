@@ -33,7 +33,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
-                    <form action="{{ url('/daily-report/welding/detail/store') }}" method="POST">
+                    <form action="{{ url('/daily-report/welding/detail/store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="col-12">

@@ -83,6 +83,14 @@ class FormFactoryBController extends Controller
     
             // Insert data into factb_actual_details table
             foreach ($request->shop as $shop) {
+                $imgPath = null;
+                if ($request->hasFile("photo_shop.$shop.0")) {
+                    $file = $request->file("photo_shop.$shop.0");
+                    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                    $destinationPath = public_path('assets/img/photo_shop/factoryb/shop/');
+                    $file->move($destinationPath, $fileName);
+                    $imgPath = 'assets/img/photo_shop/factoryb/shop/' . $fileName;
+                }
                 $shopId = FactbMstShop::where('shop_name', $shop)->value('id');
     
                 $detail = FactbActualDetail::create([
@@ -94,7 +102,7 @@ class FormFactoryBController extends Controller
                     'ot_hour' => $request->ot_hour[$shop][0],
                     'ot_hour_plan' => $request->ot_hour_plan[$shop][0],
                     'notes' => $request->notes[$shop][0] ?? null,
-                    'photo_shop' => $request->photo_shop[$shop][0] ?? null,
+                    'photo_shop' => $imgPath,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -103,6 +111,14 @@ class FormFactoryBController extends Controller
     
                 // Insert data into factb_actual_form_productions table for each model in the shop
                 foreach ($request->production as $modelName => $production) {
+                    $imgPathNG = null;
+                        if ($request->hasFile("photo_ng.$modelName.0")) {
+                            $file = $request->file("photo_ng.$modelName.0");
+                            $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                            $destinationPath = public_path('assets/img/photo_shop/factoryb/ng/');
+                            $file->move($destinationPath, $fileName);
+                            $imgPathNG = 'assets/img/photo_shop/factoryb/ng/' . $fileName;
+                        }
                     $modelId = FactbMstModel::where('model_name', $modelName)->value('id');
                     $modelShopId = FactbMstModel::where('model_name', $modelName)->value('shop_id');
                     if ($modelShopId == $shopId) {
@@ -137,7 +153,7 @@ class FormFactoryBController extends Controller
                             'reject' => $production['reject'][0] ?? null,
                             'rework' => $production['rework'][0] ?? null,
                             'remarks' => $production['remarks'][0] ?? null,
-                            'photo_ng' => $production['photo_ng'][0] ?? null,
+                            'photo_ng' => $imgPathNG,
                             'created_at' => now(),
                             'updated_at' => now(),
                         ]);
@@ -265,6 +281,14 @@ class FormFactoryBController extends Controller
 
             // Update factb_actual_details
             foreach ($request->shop as $shop) {
+                $imgPath = null;
+                if ($request->hasFile("photo_shop.$shop.0")) {
+                    $file = $request->file("photo_shop.$shop.0");
+                    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                    $destinationPath = public_path('assets/img/photo_shop/factoryb/shop/');
+                    $file->move($destinationPath, $fileName);
+                    $imgPath = 'assets/img/photo_shop/factoryb/shop/' . $fileName;
+                }
                 $shopId = FactbMstShop::where('shop_name', $shop)->value('id');
 
                 $detail = FactbActualDetail::where('header_id', $headerId)->where('shop_id', $shopId)->first();
@@ -277,7 +301,7 @@ class FormFactoryBController extends Controller
                         'ot_hour' => $request->ot_hour[$shop][0],
                         'ot_hour_plan' => $request->ot_hour_plan[$shop][0],
                         'notes' => $request->notes[$shop][0] ?? null,
-                        'photo_shop' => $request->photo_shop[$shop][0] ?? null,
+                        'photo_shop' => $imgPath,
                         'updated_at' => now(),
                     ]);
                 } else {
@@ -290,7 +314,7 @@ class FormFactoryBController extends Controller
                         'ot_hour' => $request->ot_hour[$shop][0],
                         'ot_hour_plan' => $request->ot_hour_plan[$shop][0],
                         'notes' => $request->notes[$shop][0] ?? null,
-                        'photo_shop' => $request->photo_shop[$shop][0] ?? null,
+                        'photo_shop' => $imgPath,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
@@ -343,6 +367,14 @@ class FormFactoryBController extends Controller
                         $totalProd = ($production['output8'][0] ?? 0) + ($production['output2'][0] ?? 0) + ($production['output1'][0] ?? 0);
 
                         // Update factb_actual_form_ngs
+                        $imgPathNG = null;
+                        if ($request->hasFile("photo_ng.$modelName.0")) {
+                            $file = $request->file("photo_ng.$modelName.0");
+                            $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                            $destinationPath = public_path('assets/img/photo_shop/factoryb/ng/');
+                            $file->move($destinationPath, $fileName);
+                            $imgPathNG = 'assets/img/photo_shop/factoryb/ng/' . $fileName;
+                        }
                         $ng = $request->production[$modelName];
                         $ngRecord = FactbActualFormNg::where('production_id', $productionRecord->id)->first();
                         
@@ -352,7 +384,7 @@ class FormFactoryBController extends Controller
                                 'reject' => $ng['reject'][0] ?? null,
                                 'rework' => $ng['rework'][0] ?? null,
                                 'remarks' => $ng['remarks'][0] ?? null,
-                                'photo_ng' => $ng['photo_ng'][0] ?? null,
+                                'photo_ng' => $imgPathNG,
                                 'updated_at' => now(),
                             ]);
                         } else {
@@ -363,7 +395,7 @@ class FormFactoryBController extends Controller
                                 'reject' => $ng['reject'][0] ?? null,
                                 'rework' => $ng['rework'][0] ?? null,
                                 'remarks' => $ng['remarks'][0] ?? null,
-                                'photo_ng' => $ng['photo_ng'][0] ?? null,
+                                'photo_ng' => $imgPathNG,
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ]);

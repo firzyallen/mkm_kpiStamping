@@ -102,6 +102,14 @@ class FormWeldingController extends Controller
 
             // Insert data into welding_actual_details table
             foreach ($request->shop as $shop) {
+                $imgPath = null;
+                if ($request->hasFile("photo_shop.$shop.0")) {
+                    $file = $request->file("photo_shop.$shop.0");
+                    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                    $destinationPath = public_path('assets/img/photo_shop/welding/shop/');
+                    $file->move($destinationPath, $fileName);
+                    $imgPath = 'assets/img/photo_shop/welding/shop/' . $fileName;
+                }
                 $shopId = WeldingMstShop::where('shop_name', $shop)->value('id');
 
                 $detail = WeldingActualDetail::create([
@@ -113,7 +121,7 @@ class FormWeldingController extends Controller
                     'ot_hour' => $request->ot_hour[$shop][0] ?? 0,
                     'ot_hour_plan' => $request->ot_hour_plan[$shop][0] ?? 0,
                     'notes' => $request->notes[$shop][0] ?? null,
-                    'photo_shop' => $request->photo_shop[$shop][0] ?? null,
+                    'photo_shop' => $imgPath,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -146,6 +154,7 @@ class FormWeldingController extends Controller
                     }
 
                     foreach ($request->production as $modelName => $production) {
+
                         $output8 = $production['output8'][0] ?? 0;
                         $output2 = $production['output2'][0] ?? 0;
                         $output1 = $production['output1'][0] ?? 0;
@@ -174,13 +183,21 @@ class FormWeldingController extends Controller
                             ]);
 
                             // Insert NG data into welding_actual_form_ngs table
+                            $imgPathNG = null;
+                            if ($request->hasFile("photo_ng.$modelName.0")) {
+                                $file = $request->file("photo_ng.$modelName.0");
+                                $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                                $destinationPath = public_path('assets/img/photo_shop/welding/ng/');
+                                $file->move($destinationPath, $fileName);
+                                $imgPathNG = 'assets/img/photo_shop/welding/ng/' . $fileName;
+                            }
                             WeldingActualFormNg::create([
                                 'production_id' => $productionRecord->id,
                                 'total_prod' => ($production['output8'][0] ?? 0) + ($production['output2'][0] ?? 0) + ($production['output1'][0] ?? 0),
                                 'reject' => $production['reject'][0] ?? null,
                                 'rework' => $production['rework'][0] ?? null,
                                 'remarks' => $production['remarks'][0] ?? null,
-                                'photo_ng' => $request->photo_ng[$modelName][0] ?? null,
+                                'photo_ng' => $imgPathNG,
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ]);
@@ -193,6 +210,7 @@ class FormWeldingController extends Controller
             return redirect('/daily-report/welding')->with('status', 'Daily report data saved successfully.');
         } catch (\Exception $e) {
             DB::rollBack();
+            dd($e->getMessage());
             return redirect()->back()->withInput()->withErrors(['failed' => 'Failed to save daily report data. Please try again. Error: ' . $e->getMessage()]);
         }
     }
@@ -334,6 +352,14 @@ class FormWeldingController extends Controller
 
             // Update welding_actual_details
             foreach ($request->shop as $shop) {
+                $imgPath = null;
+                if ($request->hasFile("photo_shop.$shop.0")) {
+                    $file = $request->file("photo_shop.$shop.0");
+                    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                    $destinationPath = public_path('assets/img/photo_shop/welding/shop/');
+                    $file->move($destinationPath, $fileName);
+                    $imgPath = 'assets/img/photo_shop/welding/shop/' . $fileName;
+                }
                 $shopId = WeldingMstShop::where('shop_name', $shop)->value('id');
 
                 $detail = WeldingActualDetail::where('header_id', $headerId)->where('shop_id', $shopId)->first();
@@ -346,7 +372,7 @@ class FormWeldingController extends Controller
                         'ot_hour' => $request->ot_hour[$shop][0],
                         'ot_hour_plan' => $request->ot_hour_plan[$shop][0],
                         'notes' => $request->notes[$shop][0] ?? null,
-                        'photo_shop' => $request->photo_shop[$shop][0] ?? null,
+                        'photo_shop' => $imgPath,
                         'updated_at' => now(),
                     ]);
                 } else {
@@ -359,7 +385,7 @@ class FormWeldingController extends Controller
                         'ot_hour' => $request->ot_hour[$shop][0],
                         'ot_hour_plan' => $request->ot_hour_plan[$shop][0],
                         'notes' => $request->notes[$shop][0] ?? null,
-                        'photo_shop' => $request->photo_shop[$shop][0] ?? null,
+                        'photo_shop' => $imgPath,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ]);
@@ -432,7 +458,14 @@ class FormWeldingController extends Controller
                                     'updated_at' => now(),
                                 ]);
                             }
-
+                            $imgPathNG = null;
+                            if ($request->hasFile("photo_ng.$modelName.0")) {
+                                $file = $request->file("photo_ng.$modelName.0");
+                                $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                                $destinationPath = public_path('assets/img/photo_shop/welding/ng/');
+                                $file->move($destinationPath, $fileName);
+                                $imgPathNG = 'assets/img/photo_shop/welding/ng/' . $fileName;
+                            }
                             $ng = $request->production[$modelName];
                             $ngRecord = WeldingActualFormNg::where('production_id', $productionRecord->id)->first();
                             
@@ -444,7 +477,7 @@ class FormWeldingController extends Controller
                                     'reject' => $ng['reject'][0] ?? null,
                                     'rework' => $ng['rework'][0] ?? null,
                                     'remarks' => $ng['remarks'][0] ?? null,
-                                    'photo_ng' => $ng['photo_ng'][0] ?? null,
+                                    'photo_ng' => $imgPathNG,
                                     'updated_at' => now(),
                                 ]);
                             } else {
@@ -455,7 +488,7 @@ class FormWeldingController extends Controller
                                     'reject' => $ng['reject'][0] ?? null,
                                     'rework' => $ng['rework'][0] ?? null,
                                     'remarks' => $ng['remarks'][0] ?? null,
-                                    'photo_ng' => $ng['photo_ng'][0] ?? null,
+                                    'photo_ng' => $imgPathNG,
                                     'created_at' => now(),
                                     'updated_at' => now(),
                                 ]);
