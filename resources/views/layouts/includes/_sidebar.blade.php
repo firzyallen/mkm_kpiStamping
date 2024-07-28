@@ -27,23 +27,10 @@
                     </nav>
                 </div>
                 <!-- Downtime Report Section -->
-                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseDowntimeReport" aria-expanded="false" aria-controls="collapseDowntimeReport">
+                <a class="nav-link" href="{{ url('/downtime-report') }}">
                     <div class="nav-link-icon"><i class="fas fa-clock"></i></div>
-                    Downtime Report 
-                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    Downtime Report
                 </a>
-                <div class="collapse" id="collapseDowntimeReport" data-bs-parent="#accordionSidenav">
-                    <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ url('/downtime-report/press') }}">Press</a>
-                    </nav>
-                    <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ url('/downtime-report/welding') }}">Welding</a>
-                    </nav>
-                    <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ url('/downtime-report/factory') }}">Factory B</a>
-                    </nav>
-                </div>
-
                 <!-- Sidenav Menu Heading (View)-->
                 <div class="sidenav-menu-heading">View</div>
                 <!-- Sidenav Accordion (View)-->
@@ -70,8 +57,8 @@
                 </a>
                 <div class="collapse" id="collapsePressMaster" data-bs-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ url('/press/shop') }}">Shop</a>
-                        <a class="nav-link" href="{{ url('/press/model') }}">Model</a>
+                        <a class="nav-link" href="{{ url('/masterpress/shop') }}">Shop</a>
+                        <a class="nav-link" href="{{ url('/masterpress/model') }}">Model</a>
                     </nav>
                 </div>
                 <!-- Welding Master Section -->
@@ -107,11 +94,10 @@
                 </a>
                 <div class="collapse" id="collapseDowntimeMaster" data-bs-parent="#accordionSidenav">
                     <nav class="sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ url('/downtime-master/press') }}">Press</a>
-                        <a class="nav-link" href="{{ url('/downtime-master/welding') }}">Welding</a>
-                        <a class="nav-link" href="{{ url('/downtime-master/factoryb') }}">Factory B</a>
+                        <a class="nav-link" href="{{ url('/masterdowntime') }}">Machines</a>
                     </nav>
                 </div>
+
                 @if(\Auth::user()->role === 'IT')
                 <!-- Sidenav Menu Heading (Configuration)-->
                 <div class="sidenav-menu-heading">Configuration</div>
