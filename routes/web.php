@@ -12,6 +12,10 @@ use App\Http\Controllers\MstPressController;
 use App\Http\Controllers\MstDowntimeController;
 use App\Http\Controllers\DowntimeFormController;
 
+use App\Http\Controllers\MstFactoryBController;
+use App\Http\Controllers\MstWeldingController;
+use App\Http\Controllers\FormFactoryBController;
+use App\Http\Controllers\FormWeldingController;
 
 
 /*
@@ -32,7 +36,6 @@ Route::get('/logout', [AuthController::class, 'logout']);
 Route::middleware(['auth'])->group(function () {
     //Home Controller
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-
 
     //Dropdown Controller
     Route::get('/dropdown', [DropdownController::class, 'index'])->middleware(['checkRole:IT']);
@@ -62,6 +65,23 @@ Route::middleware(['auth'])->group(function () {
 
     //Daily Report Press
 
+    //Factory B Form
+    Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
+    Route::post('/daily-report/factoryb/store/main', [FormFactoryBController::class, 'storeMain'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/factoryb/form/{id}', [FormFactoryBController::class, 'formChecksheet'])->middleware(['checkRole:IT'])->name('form.daily-report.factoryb');
+    Route::post('/daily-report/factoryb/detail/store', [FormFactoryBController::class, 'storeForm'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/factoryb/detail/{id}', [FormFactoryBController::class, 'showDetail'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/factoryb/update/{id}', [FormFactoryBController::class, 'updateDetail'])->middleware(['checkRole:IT']);
+    Route::post('/daily-report/factoryb/detail/update', [FormFactoryBController::class, 'updateForm'])->middleware(['checkRole:IT']);
+
+    //Welding Form
+    Route::get('/daily-report/welding', [FormWeldingController::class, 'index'])->middleware(['checkRole:IT']);
+    Route::post('/daily-report/welding/store/main', [FormWeldingController::class, 'storeMain'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/welding/form/{id}', [FormWeldingController::class, 'formChecksheet'])->middleware(['checkRole:IT'])->name('form.daily-report.welding');
+    Route::post('/daily-report/welding/detail/store', [FormWeldingController::class, 'storeForm'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/welding/detail/{id}', [FormWeldingController::class, 'showDetail'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/welding/update/{id}', [FormWeldingController::class, 'updateDetail'])->middleware(['checkRole:IT']);
+    Route::post('/daily-report/welding/detail/update', [FormWeldingController::class, 'updateForm'])->middleware(['checkRole:IT']);
 
     //Daily Report Factory B
 
@@ -100,5 +120,22 @@ Route::middleware(['auth'])->group(function () {
 
     //Master Welding
 
+    //Master Factory B
+    Route::get('factoryb/shop', [MstFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
+    Route::post('factoryb/shop/store', [MstFactoryBController::class, 'store'])->middleware(['checkRole:IT']);
+    Route::patch('factoryb/shop/update', [MstFactoryBController::class, 'update'])->middleware(['checkRole:IT']);
+    Route::get('factoryb/model', [MstFactoryBController::class, 'indexModel'])->middleware(['checkRole:IT']);
+    Route::post('factoryb/model/store', [MstFactoryBController::class, 'storeModel'])->middleware(['checkRole:IT']);
+    Route::patch('factoryb/model/update', [MstFactoryBController::class, 'updateModel'])->middleware(['checkRole:IT']);
 
+    //Master Welding
+    Route::get('welding/shop', [MstWeldingController::class, 'indexShop'])->middleware(['checkRole:IT']);
+    Route::post('welding/shop/store', [MstWeldingController::class, 'storeShop'])->middleware(['checkRole:IT']);
+    Route::patch('welding/shop/update', [MstWeldingController::class, 'updateShop'])->middleware(['checkRole:IT']);
+    Route::get('welding/station', [MstWeldingController::class, 'indexStation'])->middleware(['checkRole:IT']);
+    Route::post('welding/station/store', [MstWeldingController::class, 'storeStation'])->middleware(['checkRole:IT']);
+    Route::patch('welding/station/update', [MstWeldingController::class, 'updateStation'])->middleware(['checkRole:IT']);
+    Route::get('welding/model', [MstWeldingController::class, 'indexModel'])->middleware(['checkRole:IT']);
+    Route::post('welding/model/store', [MstWeldingController::class, 'storeModel'])->middleware(['checkRole:IT']);
+    Route::patch('welding/model/update', [MstWeldingController::class, 'updateModel'])->middleware(['checkRole:IT']);
 });
