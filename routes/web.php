@@ -12,6 +12,7 @@ use App\Http\Controllers\MstFactoryBController;
 use App\Http\Controllers\MstWeldingController;
 use App\Http\Controllers\FormFactoryBController;
 use App\Http\Controllers\FormWeldingController;
+use App\Http\Controllers\FactoryBKPIController;
 
 
 /*
@@ -61,8 +62,8 @@ Route::middleware(['auth'])->group(function () {
      Route::patch('daily-report/press/update/{id}', [PressController::class, 'update'])->middleware(['checkRole:IT']);
      Route::delete('daily-report/press/delete/{id}', [PressController::class, 'delete'])->middleware(['checkRole:IT']);
 
-     //Welding
-
+     //KPI Monitoring
+     Route::get('kpi-monitoring/factoryb', [FactoryBKPIController::class, 'index'])->middleware(['checkRole:IT']);
      //Factory B Form
      Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
      Route::post('/daily-report/factoryb/store/main', [FormFactoryBController::class, 'storeMain'])->middleware(['checkRole:IT']);
