@@ -58,50 +58,91 @@
                                             <div class="col-md-6 mb-4">
                                                 <div class="card card-custom">
                                                     <div class="card-header pt-2">
-                                                        <h3>HPU</h3>
+                                                        <h3>HPU (Green if: ≤ STD) 
+                                                            @php
+                                                                $statusClass = '';
+                                                                $statusText = '';
+                                                                switch ($kpiStatuses[$shop->shop_name]['hpu']) {
+                                                                    case 'green':
+                                                                        $statusClass = 'signal green';
+                                                                        $statusText = 'G';
+                                                                        break;
+                                                                    case 'red':
+                                                                        $statusClass = 'signal red';
+                                                                        $statusText = 'R';
+                                                                        break;
+                                                                    case 'grey':
+                                                                        $statusClass = 'signal grey';
+                                                                        $statusText = 'N/A';
+                                                                        break;
+                                                                }
+                                                            @endphp
+                                                            <span class="{{ $statusClass }}">{{ $statusText }}</span>
+                                                        </h3>
                                                     </div>
                                                     <div class="card-body">
-                                                        <canvas id="barChartHpu-{{ $shop->id }}"></canvas>
-                                                        <script>
-                                                            var ctxHpu = document.getElementById('barChartHpu-{{ $shop->id }}').getContext('2d');
-                                                            var hpuChart = new Chart(ctxHpu, {
-                                                                type: 'bar',
-                                                                data: {
-                                                                    labels: @json($kpiData[$shop->shop_name]['hpu']->pluck('formatted_date')),
-                                                                    datasets: [
-                                                                        {
-                                                                            label: 'Actual',
-                                                                            data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
-                                                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                                            borderColor: 'rgba(75, 192, 192, 1)',
-                                                                            borderWidth: 1
-                                                                        },
-                                                                        {
-                                                                            label: 'Plan',
-                                                                            data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
-                                                                            type: 'line',
-                                                                            borderColor: 'rgba(255, 99, 132, 1)',
-                                                                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                                            fill: false,
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                options: {
-                                                                    scales: {
-                                                                        y: {
-                                                                            beginAtZero: true
+                                                        <div class="row">
+                                                            <canvas id="barChartHpu-{{ $shop->id }}"></canvas>
+                                                            <script>
+                                                                var ctxHpu = document.getElementById('barChartHpu-{{ $shop->id }}').getContext('2d');
+                                                                var hpuChart = new Chart(ctxHpu, {
+                                                                    type: 'bar',
+                                                                    data: {
+                                                                        labels: @json($kpiData[$shop->shop_name]['hpu']->pluck('formatted_date')),
+                                                                        datasets: [
+                                                                            {
+                                                                                label: 'Actual',
+                                                                                data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
+                                                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                                                borderColor: 'rgba(75, 192, 192, 1)',
+                                                                                borderWidth: 1
+                                                                            },
+                                                                            {
+                                                                                label: 'Plan',
+                                                                                data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
+                                                                                type: 'line',
+                                                                                borderColor: 'rgba(255, 99, 132, 1)',
+                                                                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                                                fill: false,
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    options: {
+                                                                        scales: {
+                                                                            y: {
+                                                                                beginAtZero: true
+                                                                            }
                                                                         }
                                                                     }
-                                                                }
-                                                            });
-                                                        </script>
+                                                                });
+                                                            </script>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 mb-4">
                                                 <div class="card card-custom">
                                                     <div class="card-header pt-2">
-                                                        <h3>OTDP</h3>
+                                                        <h3>OTDP (Green if: ≥ {{$kpiData[$shop->shop_name]['otdp'][0]->OTDP_Plan}}) 
+                                                            @php
+                                                                $statusClass = '';
+                                                                $statusText = '';
+                                                                switch ($kpiStatuses[$shop->shop_name]['otdp']) {
+                                                                    case 'green':
+                                                                        $statusClass = 'signal green';
+                                                                        $statusText = 'G';
+                                                                        break;
+                                                                    case 'red':
+                                                                        $statusClass = 'signal red';
+                                                                        $statusText = 'R';
+                                                                        break;
+                                                                    case 'grey':
+                                                                        $statusClass = 'signal grey';
+                                                                        $statusText = 'N/A';
+                                                                        break;
+                                                                }
+                                                            @endphp
+                                                            <span class="{{ $statusClass }}">{{ $statusText }}</span></h3>
                                                     </div>
                                                     <div class="card-body">
                                                         <canvas id="barChartOtdp-{{ $shop->id }}"></canvas>
@@ -144,7 +185,26 @@
                                             <div class="col-md-6 mb-4">
                                                 <div class="card card-custom">
                                                     <div class="card-header pt-2">
-                                                        <h3>FTT</h3>
+                                                        <h3>FTT (Green if: ≥ {{$kpiData[$shop->shop_name]['ftt'][0]->FTT_Plan}}) 
+                                                            @php
+                                                                $statusClass = '';
+                                                                $statusText = '';
+                                                                switch ($kpiStatuses[$shop->shop_name]['ftt']) {
+                                                                    case 'green':
+                                                                        $statusClass = 'signal green';
+                                                                        $statusText = 'G';
+                                                                        break;
+                                                                    case 'red':
+                                                                        $statusClass = 'signal red';
+                                                                        $statusText = 'R';
+                                                                        break;
+                                                                    case 'grey':
+                                                                        $statusClass = 'signal grey';
+                                                                        $statusText = 'N/A';
+                                                                        break;
+                                                                }
+                                                            @endphp
+                                                            <span class="{{ $statusClass }}">{{ $statusText }}</span></h3>
                                                     </div>
                                                     <div class="card-body">
                                                         <canvas id="barChartFtt-{{ $shop->id }}"></canvas>
@@ -175,7 +235,33 @@
                                                                 options: {
                                                                     scales: {
                                                                         y: {
-                                                                            beginAtZero: true
+                                                                            
+                                                                            ticks: {
+                                                                                beginAtZero: true,
+                                                                                steps: 10,
+                                                                                stepSize: 10,
+                                                                                max: 100
+                                                                            },
+                                                                            title: {
+                                                                                display: true,
+                                                                                text: 'FTT'
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    plugins: {
+                                                                        tooltip: {
+                                                                            callbacks: {
+                                                                                title: function(tooltipItem) {
+                                                                                    return tooltipItem[0].label;
+                                                                                },
+                                                                                label: function(context) {
+                                                                                    if (context.dataset.label === 'Actual') {
+                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                                                    } else {
+                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                                                    }
+                                                                                }
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -381,6 +467,18 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="start_date">Status Start Date</label>
+                                            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ $startDate ?? now()->startOfMonth()->format('Y-m-d') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="end_date"> Status End Date</label>
+                                            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ $endDate ?? now()->endOfMonth()->format('Y-m-d') }}">
+                                        </div>
+                                    </div>
                                     <div class="col-12 mt-3">
                                         <button type="submit" class="btn btn-primary">Apply</button>
                                     </div>
@@ -416,6 +514,53 @@
                         #settingsCardHeader {
                             cursor: pointer;
                         }
+
+                        h3 {
+                            font-size: 20px;
+                        }
+
+                        .signal {
+                            display: inline-block;
+                            width: 25px; /* Reduced width */
+                            height: 25px; /* Reduced height */
+                            border-radius: 70%;
+                            line-height: 25px; /* Match line-height to height */
+                            text-align: center;
+                            color: white;
+                            font-size-adjust: 0.45;
+                            font-weight: bold;
+                        }
+
+                        .green {
+                            background-color: green;
+                        }
+
+                        .yellow {
+                            background-color: yellow;
+                            color: black;
+                        }
+
+                        .red {
+                            background-color: red;
+                        }
+
+                        .indicator-table {
+                            width: auto; /* Adjusted width to auto */
+                            border-collapse: collapse;
+                            margin: 0 auto;
+                            font-size: 0.9rem; /* Adjusted font size */
+                        }
+
+                        .indicator-table th, .indicator-table td {
+                            border: 1px solid #dee2e6;
+                            padding: 4px; /* Reduced padding */
+                            text-align: center;
+                        }
+
+                        .indicator-table th {
+                            background-color: #f8f9fa;
+                        }
+                        
                     </style>
                 </div>
             </section>
