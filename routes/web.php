@@ -6,17 +6,16 @@ use App\Http\Controllers\DropdownController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RulesController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\PressController;
 
 use App\Http\Controllers\MstPressController;
 use App\Http\Controllers\MstDowntimeController;
-use App\Http\Controllers\DowntimeFormController;
-
 use App\Http\Controllers\MstFactoryBController;
 use App\Http\Controllers\MstWeldingController;
+
 use App\Http\Controllers\FormFactoryBController;
 use App\Http\Controllers\FormWeldingController;
-
+use App\Http\Controllers\FormPressController;
+use App\Http\Controllers\DowntimeFormController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,13 +56,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/revoke/{user}', [UserController::class, 'revoke'])->middleware(['checkRole:IT']);
     Route::get('/user/access/{user}', [UserController::class, 'access'])->middleware(['checkRole:IT']);
 
-    //Daily Report Press
-    Route::get('daily-report/press', [PressController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::post('daily-report/press/store', [PressController::class, 'store'])->middleware(['checkRole:IT']);
-    Route::patch('daily-report/press/update/{id}', [PressController::class, 'update'])->middleware(['checkRole:IT']);
-    Route::delete('daily-report/press/delete/{id}', [PressController::class, 'delete'])->middleware(['checkRole:IT']);
-
-    //Daily Report Press
+    //Daily Report Form
+    // Press Form
+    Route::get('/daily-report/press', [FormPressController::class, 'index'])->middleware(['checkRole:IT']);
+    Route::post('/daily-report/press/store/main', [FormPressController::class, 'storeMain'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/press/form/{id}', [FormPressController::class, 'formPress'])->middleware(['checkRole:IT'])->name('form.daily-report.press');
+    Route::post('/daily-report/press/detail/store', [FormPressController::class, 'storeForm'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/press/detail/{id}', [FormPressController::class, 'showDetail'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/press/update/{id}', [FormPressController::class, 'updateDetail'])->middleware(['checkRole:IT']);
+    Route::post('/daily-report/press/detail/update', [FormPressController::class, 'updateForm'])->middleware(['checkRole:IT']);
 
     //Factory B Form
     Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
@@ -82,11 +83,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/daily-report/welding/detail/{id}', [FormWeldingController::class, 'showDetail'])->middleware(['checkRole:IT']);
     Route::get('/daily-report/welding/update/{id}', [FormWeldingController::class, 'updateDetail'])->middleware(['checkRole:IT']);
     Route::post('/daily-report/welding/detail/update', [FormWeldingController::class, 'updateForm'])->middleware(['checkRole:IT']);
-
-    //Daily Report Factory B
-
-
-    //Daily Report Welding
 
     //DowntimeFormController Controller
     // Downtime Form Controller
@@ -108,18 +104,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/masterpress/model/store', [MstPressController::class, 'storeModel'])->middleware(['checkRole:IT']);
     Route::put('/masterpress/model/update', [MstPressController::class, 'updateModel'])->middleware(['checkRole:IT']);
 
-    //MstDowntimeController Controller
-    Route::middleware(['checkRole:IT'])->group(function () {
-        Route::get('/masterdowntime', [MstDowntimeController::class, 'index']);
-        Route::post('/masterdowntime/store', [MstDowntimeController::class, 'storeMachine']);
-        Route::patch('/masterdowntime/update', [MstDowntimeController::class, 'updateMachine'])->name('masterdowntime.update');
-    });
-
-    //Master Factory B 
-
-
-    //Master Welding
-
     //Master Factory B
     Route::get('factoryb/shop', [MstFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
     Route::post('factoryb/shop/store', [MstFactoryBController::class, 'store'])->middleware(['checkRole:IT']);
@@ -138,4 +122,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('welding/model', [MstWeldingController::class, 'indexModel'])->middleware(['checkRole:IT']);
     Route::post('welding/model/store', [MstWeldingController::class, 'storeModel'])->middleware(['checkRole:IT']);
     Route::patch('welding/model/update', [MstWeldingController::class, 'updateModel'])->middleware(['checkRole:IT']);
+
+    //MstDowntimeController Controller
+    Route::middleware(['checkRole:IT'])->group(function () {
+        Route::get('/masterdowntime', [MstDowntimeController::class, 'index']);
+        Route::post('/masterdowntime/store', [MstDowntimeController::class, 'storeMachine']);
+        Route::patch('/masterdowntime/update', [MstDowntimeController::class, 'updateMachine'])->name('masterdowntime.update');
+    });
 });

@@ -64,8 +64,20 @@ class DowntimeFormController extends Controller
         $header = DowntimeFormHeader::with('details.actuals')->findOrFail($id);
         $machines = DowntimeMstMachine::all();
         $shops = UnifiedShop::all();
-        $downtimeCategories = Dropdown::where('category', 'Downtime')->get();
-        $judgements = Dropdown::where('category', 'Judgement')->get();
+
+        // Hardcoded downtime categories and judgements
+        $downtimeCategories = [
+            'Machine & PLN Off' => 'ME/MTC',
+            'Tooling' => 'ME/MTC',
+            'Quality Material' => 'QM',
+            'Manpower, Repair, IDLE (Downtime Process)' => 'OP'
+        ];
+
+        $judgements = [
+            'OK' => 'OK',
+            'Not Good' => 'NG',
+            'Temporary' => 'Temp'
+        ];
 
         return view('downtime-report.form', compact('header', 'machines', 'shops', 'downtimeCategories', 'judgements'));
     }

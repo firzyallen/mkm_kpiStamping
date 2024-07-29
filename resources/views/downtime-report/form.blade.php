@@ -78,10 +78,10 @@
                                                                     <select name="downtime_cause[]"
                                                                         class="form-control downtime-cause" required>
                                                                         <option value="">Select Downtime</option>
-                                                                        @foreach ($downtimeCategories as $category)
-                                                                            <option value="{{ $category->id }}"
-                                                                                data-code="{{ $category->code_format }}">
-                                                                                {{ $category->name_value }}</option>
+                                                                        @foreach ($downtimeCategories as $category => $shop_call)
+                                                                            <option value="{{ $category }}"
+                                                                                data-code="{{ $shop_call }}">
+                                                                                {{ $category }}</option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
@@ -109,9 +109,9 @@
                                                                     <label for="judgement">Judgement</label>
                                                                     <select name="judgement[]" class="form-control">
                                                                         <option value="">Select Judgement</option>
-                                                                        @foreach ($judgements as $judgement)
-                                                                            <option value="{{ $judgement->id }}">
-                                                                                {{ $judgement->name_value }}</option>
+                                                                        @foreach ($judgements as $judgement => $code)
+                                                                            <option value="{{ $code }}">
+                                                                                {{ $judgement }}</option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
@@ -192,8 +192,8 @@
                             <label for="downtime-cause">Downtime Cause <span class="text-danger">*</span></label>
                             <select name="downtime_cause[]" class="form-control downtime-cause" required>
                                 <option value="">Select Downtime</option>
-                                @foreach ($downtimeCategories as $category)
-                                    <option value="{{ $category->id }}" data-code="{{ $category->code_format }}">{{ $category->name_value }}</option>
+                                @foreach ($downtimeCategories as $category => $shop_call)
+                                    <option value="{{ $category }}" data-code="{{ $shop_call }}">{{ $category }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -219,8 +219,8 @@
                             <label for="judgement">Judgement</label>
                             <select name="judgement[]" class="form-control">
                                 <option value="">Select Judgement</option>
-                                @foreach ($judgements as $judgement)
-                                    <option value="{{ $judgement->id }}">{{ $judgement->name_value }}</option>
+                                @foreach ($judgements as $judgement => $code)
+                                    <option value="{{ $code }}">{{ $judgement }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -266,7 +266,7 @@
                     if (shopId == "{{ $machine->shop_id }}") {
                         machineSelect.append(
                             '<option value="{{ $machine->id }}">{{ $machine->machine_name }}</option>'
-                            );
+                        );
                     }
                 @endforeach
             });
@@ -276,9 +276,9 @@
                 var selectedCause = $(this).find(':selected').data('code');
                 var shopCallInput = $(this).closest('tr').find('.shop-call');
                 shopCallInput.val('');
-                @foreach ($downtimeCategories as $category)
-                    if (selectedCause === "{{ $category->code_format }}") {
-                        shopCallInput.val("{{ $category->code_format }}");
+                @foreach ($downtimeCategories as $category => $shop_call)
+                    if (selectedCause === "{{ $shop_call }}") {
+                        shopCallInput.val("{{ $shop_call }}");
                     }
                 @endforeach
             });
