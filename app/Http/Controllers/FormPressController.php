@@ -98,6 +98,7 @@ class FormPressController extends Controller
             ];
         }
 
+
         return view('daily-report.press.form', compact('formattedData', 'item', 'id', 'workingHour'));
     }
 
@@ -129,38 +130,20 @@ class FormPressController extends Controller
                 }
                 $shopId = PressMstShop::where('shop_name', $shop)->value('id');
 
-                $dayOfWeek = date('l', strtotime($request->date)); // Get the day of the week from the date
-                $workingHour = 0;
-                if ($shift == 'day') {
-                    if (in_array($dayOfWeek, ['Monday', 'Tuesday', 'Wednesday', 'Thursday'])) {
-                        $workingHour = 7.58;
-                    } elseif ($dayOfWeek == 'Friday') {
-                        $workingHour = 7.00;
-                    }
-                } else if ($shift == 'night') {
-                    $workingHour = 6.75;
-                }
-
                 $detail = PressActualFormDetail::create([
                     'header_id' => $headerId,
                     'shop_id' => $shopId,
                     'manpower' => $request->manpower[$shop][0],
                     'manpower_plan' => $request->manpower_plan[$shop][0],
-                    'working_hour' => $workingHour,
+                    'working_hour' => $request->working_hour[$shop][0],
                     'notes' => $request->notes[$shop][0] ?? null,
                     'photo_shop' => $imgPath,
                 ]);
 
                 $detailId = $detail->id;
 
-                foreach ($request->production[$shop] as $index => $production) {
+                foreach ($request->production as $shopProduction) {
                     // Debugging: Check if each production item has the required keys
-                    if (!isset($production['model'])) {
-                        Log::error("Model key is missing for production at index $index for shop $shop");
-                        Log::error("Production data: " . print_r($production, true));
-                        throw new \Exception("Model key is missing for production at index $index for shop $shop");
-                    }
-
                     $imgPathNG = null;
                     if ($request->hasFile("photo_ng.$shop.$index")) {
                         $file = $request->file("photo_ng.$shop.$index");
@@ -170,6 +153,7 @@ class FormPressController extends Controller
                         $imgPathNG = 'assets/img/photo_shop/press/ng/' . $fileName;
                     }
                     $modelId = PressMstModel::where('model_name', $production['model'])->value('id');
+                    $modelShopId = PressMstModel::where('model_name', $production['model'])->value('shop_id');
 
                     $productionId = PressActualFormProduction::create([
                         'details_id' => $detailId,

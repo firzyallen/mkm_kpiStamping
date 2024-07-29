@@ -76,6 +76,7 @@ class FormFactoryBController extends Controller
 
     public function storeForm(Request $request)
     {
+        dd($request);
         DB::beginTransaction();
     
         try {
