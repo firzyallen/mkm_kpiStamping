@@ -13,6 +13,7 @@ use App\Models\WeldingMstModel;
 use App\Models\WeldingMstShop;
 use App\Models\WeldingMstStation;
 use App\Models\Dropdown;
+use Carbon\Carbon;
 
 class FormWeldingController extends Controller
 {
@@ -86,11 +87,23 @@ class FormWeldingController extends Controller
                 
                 $shopData['stations'][] = $stationData;
             }
+
+            if($item->shift == 'Night'){
+                $working_hour = 6.75;
+            }
+            elseif($item->shift =='Day'){
+                $carbonDate = Carbon::parse($item->date);
+                if ($carbonDate->isFriday()) {
+                    $working_hour = 7;
+                } else {
+                    $working_hour = 7.58;
+                }
+            }
             
             $formattedData[] = $shopData;
         }
     
-        return view('daily-report.welding.form', compact('formattedData', 'item', 'id'));
+        return view('daily-report.welding.form', compact('formattedData', 'item', 'id', 'working_hour'));
     }
     
     public function storeForm(Request $request)

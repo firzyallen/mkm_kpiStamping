@@ -11,7 +11,7 @@
                 </a>
                 <!-- KPI Monitoring Section -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseKPIMonitoring" aria-expanded="false" aria-controls="collapseKPIMonitoring">
-                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="nav-link-icon"><i class="fas fa-book"></i></div>
                     KPI Monitoring
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
@@ -68,7 +68,7 @@
                 <div class="sidenav-menu-heading">Master</div>
                 <!-- Press Master Section -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapsePressMaster" aria-expanded="false" aria-controls="collapsePressMaster">
-                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="nav-link-icon"><i class="fas fa-marker"></i></div>
                     Press
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
@@ -80,7 +80,7 @@
                 </div>
                 <!-- Welding Master Section -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseWeldingMaster" aria-expanded="false" aria-controls="collapseWeldingMaster">
-                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="nav-link-icon"><i class="fas fa-marker"></i></div>
                     Welding
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
@@ -93,7 +93,7 @@
                 </div>
                 <!-- Factory B Master Section -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseFactoryBMaster" aria-expanded="false" aria-controls="collapseFactoryBMaster">
-                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="nav-link-icon"><i class="fas fa-marker"></i></div>
                     Factory B
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
@@ -105,7 +105,7 @@
                 </div>
                 <!-- Downtime Master Section -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseDowntimeMaster" aria-expanded="false" aria-controls="collapseDowntimeMaster">
-                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <div class="nav-link-icon"><i class="fas fa-marker"></i></div>
                     Downtime
                     <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>

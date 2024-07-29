@@ -76,7 +76,7 @@
                                                                 </div>
                                                                 <div class="col-md-3 mb-3">
                                                                     <label for="working_hour">Working Hour</label>
-                                                                    <input type="decimal" name="working_hour[{{ $data['shop_name'] }}][]" class="form-control form-control-sm" style="width: 100px;" value="0" min="0">
+                                                                    <input type="decimal" name="working_hour[{{ $data['shop_name'] }}][]" class="form-control form-control-sm" style="width: 100px;" value={{$working_hour}} min="0">
                                                                 </div>
                                                                 <div class="col-md-6 mb-3">
                                                                     <label for="notes">Notes</label>
