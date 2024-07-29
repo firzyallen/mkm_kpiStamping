@@ -12,6 +12,7 @@ use App\Models\FactbActualHeader;
 use App\Models\FactbMstModel;
 use App\Models\FactbMstShop;
 use App\Models\Dropdown;
+use Carbon\Carbon;
 
 class FormFactoryBController extends Controller
 {
@@ -71,7 +72,18 @@ class FormFactoryBController extends Controller
                 'model_name' => $model->model_name,
             ];
         }
-        return view('daily-report.factoryb.form', compact('formattedData', 'item', 'id'));
+        if($item->shift == 'Night'){
+            $working_hour = 6.75;
+        }
+        elseif($item->shift =='Day'){
+            $carbonDate = Carbon::parse($item->date);
+            if ($carbonDate->isFriday()) {
+                $working_hour = 7;
+            } else {
+                $working_hour = 7.58;
+            }
+        }
+        return view('daily-report.factoryb.form', compact('formattedData', 'item', 'id', 'working_hour'));
     }
 
     public function storeForm(Request $request)

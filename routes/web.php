@@ -73,7 +73,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/daily-report/press', [FormPressController::class, 'index'])->middleware(['checkRole:IT']);
     Route::post('/daily-report/press/store/main', [FormPressController::class, 'storeMain'])->middleware(['checkRole:IT']);
     Route::get('/daily-report/press/form/{id}', [FormPressController::class, 'formPress'])->middleware(['checkRole:IT'])->name('form.daily-report.press');
-    Route::post('/daily-report/press/detail/store', [FormPressController::class, 'storeForm'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/press/detail/{id}', [FormPressController::class, 'showDetail'])->name('form.daily-report.press.detail');
     Route::get('/daily-report/press/detail/{id}', [FormPressController::class, 'showDetail'])->middleware(['checkRole:IT']);
     Route::get('/daily-report/press/update/{id}', [FormPressController::class, 'updateDetail'])->middleware(['checkRole:IT']);
     Route::post('/daily-report/press/detail/update', [FormPressController::class, 'updateForm'])->middleware(['checkRole:IT']);

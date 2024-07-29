@@ -142,8 +142,14 @@ class FormPressController extends Controller
 
                 $detailId = $detail->id;
 
-                foreach ($request->production as $shopProduction) {
-                    // Debugging: Check if each production item has the required keys
+                foreach ($request->production[$shop]['model'] as $index => $model) {
+                    // Ensure each production item has the required keys
+                    if (!isset($model)) {
+                        Log::error("Model key is missing for production at index $index for shop $shop");
+                        Log::error("Production data: " . print_r($request->production[$shop], true));
+                        throw new \Exception("Model key is missing for production at index $index for shop $shop");
+                    }
+
                     $imgPathNG = null;
                     if ($request->hasFile("photo_ng.$shop.$index")) {
                         $file = $request->file("photo_ng.$shop.$index");
@@ -152,33 +158,32 @@ class FormPressController extends Controller
                         $file->move($destinationPath, $fileName);
                         $imgPathNG = 'assets/img/photo_shop/press/ng/' . $fileName;
                     }
-                    $modelId = PressMstModel::where('model_name', $production['model'])->value('id');
-                    $modelShopId = PressMstModel::where('model_name', $production['model'])->value('shop_id');
+                    $modelId = PressMstModel::where('model_name', $model)->value('id');
 
                     $productionId = PressActualFormProduction::create([
                         'details_id' => $detailId,
                         'model_id' => $modelId,
-                        'production_process' => $production['production_process'],
-                        'status' => $production['status'],
-                        'type' => $production['type'],
-                        'inc_material' => $production['inc_material'] ?? null,
-                        'machine' => $production['machine'],
-                        'setting' => $production['setting'] ?? null,
-                        'hour_from' => $production['hour_from'] ?? null,
-                        'hour_to' => $production['hour_to'] ?? null,
-                        'plan_prod' => $production['plan_prod'] ?? 0,
-                        'OK' => $production['OK'] ?? 0,
-                        'manpower' => $production['manpower'] ?? 0,
+                        'production_process' => $request->production[$shop]['production_process'][$index],
+                        'status' => $request->production[$shop]['status'][$index],
+                        'type' => $request->production[$shop]['type'][$index],
+                        'inc_material' => $request->production[$shop]['inc_material'][$index] ?? null,
+                        'machine' => $request->production[$shop]['machine'][$index] ?? 0,
+                        'setting' => $request->production[$shop]['setting'][$index] ?? 0,
+                        'hour_from' => $request->production[$shop]['hour_from'][$index] ?? null,
+                        'hour_to' => $request->production[$shop]['hour_to'][$index] ?? null,
+                        'plan_prod' => $request->production[$shop]['plan_prod'][$index] ?? 0,
+                        'OK' => $request->production[$shop]['OK'][$index] ?? 0,
+                        'manpower' => $request->production[$shop]['manpower'][$index] ?? 0,
                     ])->id;
 
                     PressActualFormNg::create([
                         'production_id' => $productionId,
                         'model_id' => $modelId,
-                        'OK' => $production['OK'] ?? 0,
-                        'rework' => $production['rework'] ?? 0,
-                        'dmg_part' => $production['dmg_part'] ?? 0,
-                        'dmg_rm' => $production['dmg_rm'] ?? 0,
-                        'remarks' => $production['remarks'] ?? null,
+                        'OK' => $request->production[$shop]['OK'][$index] ?? 0,
+                        'rework' => $request->ng[$shop]['rework'][$index] ?? 0,
+                        'dmg_part' => $request->ng[$shop]['dmg_part'][$index] ?? 0,
+                        'dmg_rm' => $request->ng[$shop]['dmg_rm'][$index] ?? 0,
+                        'remarks' => $request->ng[$shop]['remarks'][$index] ?? null,
                         'photo_ng' => $imgPathNG,
                     ]);
                 }

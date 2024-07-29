@@ -24,7 +24,7 @@ class PressActualFormProduction extends Model
         'plan_prod',
         'OK',
         'manpower',
-        'production_process'
+        'prod_process'
     ];
 
     public function details()
