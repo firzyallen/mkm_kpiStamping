@@ -58,12 +58,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/revoke/{user}', [UserController::class, 'revoke'])->middleware(['checkRole:IT']);
     Route::get('/user/access/{user}', [UserController::class, 'access'])->middleware(['checkRole:IT']);
 
-    //Press
-    Route::get('daily-report/press', [PressController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::post('daily-report/press/store', [PressController::class, 'store'])->middleware(['checkRole:IT']);
-    Route::patch('daily-report/press/update/{id}', [PressController::class, 'update'])->middleware(['checkRole:IT']);
-    Route::delete('daily-report/press/delete/{id}', [PressController::class, 'delete'])->middleware(['checkRole:IT']);
-
     //KPI Monitoring
     Route::get('kpi-monitoring/factoryb', [FactoryBKPIController::class, 'index'])->middleware(['checkRole:IT']);
     //Factory B Form

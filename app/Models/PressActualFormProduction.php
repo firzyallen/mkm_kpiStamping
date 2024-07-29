@@ -13,8 +13,8 @@ class PressActualFormProduction extends Model
 
     protected $fillable = [
         'details_id',
-        'status',
         'model_id',
+        'status',
         'type',
         'inc_material',
         'machine',
@@ -22,7 +22,9 @@ class PressActualFormProduction extends Model
         'hour_from',
         'hour_to',
         'plan_prod',
-        'OK'
+        'OK',
+        'manpower',
+        'production_process'
     ];
 
     public function details()

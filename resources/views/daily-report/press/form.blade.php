@@ -8,14 +8,10 @@
                 </div>
             </div>
         </header>
-        <!-- Main page content-->
         <div class="container-fluid px-4 mt-n10">
-            <!-- Content Wrapper. Contains page content -->
             <div class="content-wrapper">
-                <!-- Content Header (Page header) -->
                 <section class="content-header">
                 </section>
-                <!-- Main content -->
                 <section class="content">
                     <div class="container-fluid">
                         <form action="{{ url('/daily-report/press/detail/store') }}" method="POST"
@@ -68,28 +64,31 @@
                                                             <div class="form-group mt-4">
                                                                 <div class="row">
                                                                     <div class="col-md-3 mb-3">
-                                                                        <label for="manpower_plan">Man Power Plan</label>
+                                                                        <label for="manpower_plan">Man Power Plan <span
+                                                                                class="required">*</span></label>
                                                                         <input type="number" step="0.01"
                                                                             name="manpower_plan[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
                                                                             style="width: 100px;" value="0"
-                                                                            min="0">
+                                                                            min="0" required>
                                                                     </div>
                                                                     <div class="col-md-3 mb-3">
-                                                                        <label for="manpower">Man Power Actual</label>
-                                                                        <input type="number" step="0.01"
+                                                                        <label for="manpower">Man Power Actual <span
+                                                                                class="required">*</span></label>
+                                                                        <input type="decimal"
                                                                             name="manpower[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
                                                                             style="width: 100px;" value="0"
-                                                                            min="0">
+                                                                            min="0" required>
                                                                     </div>
                                                                     <div class="col-md-3 mb-3">
-                                                                        <label for="working_hour">Working Hour</label>
-                                                                        <input type="number" step="0.01"
+                                                                        <label for="working_hour">Working Hour <span
+                                                                                class="required">*</span></label>
+                                                                        <input type="decimal"
                                                                             name="working_hour[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
-                                                                            style="width: 100px;" value="0"
-                                                                            min="0">
+                                                                            style="width: 100px;" value={{ $workingHour }}
+                                                                            min="0" required>
                                                                     </div>
                                                                     <div class="col-md-6 mb-3">
                                                                         <label for="notes">Notes</label>
@@ -109,173 +108,204 @@
                                                                         <table class="table table-bordered table-striped">
                                                                             <thead>
                                                                                 <tr>
-                                                                                    <th style="width: 100px;">Model</th>
-                                                                                    <th style="width: 550px;">Production
-                                                                                    </th>
+                                                                                    <th>Model</th>
+                                                                                    <th>Production</th>
                                                                                     <th>NG</th>
+                                                                                    <th>Action</th>
                                                                                 </tr>
                                                                             </thead>
-                                                                            <tbody>
-                                                                                @foreach ($formattedData as $model)
-                                                                                    @if ($model['shop_name'] === $data['shop_name'])
-                                                                                        <tr>
-                                                                                            <input type="hidden"
-                                                                                                name="model[]"
-                                                                                                value="{{ $model['model_name'] }}">
-                                                                                            <input type="hidden"
-                                                                                                name="shopAll[]"
-                                                                                                value="{{ $model['shop_name'] }}">
-                                                                                            <td class="text-center">
-                                                                                                {{ $model['model_name'] }}
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                <div style="width: 540px;"
-                                                                                                    class="row">
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Status</label>
-                                                                                                        <select
-                                                                                                            name="production[{{ $model['model_name'] }}][status][]"
-                                                                                                            class="form-control form-control-sm">
-                                                                                                            <option
-                                                                                                                value="f">
-                                                                                                                Finished
-                                                                                                            </option>
-                                                                                                            <option
-                                                                                                                value="n">
-                                                                                                                Not Finished
-                                                                                                            </option>
-                                                                                                        </select>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Type</label>
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            name="production[{{ $model['model_name'] }}][type][]"
-                                                                                                            class="form-control form-control-sm"
-                                                                                                            style="width: 80px;"
-                                                                                                            placeholder="oem/part">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Included
-                                                                                                            Material</label>
-                                                                                                        <input
-                                                                                                            type="text"
-                                                                                                            name="production[{{ $model['model_name'] }}][inc_material][]"
-                                                                                                            class="form-control form-control-sm"
-                                                                                                            style="width: 80px;"
-                                                                                                            placeholder="material">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Machine</label>
-                                                                                                        <input
-                                                                                                            type="number"
-                                                                                                            name="production[{{ $model['model_name'] }}][machine][]"
-                                                                                                            class="form-control form-control-sm"
-                                                                                                            style="width: 80px;"
-                                                                                                            value="0"
-                                                                                                            min="0">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Setting</label>
-                                                                                                        <input
-                                                                                                            type="number"
-                                                                                                            step="0.01"
-                                                                                                            name="production[{{ $model['model_name'] }}][setting][]"
-                                                                                                            class="form-control form-control-sm"
-                                                                                                            style="width: 80px;"
-                                                                                                            value="0"
-                                                                                                            min="0">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Hour
-                                                                                                            From</label>
-                                                                                                        <input
-                                                                                                            type="time"
-                                                                                                            name="production[{{ $model['model_name'] }}][hour_from][]"
-                                                                                                            class="form-control form-control-sm">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Hour
-                                                                                                            To</label>
-                                                                                                        <input
-                                                                                                            type="time"
-                                                                                                            name="production[{{ $model['model_name'] }}][hour_to][]"
-                                                                                                            class="form-control form-control-sm">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Plan
-                                                                                                            Production</label>
-                                                                                                        <input
-                                                                                                            type="number"
-                                                                                                            name="production[{{ $model['model_name'] }}][plan_prod][]"
-                                                                                                            class="form-control form-control-sm"
-                                                                                                            style="width: 80px;"
-                                                                                                            value="0"
-                                                                                                            min="0">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>OK</label>
-                                                                                                        <input
-                                                                                                            type="number"
-                                                                                                            name="production[{{ $model['model_name'] }}][OK][]"
-                                                                                                            class="form-control form-control-sm"
-                                                                                                            style="width: 80px;"
-                                                                                                            value="0"
-                                                                                                            min="0">
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </td>
-                                                                                            <td>
-                                                                                                <div class="row">
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Rework</label>
-                                                                                                        <input
-                                                                                                            type="number"
-                                                                                                            name="ng[{{ $model['model_name'] }}][rework][]"
-                                                                                                            class="form-control form-control-sm"
-                                                                                                            style="width: 80px;"
-                                                                                                            value="0"
-                                                                                                            min="0">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>DMG
-                                                                                                            Part</label>
-                                                                                                        <input
-                                                                                                            type="number"
-                                                                                                            name="ng[{{ $model['model_name'] }}][dmg_part][]"
-                                                                                                            class="form-control form-control-sm"
-                                                                                                            style="width: 80px;"
-                                                                                                            value="0"
-                                                                                                            min="0">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>DMG
-                                                                                                            RM</label>
-                                                                                                        <input
-                                                                                                            type="number"
-                                                                                                            name="ng[{{ $model['model_name'] }}][dmg_rm][]"
-                                                                                                            class="form-control form-control-sm"
-                                                                                                            style="width: 80px;"
-                                                                                                            value="0"
-                                                                                                            min="0">
-                                                                                                    </div>
-                                                                                                    <div class="col-md-4">
-                                                                                                        <label>Remarks</label>
-                                                                                                        <textarea name="ng[{{ $model['model_name'] }}][remarks][]" class="form-control form-control-sm" rows="2"></textarea>
-                                                                                                    </div>
-                                                                                                    <div class="col-md-8">
-                                                                                                        <label>Photo
-                                                                                                            NG</label>
-                                                                                                        <input
-                                                                                                            type="file"
-                                                                                                            name="photo_ng[{{ $model['model_name'] }}][]"
-                                                                                                            class="form-control form-control-sm">
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                    @endif
-                                                                                @endforeach
+                                                                            <tbody class="production-rows"
+                                                                                data-shop="{{ $data['shop_name'] }}">
+                                                                                <tr class="production-row">
+                                                                                    <td>
+                                                                                        <label>Status <span
+                                                                                                class="required">*</span></label>
+                                                                                        <select
+                                                                                            name="production[{{ $data['shop_name'] }}][status][]"
+                                                                                            class="form-control form-control-sm status-select"
+                                                                                            required>
+                                                                                            <option value="" disabled
+                                                                                                selected>Select Status
+                                                                                            </option>
+                                                                                            <option value="f">Finished
+                                                                                            </option>
+                                                                                            <option value="n">Not
+                                                                                                Finished</option>
+                                                                                        </select>
+                                                                                        <label>Model <span
+                                                                                                class="required">*</span></label>
+                                                                                        <select
+                                                                                            name="production[{{ $data['shop_name'] }}][model][]"
+                                                                                            class="form-control form-control-sm model-select"
+                                                                                            required>
+                                                                                            <option value="" disabled
+                                                                                                selected>Select Model
+                                                                                            </option>
+                                                                                            @foreach ($formattedData as $model)
+                                                                                                @if ($model['shop_name'] === $data['shop_name'])
+                                                                                                    <option
+                                                                                                        value="{{ $model['model_name'] }}">
+                                                                                                        {{ $model['model_name'] }}
+                                                                                                    </option>
+                                                                                                @endif
+                                                                                            @endforeach
+                                                                                        </select>
+                                                                                        <label>Incoming Material</label>
+                                                                                        <input type="text"
+                                                                                            name="production[{{ $data['shop_name'] }}][inc_material][]"
+                                                                                            class="form-control form-control-sm"
+                                                                                            placeholder="Incoming Material">
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="row">
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Production Process
+                                                                                                    <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="text"
+                                                                                                    name="production[{{ $data['shop_name'] }}][production_process][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    placeholder="production process"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Type <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <select
+                                                                                                    name="production[{{ $data['shop_name'] }}][type][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    required>
+                                                                                                    <option value=""
+                                                                                                        disabled selected>
+                                                                                                        Select Type</option>
+                                                                                                    <option value="OEM">
+                                                                                                        OEM</option>
+                                                                                                    <option value="Part">
+                                                                                                        Part</option>
+                                                                                                </select>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Manpower <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="number"
+                                                                                                    step="0.01"
+                                                                                                    name="production[{{ $data['shop_name'] }}][manpower][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    value="0"
+                                                                                                    min="0"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Machine <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="number"
+                                                                                                    name="production[{{ $data['shop_name'] }}][machine][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    value="0"
+                                                                                                    min="0"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Setting <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="number"
+                                                                                                    step="0.01"
+                                                                                                    name="production[{{ $data['shop_name'] }}][setting][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    value="0"
+                                                                                                    min="0"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Plan Production <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="number"
+                                                                                                    name="production[{{ $data['shop_name'] }}][plan_prod][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    value="0"
+                                                                                                    min="0"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Hour From <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="time"
+                                                                                                    name="production[{{ $data['shop_name'] }}][hour_from][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Hour To <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="time"
+                                                                                                    name="production[{{ $data['shop_name'] }}][hour_to][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>OK <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="number"
+                                                                                                    name="production[{{ $data['shop_name'] }}][OK][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    value="0"
+                                                                                                    min="0"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <div class="row">
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Rework <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="number"
+                                                                                                    name="ng[{{ $data['shop_name'] }}][rework][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    value="0"
+                                                                                                    min="0"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>DMG Part <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="number"
+                                                                                                    name="ng[{{ $data['shop_name'] }}][dmg_part][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    value="0"
+                                                                                                    min="0"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>DMG RM <span
+                                                                                                        class="required">*</span></label>
+                                                                                                <input type="number"
+                                                                                                    name="ng[{{ $data['shop_name'] }}][dmg_rm][]"
+                                                                                                    class="form-control form-control-sm"
+                                                                                                    value="0"
+                                                                                                    min="0"
+                                                                                                    required>
+                                                                                            </div>
+                                                                                            <div class="col-md-4">
+                                                                                                <label>Remarks</label>
+                                                                                                <textarea name="ng[{{ $data['shop_name'] }}][remarks][]" class="form-control form-control-sm" rows="2"></textarea>
+                                                                                            </div>
+                                                                                            <div class="col-md-8">
+                                                                                                <label>Photo NG</label>
+                                                                                                <input type="file"
+                                                                                                    name="ng[{{ $data['shop_name'] }}][photo_ng][]"
+                                                                                                    class="form-control form-control-sm">
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        <button type="button"
+                                                                                            class="btn btn-success btn-sm add-production-row">
+                                                                                            <i
+                                                                                                class="fas fa-plus-circle"></i>
+                                                                                        </button>
+                                                                                    </td>
+                                                                                </tr>
                                                                             </tbody>
                                                                         </table>
                                                                     </div>
@@ -295,15 +325,125 @@
             </div>
         </div>
     </main>
+    <style>
+        .required {
+            color: red;
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        // Function to calculate production difference
-        $('.production-planning, .production-actual').on('input', function() {
-            var row = $(this).closest('tr');
-            var planning = row.find('.production-planning').val();
-            var actual = row.find('.production-actual').val();
-            var difference = actual - planning;
-            row.find('.production-different').val(difference);
+        $(document).ready(function() {
+            var formattedData = @json($formattedData);
+
+            $(document).on('click', '.add-production-row', function() {
+                var shopName = $(this).closest('.tab-pane').find('.production-rows').data('shop');
+                var modelsOptions = '';
+
+                formattedData.forEach(function(model) {
+                    if (model.shop_name === shopName) {
+                        modelsOptions +=
+                            `<option value="${model.model_name}">${model.model_name}</option>`;
+                    }
+                });
+
+                var productionRow = `
+                <tr class="production-row">
+                    <td>
+                        <label>Status <span class="required">*</span></label>
+                        <select name="production[${shopName}][status][]" class="form-control form-control-sm status-select" required>
+                            <option value="" disabled selected>Select Status</option>
+                            <option value="f">Finished</option>
+                            <option value="n">Not Finished</option>
+                        </select>
+                        <label>Model <span class="required">*</span></label>
+                        <select name="production[${shopName}][model][]" class="form-control form-control-sm model-select" required>
+                            <option value="" disabled selected>Select Model</option>
+                            ${modelsOptions}
+                        </select>
+                        <label>Incoming Material</label>
+                        <input type="text" name="production[${shopName}][inc_material][]" class="form-control form-control-sm" placeholder="Incoming Material">
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Production Process <span class="required">*</span></label>
+                                <input type="text" name="production[${shopName}][production_process][]" class="form-control form-control-sm" placeholder="production process" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Type <span class="required">*</span></label>
+                                <select name="production[${shopName}][type][]" class="form-control form-control-sm" required>
+                                    <option value="" disabled selected>Select Type</option>
+                                    <option value="OEM">OEM</option>
+                                    <option value="Part">Part</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Manpower <span class="required">*</span></label>
+                                <input type="number" step="0.01" name="production[${shopName}][manpower][]" class="form-control form-control-sm" value="0" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Machine <span class="required">*</span></label>
+                                <input type="number" name="production[${shopName}][machine][]" class="form-control form-control-sm" value="0" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Setting <span class="required">*</span></label>
+                                <input type="number" step="0.01" name="production[${shopName}][setting][]" class="form-control form-control-sm" value="0" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Plan Production <span class="required">*</span></label>
+                                <input type="number" name="production[${shopName}][plan_prod][]" class="form-control form-control-sm" value="0" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Hour From <span class="required">*</span></label>
+                                <input type="time" name="production[${shopName}][hour_from][]" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Hour To <span class="required">*</span></label>
+                                <input type="time" name="production[${shopName}][hour_to][]" class="form-control form-control-sm" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>OK <span class="required">*</span></label>
+                                <input type="number" name="production[${shopName}][OK][]" class="form-control form-control-sm" value="0" min="0" required>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Rework <span class="required">*</span></label>
+                                <input type="number" name="ng[${shopName}][rework][]" class="form-control form-control-sm" value="0" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>DMG Part <span class="required">*</span></label>
+                                <input type="number" name="ng[${shopName}][dmg_part][]" class="form-control form-control-sm" value="0" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>DMG RM <span class="required">*</span></label>
+                                <input type="number" name="ng[${shopName}][dmg_rm][]" class="form-control form-control-sm" value="0" min="0" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label>Remarks</label>
+                                <textarea name="ng[${shopName}][remarks][]" class="form-control form-control-sm" rows="2"></textarea>
+                            </div>
+                            <div class="col-md-8">
+                                <label>Photo NG</label>
+                                <input type="file" name="ng[${shopName}][photo_ng][]" class="form-control form-control-sm">
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm remove-row">
+                            <i class="fas fa-minus-circle"></i>
+                        </button>
+                    </td>
+                </tr>
+                `;
+                $(this).closest('.production-rows').append(productionRow);
+            });
+
+            $(document).on('click', '.remove-row', function() {
+                $(this).closest('.production-row').remove();
+            });
         });
     </script>
 @endsection

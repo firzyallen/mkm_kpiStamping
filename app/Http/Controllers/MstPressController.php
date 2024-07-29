@@ -158,7 +158,6 @@ class MstPressController extends Controller
 
     public function updateModel(Request $request)
     {
-        dd($request->all());
         // Validate the incoming request
         $request->validate([
             'id' => 'required|integer|exists:press_mst_models,id',
