@@ -9,6 +9,23 @@
                     <div style="margin-left: -2px" class="nav-link-icon"><i class="fas fa-home"></i></div>
                     Home
                 </a>
+                <!-- KPI Monitoring Section -->
+                <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseKPIMonitoring" aria-expanded="false" aria-controls="collapseKPIMonitoring">
+                    <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>
+                    KPI Monitoring
+                    <div class="sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseKPIMonitoring" data-bs-parent="#accordionSidenav">
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/kpi-monitoring/press') }}">Press</a>
+                    </nav>
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/kpi-monitoring/welding') }}">Welding</a>
+                    </nav>
+                    <nav class="sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ url('/kpi-monitoring/factoryb') }}">Factory B</a>
+                    </nav>
+                </div>
                 <!-- Daily Report Section -->
                 <a class="nav-link collapsed" href="javascript:void(0);" data-bs-toggle="collapse" data-bs-target="#collapseDailyReport" aria-expanded="false" aria-controls="collapseDailyReport">
                     <div class="nav-link-icon"><i class="fas fa-clipboard-list"></i></div>

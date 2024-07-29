@@ -14,6 +14,8 @@ use App\Http\Controllers\MstWeldingController;
 
 use App\Http\Controllers\FormFactoryBController;
 use App\Http\Controllers\FormWeldingController;
+use App\Http\Controllers\FactoryBKPIController;
+
 use App\Http\Controllers\FormPressController;
 use App\Http\Controllers\DowntimeFormController;
 
@@ -56,6 +58,22 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/revoke/{user}', [UserController::class, 'revoke'])->middleware(['checkRole:IT']);
     Route::get('/user/access/{user}', [UserController::class, 'access'])->middleware(['checkRole:IT']);
 
+    //Press
+    Route::get('daily-report/press', [PressController::class, 'index'])->middleware(['checkRole:IT']);
+    Route::post('daily-report/press/store', [PressController::class, 'store'])->middleware(['checkRole:IT']);
+    Route::patch('daily-report/press/update/{id}', [PressController::class, 'update'])->middleware(['checkRole:IT']);
+    Route::delete('daily-report/press/delete/{id}', [PressController::class, 'delete'])->middleware(['checkRole:IT']);
+
+    //KPI Monitoring
+    Route::get('kpi-monitoring/factoryb', [FactoryBKPIController::class, 'index'])->middleware(['checkRole:IT']);
+    //Factory B Form
+    Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
+    Route::post('/daily-report/factoryb/store/main', [FormFactoryBController::class, 'storeMain'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/factoryb/form/{id}', [FormFactoryBController::class, 'formChecksheet'])->middleware(['checkRole:IT'])->name('form.daily-report.factoryb');
+    Route::post('/daily-report/factoryb/detail/store', [FormFactoryBController::class, 'storeForm'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/factoryb/detail/{id}', [FormFactoryBController::class, 'showDetail'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/factoryb/update/{id}', [FormFactoryBController::class, 'updateDetail'])->middleware(['checkRole:IT']);
+    Route::post('/daily-report/factoryb/detail/update', [FormFactoryBController::class, 'updateForm'])->middleware(['checkRole:IT']);
     //Daily Report Form
     // Press Form
     Route::get('/daily-report/press', [FormPressController::class, 'index'])->middleware(['checkRole:IT']);
