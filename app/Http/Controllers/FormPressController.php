@@ -11,6 +11,7 @@ use App\Models\PressActualFormProduction;
 use App\Models\PressActualFormNg;
 use App\Models\PressMstModel;
 use App\Models\PressMstShop;
+use Carbon\Carbon;
 
 
 class FormPressController extends Controller
@@ -151,8 +152,8 @@ class FormPressController extends Controller
                     }
 
                     $imgPathNG = null;
-                    if ($request->hasFile("photo_ng.$shop.$index")) {
-                        $file = $request->file("photo_ng.$shop.$index");
+                    if ($request->hasFile("ng.$shop.photo_ng.$index")) {
+                        $file = $request->file("ng.$shop.photo_ng.$index");
                         $fileName = uniqid() . '_' . $file->getClientOriginalName();
                         $destinationPath = public_path('assets/img/photo_shop/press/ng/');
                         $file->move($destinationPath, $fileName);
@@ -163,7 +164,7 @@ class FormPressController extends Controller
                     $productionId = PressActualFormProduction::create([
                         'details_id' => $detailId,
                         'model_id' => $modelId,
-                        'production_process' => $request->production[$shop]['production_process'][$index],
+                        'prod_process' => $request->production[$shop]['production_process'][$index],
                         'status' => $request->production[$shop]['status'][$index],
                         'type' => $request->production[$shop]['type'][$index],
                         'inc_material' => $request->production[$shop]['inc_material'][$index] ?? null,
@@ -229,15 +230,15 @@ class FormPressController extends Controller
                 $shopData['models'][] = [
                     'model_id' => $model->model_id,
                     'model_name' => PressMstModel::where('id', $model->model_id)->value('model_name'),
-                    'production_process' => $model->production_process,
+                    'production_process' => $model->prod_process,
                     'status' => $model->status,
                     'type' => $model->type,
                     'inc_material' => $model->inc_material,
                     'machine' => $model->machine,
                     'manpower' => $model->manpower,
                     'setting' => $model->setting,
-                    'hour_from' => $model->hour_from,
-                    'hour_to' => $model->hour_to,
+                    'hour_from' => Carbon::parse($model->hour_from)->format('H:i'),
+                    'hour_to' => Carbon::parse($model->hour_to)->format('H:i'),
                     'plan_prod' => $model->plan_prod,
                     'OK' => $model->OK,
                     'rework' => $notGoods->where('production_id', $model->id)->first()->rework ?? null,
@@ -283,17 +284,18 @@ class FormPressController extends Controller
 
             foreach ($models as $model) {
                 $shopData['models'][] = [
+                    'production_id' => $model->id,
                     'model_id' => $model->model_id,
                     'model_name' => PressMstModel::where('id', $model->model_id)->value('model_name'),
-                    'production_process' => $model->production_process,
+                    'production_process' => $model->prod_process,
                     'status' => $model->status,
                     'type' => $model->type,
                     'inc_material' => $model->inc_material,
                     'machine' => $model->machine,
                     'manpower' => $model->manpower,
                     'setting' => $model->setting,
-                    'hour_from' => $model->hour_from,
-                    'hour_to' => $model->hour_to,
+                    'hour_from' => Carbon::parse($model->hour_from)->format('H:i'),
+                    'hour_to' => Carbon::parse($model->hour_to)->format('H:i'),
                     'plan_prod' => $model->plan_prod,
                     'OK' => $model->OK,
                     'rework' => $notGoods->where('production_id', $model->id)->first()->rework ?? null,
@@ -306,7 +308,6 @@ class FormPressController extends Controller
 
             $formattedData[] = $shopData;
         }
-
         return view('daily-report.press.update', compact('header', 'formattedData', 'id'));
     }
 
@@ -335,101 +336,129 @@ class FormPressController extends Controller
 
                 if ($detail) {
                     $detail->update([
-                        'manpower' => $request->manpower[$shop][0],
-                        'manpower_plan' => $request->manpower_plan[$shop][0],
-                        'working_hour' => $request->working_hour[$shop][0],
-                        'notes' => $request->notes[$shop][0] ?? null,
-                        'photo_shop' => $imgPath,
+                        'manpower' => $request->manpower[$shop][0] ?? $detail->manpower,
+                        'manpower_plan' => $request->manpower_plan[$shop][0] ?? $detail->manpower_plan,
+                        'working_hour' => $request->working_hour[$shop][0] ?? $detail->working_hour,
+                        'notes' => $request->notes[$shop][0] ?? $detail->notes,
+                        'photo_shop' => $imgPath ?? $detail->photo_shop,
                     ]);
-                } else {
-                    $detail = PressActualFormDetail::create([
-                        'header_id' => $headerId,
-                        'shop_id' => $shopId,
-                        'manpower' => $request->manpower[$shop][0],
-                        'manpower_plan' => $request->manpower_plan[$shop][0],
-                        'working_hour' => $request->working_hour[$shop][0],
-                        'notes' => $request->notes[$shop][0] ?? null,
-                        'photo_shop' => $imgPath,
-                    ]);
-                }
-
-                foreach ($request->production[$shop] as $index => $production) {
-                    $imgPathNG = null;
-                    if ($request->hasFile("photo_ng.$shop.$index")) {
-                        $file = $request->file("photo_ng.$shop.$index");
-                        $fileName = uniqid() . '_' . $file->getClientOriginalName();
-                        $destinationPath = public_path('assets/img/photo_shop/press/ng/');
-                        $file->move($destinationPath, $fileName);
-                        $imgPathNG = 'assets/img/photo_shop/press/ng/' . $fileName;
-                    }
-                    $modelId = PressMstModel::where('model_name', $production['model'])->value('id');
-
-                    $productionRecord = PressActualFormProduction::where('details_id', $detail->id)->where('model_id', $modelId)->first();
-
-                    if ($productionRecord) {
-                        $productionRecord->update([
-                            'production_process' => $production['production_process'],
-                            'status' => $production['status'],
-                            'type' => $production['type'],
-                            'inc_material' => $production['inc_material'] ?? null,
-                            'machine' => $production['machine'],
-                            'setting' => $production['setting'] ?? null,
-                            'hour_from' => $production['hour_from'] ?? null,
-                            'hour_to' => $production['hour_to'] ?? null,
-                            'plan_prod' => $production['plan_prod'] ?? 0,
-                            'OK' => $production['OK'] ?? 0,
-                            'manpower' => $production['manpower'] ?? 0,
-                        ]);
-                    } else {
-                        $productionRecord = PressActualFormProduction::create([
-                            'details_id' => $detail->id,
-                            'model_id' => $modelId,
-                            'production_process' => $production['production_process'],
-                            'status' => $production['status'],
-                            'type' => $production['type'],
-                            'inc_material' => $production['inc_material'] ?? null,
-                            'machine' => $production['machine'],
-                            'setting' => $production['setting'] ?? null,
-                            'hour_from' => $production['hour_from'] ?? null,
-                            'hour_to' => $production['hour_to'] ?? null,
-                            'plan_prod' => $production['plan_prod'] ?? 0,
-                            'OK' => $production['OK'] ?? 0,
-                            'manpower' => $production['manpower'] ?? 0,
-                        ]);
-                    }
-
-                    $ng = $request->ng[$shop][$index];
-                    $ngRecord = PressActualFormNg::where('production_id', $productionRecord->id)->first();
-
-                    if ($ngRecord) {
-                        $ngRecord->update([
-                            'OK' => $ng['OK'] ?? 0,
-                            'rework' => $ng['rework'] ?? 0,
-                            'dmg_part' => $ng['dmg_part'] ?? 0,
-                            'dmg_rm' => $ng['dmg_rm'] ?? 0,
-                            'remarks' => $ng['remarks'] ?? null,
-                            'photo_ng' => $imgPathNG,
-                        ]);
-                    } else {
-                        PressActualFormNg::create([
-                            'production_id' => $productionRecord->id,
-                            'model_id' => $modelId,
-                            'OK' => $ng['OK'] ?? 0,
-                            'rework' => $ng['rework'] ?? 0,
-                            'dmg_part' => $ng['dmg_part'] ?? 0,
-                            'dmg_rm' => $ng['dmg_rm'] ?? 0,
-                            'remarks' => $ng['remarks'] ?? null,
-                            'photo_ng' => $imgPathNG,
-                        ]);
-                    }
                 }
             }
+            foreach ($request->production as $prodId => $productionData) {
+                $modelId = PressActualFormProduction::where('id', $prodId)->value('model_id');
+                $modelShopId = PressMstModel::where('id', $modelId)->value('shop_id');
+                $productionRecord = PressActualFormProduction::where('id', $prodId)->first();
+                if ($productionRecord) {
+                    $productionRecord->update([
+                        'prod_process' => $productionData['production_process'][0] ?? $productionRecord->prod_process,
+                        'status' => $productionData['status'][0] ?? $productionRecord->status,
+                        'type' => $productionData['type'][0] ?? $productionRecord->type,
+                        'inc_material' => $productionData['inc_material'][0] ?? $productionRecord->inc_material,
+                        'machine' => $productionData['machine'][0] ?? $productionRecord->machine,
+                        'setting' => $productionData['setting'][0] ?? $productionRecord->setting,
+                        'hour_from' => $productionData['hour_from'][0] ?? $productionRecord->hour_from,
+                        'hour_to' => $productionData['hour_to'][0] ?? $productionRecord->hour_to,
+                        'plan_prod' => $productionData['plan_prod'][0] ?? $productionRecord->plan_prod,
+                        'OK' => $productionData['OK'][0] ?? $productionRecord->OK,
+                        'manpower' => $productionData['manpower'][0] ?? $productionRecord->manpower,
+                    ]);
+                } else {
+                    $productionRecord = PressActualFormProduction::create([
+                        'details_id' => $detail->id,
+                        'model_id' => $modelId,
+                        'prod_process' => $productionData['production_process'][0],
+                        'status' => $productionData['status'][0],
+                        'type' => $productionData['type'][0],
+                        'inc_material' => $productionData['inc_material'][0] ?? null,
+                        'machine' => $productionData['machine'][0],
+                        'setting' => $productionData['setting'][0] ?? null,
+                        'hour_from' => $productionData['hour_from'][0] ?? null,
+                        'hour_to' => $productionData['hour_to'][0] ?? null,
+                        'plan_prod' => $productionData['plan_prod'][0] ?? 0,
+                        'OK' => $productionData['OK'][0] ?? 0,
+                        'manpower' => $productionData['manpower'][0] ?? 0,
+                    ]);
+                }
+                $imgPathNG = null;
+                if ($request->hasFile("ng.$prodId.photo_ng.0")) {
+                    $file = $request->file("ng.$prodId.photo_ng.0");
+                    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                    $destinationPath = public_path('assets/img/photo_shop/press/ng/');
+                    $file->move($destinationPath, $fileName);
+                    $imgPathNG = 'assets/img/photo_shop/press/ng/' . $fileName;
+                }
+                $ng = $request->ng[$prodId];
+                $ngRecord = PressActualFormNg::where('production_id', $prodId)->first();
 
+                if ($ngRecord) {
+                    $ngRecord->update([
+                        'OK' => $ng['OK'][0] ?? $ngRecord->OK,
+                        'rework' => $ng['rework'][0] ?? $ngRecord->rework,
+                        'dmg_part' => $ng['dmg_part'][0] ?? $ngRecord->dmg_part,
+                        'dmg_rm' => $ng['dmg_rm'][0] ?? $ngRecord->dmg_rm,
+                        'remarks' => $ng['remarks'][0] ?? $ngRecord->remarks,
+                        'photo_ng' => $imgPathNG ?? $ngRecord->photo_ng,
+                    ]);
+                } else {
+                    PressActualFormNg::create([
+                        'production_id' => $prodId,
+                        'model_id' => $modelId,
+                        'OK' => $ng['OK'][0] ?? 0,
+                        'rework' => $ng['rework'][0] ?? 0,
+                        'dmg_part' => $ng['dmg_part'][0] ?? 0,
+                        'dmg_rm' => $ng['dmg_rm'][0] ?? 0,
+                        'remarks' => $ng['remarks'][0] ?? null,
+                        'photo_ng' => $imgPathNG,
+                    ]);
+                }
+            }
             DB::commit();
             return redirect('/daily-report/press')->with('status', 'Daily report data updated successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect('/daily-report/press')->with('failed', 'Failed to update daily report data. Please try again. Error: ' . $e->getMessage());
-        }
+         }
+        catch (\Exception $e) {
+        DB::rollBack();
+        return redirect('/daily-report/press')->with('failed', 'Failed to update daily report data. Please try again. Error: ' . $e->getMessage());
     }
+    }
+
+    public function destroy($id)
+{
+    DB::beginTransaction();
+
+    try {
+        // Decrypt the header ID
+        $headerId = decrypt($id);
+
+        // Find the header
+        $header = PressActualHeader::findOrFail($headerId);
+
+        // Get all details associated with the header
+        $details = PressActualFormDetail::where('header_id', $headerId)->get();
+
+        // Loop through details and delete associated productions and ng records
+        foreach ($details as $detail) {
+            $productions = PressActualFormProduction::where('details_id', $detail->id)->get();
+
+            foreach ($productions as $production) {
+                PressActualFormNg::where('production_id', $production->id)->delete();
+                $production->delete();
+            }
+
+            $detail->delete();
+        }
+
+        // Finally, delete the header
+        $header->delete();
+
+        DB::commit();
+        return redirect('/daily-report/press')->with('status', 'Daily report deleted successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect('/daily-report/press')->with('failed', 'Failed to delete daily report. Please try again. Error: ' . $e->getMessage());
+    }
+}
+
+
+
+
 }

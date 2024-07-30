@@ -170,7 +170,7 @@
                                                             <td>{{ $data->date }}</td>
                                                             <td>{{ $data->shift }}</td>
                                                             <td>{{ $data->created_by }}</td>
-                                                            <td>{{ $data->pic }}</td>
+                                                            <td>{{ $data->PIC }}</td>
 
                                                             <td>
                                                                 <a title="Detail Report"
@@ -181,6 +181,11 @@
                                                                     href="{{ url('/daily-report/press/update/' . encrypt($data->id)) }}"
                                                                     class="btn btn-primary btn-sm me-2"><i
                                                                         class="fas fa-edit"></i></a>
+                                                                <form action="{{ url('/daily-report/press/delete/' . encrypt($data->id)) }}" method="POST" style="display:inline;" id="delete-form-{{ $data->id }}">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <a title="Delete Report" onclick="confirmDelete({{ $data->id }})" class="btn btn-primary btn-sm me-2"><i class="fas fa-trash"></i></a>
+                                                                </form>
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -212,5 +217,10 @@
                 "autoWidth": false,
             });
         });
+        function confirmDelete(id) {
+        if (confirm('Are you sure you want to delete this report?')) {
+            document.getElementById('delete-form-' + id).submit();
+        }
+        }
     </script>
 @endsection
