@@ -286,6 +286,7 @@ class FormFactoryBController extends Controller
 
     public function updateForm(Request $request)
     {
+        dd($request);
         DB::beginTransaction();
 
         try {
