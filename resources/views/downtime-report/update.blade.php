@@ -10,7 +10,6 @@
                         Update Downtime Report Form
                     </h1>
                 </div>
-            </div>
         </header>
         <!-- Main page content-->
         <div class="container-fluid px-4 mt-n10">
@@ -48,7 +47,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody id="downtime-table">
-                                                        @foreach ($formattedData as $index => $data)
+                                                        @forelse ($formattedData as $index => $data)
                                                             @foreach ($data['actuals'] as $actualIndex => $actual)
                                                                 <tr>
                                                                     <td>
@@ -195,7 +194,12 @@
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
-                                                        @endforeach
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="5" class="text-center">No downtime reports
+                                                                    found. Please add a new report below.</td>
+                                                            </tr>
+                                                        @endforelse
                                                     </tbody>
                                                 </table>
                                                 <button type="button" class="btn btn-success add-downtime-row">Add
@@ -236,12 +240,7 @@
                             <select name="machine[]" class="form-control machine-select" required disabled>
                                 <option value="">Select Machine</option>
                                 @foreach ($machines as $machine)
-                                    @if ($machine->shop_id == $data['shop_id'])
-                                        <option value="{{ $machine->id }}"
-                                        {{ $machine->id == $actual['machine_id'] }}>
-                                        {{ $machine->machine_name }}
-                                        </option>
-                                    @endif
+                                    <option value="{{ $machine->id }}" data-shop="{{ $machine->shop_id }}">{{ $machine->machine_name }}</option>
                                 @endforeach
                             </select>
                         </div>
