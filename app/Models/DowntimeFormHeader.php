@@ -9,12 +9,26 @@ class DowntimeFormHeader extends Model
 {
     use HasFactory;
 
+    protected $table = 'downtime_form_headers';
+
     protected $fillable = [
-        'shop_type', 'shift', 'date', 'created_by'
+        'section_id', 'shift', 'date', 'revision', 'created_by',
     ];
 
+    protected $dates = [
+        'created_at',
+        'updated_at',
+    ];
+
+    // Define the relationship with DowntimeFormDetail
     public function details()
     {
-        return $this->hasMany(DowntimeFormDetails::class, 'header_id');
+        return $this->hasMany(DowntimeFormDetail::class, 'header_id');
+    }
+
+    // Define the relationship with UnifiedSection
+    public function section()
+    {
+        return $this->belongsTo(UnifiedSection::class, 'section_id');
     }
 }

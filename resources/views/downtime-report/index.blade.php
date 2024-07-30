@@ -29,34 +29,6 @@
                                     <div class="card-header">
                                         <h3 class="card-title">Downtime Reports</h3>
                                     </div>
-
-                                    <!-- Error Alert -->
-                                    @if ($errors->any())
-                                        <div class="alert alert-danger">
-                                            <ul>
-                                                @foreach ($errors->all() as $error)
-                                                    <li>{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                    @endif
-
-                                    @if (session('error'))
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            {{ session('error') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                aria-label="Close"></button>
-                                        </div>
-                                    @endif
-
-                                    @if (session('status'))
-                                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                            {{ session('status') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                aria-label="Close"></button>
-                                        </div>
-                                    @endif
-
                                     <!-- /.card-header -->
                                     <div class="card-body">
                                         <div class="row">
@@ -82,14 +54,15 @@
                                                                 @csrf
                                                                 <div class="modal-body">
                                                                     <div class="form-group mb-3">
-                                                                        <label for="shop_type">Section</label>
-                                                                        <select name="shop_type" id="shop_type"
+                                                                        <label for="section_id">Section</label>
+                                                                        <select name="section_id" id="section_id"
                                                                             class="form-control" required>
                                                                             <option value="">- Please Select Section -
                                                                             </option>
-                                                                            @foreach ($shopTypes as $type)
-                                                                                <option value="{{ $type }}">
-                                                                                    {{ ucfirst($type) }}</option>
+                                                                            @foreach ($sectionTypes as $section)
+                                                                                <option value="{{ $section->id }}">
+                                                                                    {{ ucfirst($section->section_name) }}
+                                                                                </option>
                                                                             @endforeach
                                                                         </select>
                                                                     </div>
@@ -122,6 +95,42 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-sm-12">
+                                                <!--alert success -->
+                                                @if (session('status'))
+                                                    <div class="alert alert-success alert-dismissible fade show"
+                                                        role="alert">
+                                                        <strong>{{ session('status') }}</strong>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                @endif
+
+                                                @if (session('failed'))
+                                                    <div class="alert alert-danger alert-dismissible fade show"
+                                                        role="alert">
+                                                        <strong>{{ session('failed') }}</strong>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                @endif
+
+                                                <!--validasi form-->
+                                                @if (count($errors) > 0)
+                                                    <div class="alert alert-info alert-dismissible fade show"
+                                                        role="alert">
+                                                        <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                            aria-label="Close"></button>
+                                                        <ul>
+                                                            <li><strong>Data Process Failed !</strong></li>
+                                                            @foreach ($errors->all() as $error)
+                                                                <li><strong>{{ $error }}</strong></li>
+                                                            @endforeach
+                                                        </ul>
+                                                    </div>
+                                                @endif
+                                                <!--end validasi form-->
+                                            </div>
                                         </div>
                                         <div class="table-responsive">
                                             <table id="tableDowntime" class="table table-bordered table-striped">
@@ -142,7 +151,7 @@
                                                     @foreach ($headers as $header)
                                                         <tr>
                                                             <td>{{ $no++ }}</td>
-                                                            <td>{{ ucfirst($header->shop_type) }}</td>
+                                                            <td>{{ ucfirst($header->section->section_name) }}</td>
                                                             <td>{{ $header->date }}</td>
                                                             <td>{{ $header->shift }}</td>
                                                             <td>{{ $header->created_by }}</td>
@@ -155,6 +164,16 @@
                                                                     href="{{ url('/downtime-report/update/' . encrypt($header->id)) }}"
                                                                     class="btn btn-primary btn-sm me-2"><i
                                                                         class="fas fa-edit"></i></a>
+                                                                <form
+                                                                    action="{{ url('/downtime-report/delete/' . encrypt($header->id)) }}"
+                                                                    method="POST" class="d-inline"
+                                                                    onsubmit="return confirm('Are you sure you want to delete this report?');">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit"
+                                                                        class="btn btn-danger btn-sm"><i
+                                                                            class="fas fa-trash"></i></button>
+                                                                </form>
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -185,6 +204,9 @@
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
+                "order": [
+                    [2, "desc"]
+                ] // Sort by date (3rd column, zero-based index) in descending order
             });
         });
     </script>

@@ -9,11 +9,10 @@ class UnifiedShop extends Model
 {
     use HasFactory;
 
-    protected $table = 'unified_shops'; // specify the table name if it's different from the default
-    
+    protected $table = 'unified_shops';
+
     protected $fillable = [
-        'shop_name',
-        'shop_type',
+        'section_id', 'shop_name',
     ];
 
     protected $dates = [
@@ -21,13 +20,21 @@ class UnifiedShop extends Model
         'updated_at',
     ];
 
-    protected $primaryKey = ['shop_id', 'shop_type']; // composite primary key
+    // Define the relationship with UnifiedSection
+    public function section()
+    {
+        return $this->belongsTo(UnifiedSection::class, 'section_id');
+    }
 
-    public $incrementing = false; // composite keys are not auto-incrementing
-
+    // Define the relationship with DowntimeMstMachine
     public function machines()
     {
-        return $this->hasMany(DowntimeMstMachine::class, 'shop_id', 'shop_id')
-                    ->where('shop_type', $this->shop_type);
+        return $this->hasMany(DowntimeMstMachine::class, 'shop_id');
+    }
+
+    // Define the relationship with DowntimeFormDetail
+    public function downtimeDetails()
+    {
+        return $this->hasMany(DowntimeFormDetail::class, 'shop_id');
     }
 }

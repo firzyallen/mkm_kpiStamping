@@ -19,14 +19,18 @@
                 <!-- Main content -->
                 <section class="content">
                     <div class="container-fluid">
-                        <form action="{{ url('/downtime-report/store-details') }}" method="POST">
+                        <form action="{{ url('/downtime-report/store-details') }}" method="POST"
+                            enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="header_id" value="{{ $header->id }}">
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h3 class="card-title">Downtime Report Form</h3>
+                                            <h3 class="card-title">Downtime Report Form for Section:
+                                                <b>{{ $header->section->section_name }}</b>, Shift:
+                                                <b>{{ $header->shift }}</b>, Date:
+                                                <b>{{ \Carbon\Carbon::parse($header->date)->format('d-m-Y') }}</b></h3>
                                             <button type="submit" class="btn btn-primary">Submit</button>
                                         </div>
                                         <div class="card-body">
@@ -51,8 +55,10 @@
                                                                         required>
                                                                         <option value="">Select Shop</option>
                                                                         @foreach ($shops as $shop)
-                                                                            <option value="{{ $shop->shop_id }}">
-                                                                                {{ $shop->shop_name }}</option>
+                                                                            @if ($shop->section_id == $header->section_id)
+                                                                                <option value="{{ $shop->id }}">
+                                                                                    {{ $shop->shop_name }}</option>
+                                                                            @endif
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
@@ -63,12 +69,19 @@
                                                                         class="form-control machine-select" required
                                                                         disabled>
                                                                         <option value="">Select Machine</option>
-                                                                        @foreach ($machines as $machine)
-                                                                            <option value="{{ $machine->id }}"
-                                                                                data-shop="{{ $machine->shop_id }}">
-                                                                                {{ $machine->machine_name }}</option>
-                                                                        @endforeach
                                                                     </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="reporter">Reporter <span
+                                                                            class="text-danger">*</span></label>
+                                                                    <input type="text" name="reporter[]"
+                                                                        class="form-control" required
+                                                                        placeholder="Enter reporter name">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="photo">Photo</label>
+                                                                    <input type="file" name="photo[]"
+                                                                        class="form-control">
                                                                 </div>
                                                             </td>
                                                             <td>
@@ -137,7 +150,7 @@
                                                                 <div class="form-group">
                                                                     <label for="percentage">Percentage</label>
                                                                     <input type="text" name="percentage[]"
-                                                                        class="form-control"
+                                                                        class="form-control percentage-input"
                                                                         placeholder="Write it in decimal (e.g., 0.23)">
                                                                 </div>
                                                             </td>
@@ -163,6 +176,27 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Function to fetch machines based on the selected shop
+            function fetchMachines(shopId, machineSelect) {
+                machineSelect.prop('disabled', false);
+                machineSelect.empty();
+                machineSelect.append('<option value="">Select Machine</option>');
+                @foreach ($machines as $machine)
+                    if (shopId == "{{ $machine->shop_id }}") {
+                        machineSelect.append(
+                            '<option value="{{ $machine->id }}">{{ $machine->machine_name }}</option>'
+                        );
+                    }
+                @endforeach
+            }
+
+            // Function to handle shop change event
+            $(document).on('change', '.shop-select', function() {
+                var shopId = $(this).val();
+                var machineSelect = $(this).closest('tr').find('.machine-select');
+                fetchMachines(shopId, machineSelect);
+            });
+
             // Function to add new downtime row
             $(document).on('click', '.add-downtime-row', function() {
                 var newRow = `
@@ -173,7 +207,9 @@
                             <select name="shop[]" class="form-control shop-select" required>
                                 <option value="">Select Shop</option>
                                 @foreach ($shops as $shop)
-                                    <option value="{{ $shop->shop_id }}">{{ $shop->shop_name }}</option>
+                                    @if ($shop->section_id == $header->section_id)
+                                        <option value="{{ $shop->id }}">{{ $shop->shop_name }}</option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
@@ -181,10 +217,15 @@
                             <label for="machine">Machine <span class="text-danger">*</span></label>
                             <select name="machine[]" class="form-control machine-select" required disabled>
                                 <option value="">Select Machine</option>
-                                @foreach ($machines as $machine)
-                                    <option value="{{ $machine->id }}" data-shop="{{ $machine->shop_id }}">{{ $machine->machine_name }}</option>
-                                @endforeach
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reporter">Reporter <span class="text-danger">*</span></label>
+                            <input type="text" name="reporter[]" class="form-control" required placeholder="Enter reporter name">
+                        </div>
+                        <div class="form-group">
+                            <label for="photo">Photo</label>
+                            <input type="file" name="photo[]" class="form-control">
                         </div>
                     </td>
                     <td>
@@ -240,7 +281,7 @@
                         </div>
                         <div class="form-group">
                             <label for="percentage">Percentage</label>
-                            <input type="text" name="percentage[]" class="form-control" placeholder="Write it in decimal (e.g., 0.23)">
+                            <input type="text" name="percentage[]" class="form-control percentage-input" placeholder="Write it in decimal (e.g., 0.23)">
                         </div>
                     </td>
                     <td>
@@ -250,25 +291,11 @@
                 $('#downtime-table').append(newRow);
             });
 
-            // Function to remove downtime row
+            // Function to remove downtime row with confirmation
             $(document).on('click', '.remove-downtime-row', function() {
-                $(this).closest('tr').remove();
-            });
-
-            // Function to fetch machines based on the selected shop
-            $(document).on('change', '.shop-select', function() {
-                var shopId = $(this).val();
-                var machineSelect = $(this).closest('tr').find('.machine-select');
-                machineSelect.prop('disabled', false);
-                machineSelect.empty();
-                machineSelect.append('<option value="">Select Machine</option>');
-                @foreach ($machines as $machine)
-                    if (shopId == "{{ $machine->shop_id }}") {
-                        machineSelect.append(
-                            '<option value="{{ $machine->id }}">{{ $machine->machine_name }}</option>'
-                        );
-                    }
-                @endforeach
+                if (confirm("Are you sure you want to remove this downtime row?")) {
+                    $(this).closest('tr').remove();
+                }
             });
 
             // Function to set shop call based on downtime cause
@@ -294,6 +321,14 @@
                     var end = new Date('1970-01-01T' + endTime + 'Z');
                     var diff = (end - start) / (1000 * 60 * 60); // Calculate difference in hours
                     row.find('.balance').val(diff.toFixed(2));
+                }
+            });
+
+            // Function to format percentage input
+            $(document).on('input', '.percentage-input', function() {
+                var value = parseFloat($(this).val());
+                if (!isNaN(value)) {
+                    $(this).val(value.toFixed(2));
                 }
             });
         });
