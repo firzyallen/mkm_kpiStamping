@@ -424,5 +424,42 @@ class FormFactoryBController extends Controller
         }
     }
 
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Decrypt the header ID
+            $headerId = decrypt($id);
+
+            // Find the header
+            $header = FactbActualHeader::findOrFail($headerId);
+
+            // Get all details associated with the header
+            $details = FactbActualDetail::where('header_id', $headerId)->get();
+
+            // Loop through details and delete associated productions and ng records
+            foreach ($details as $detail) {
+                $productions = FactbActualFormProduction::where('details_id', $detail->id)->get();
+
+                foreach ($productions as $production) {
+                    FactbActualFormNg::where('production_id', $production->id)->delete();
+                    $production->delete();
+                }
+
+                $detail->delete();
+            }
+
+            // Finally, delete the header
+            $header->delete();
+
+            DB::commit();
+            return redirect('/daily-report/factoryb')->with('status', 'Daily report deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect('/daily-report/factoryb')->with('failed', 'Failed to delete daily report. Please try again. Error: ' . $e->getMessage());
+        }
+    }
+
 }
 

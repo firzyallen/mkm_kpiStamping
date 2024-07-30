@@ -13,6 +13,7 @@ use App\Http\Controllers\MstWeldingController;
 use App\Http\Controllers\FormFactoryBController;
 use App\Http\Controllers\FormWeldingController;
 use App\Http\Controllers\FactoryBKPIController;
+use App\Http\Controllers\WeldingKPIController;
 
 
 /*
@@ -64,6 +65,7 @@ Route::middleware(['auth'])->group(function () {
 
      //KPI Monitoring
      Route::get('kpi-monitoring/factoryb', [FactoryBKPIController::class, 'index'])->middleware(['checkRole:IT']);
+     Route::get('kpi-monitoring/welding', [WeldingKPIController::class, 'index'])->middleware(['checkRole:IT']);
      //Factory B Form
      Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
      Route::post('/daily-report/factoryb/store/main', [FormFactoryBController::class, 'storeMain'])->middleware(['checkRole:IT']);
@@ -72,6 +74,7 @@ Route::middleware(['auth'])->group(function () {
      Route::get('/daily-report/factoryb/detail/{id}', [FormFactoryBController::class, 'showDetail'])->middleware(['checkRole:IT']);
      Route::get('/daily-report/factoryb/update/{id}', [FormFactoryBController::class, 'updateDetail'])->middleware(['checkRole:IT']);
      Route::post('/daily-report/factoryb/detail/update', [FormFactoryBController::class, 'updateForm'])->middleware(['checkRole:IT']);
+     Route::delete('/daily-report/factoryb/delete/{id}', [FormFactoryBController::class, 'destroy'])->middleware(['checkRole:IT']);
 
     //Welding Form
     Route::get('/daily-report/welding', [FormWeldingController::class, 'index'])->middleware(['checkRole:IT']);
@@ -81,6 +84,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/daily-report/welding/detail/{id}', [FormWeldingController::class, 'showDetail'])->middleware(['checkRole:IT']);
     Route::get('/daily-report/welding/update/{id}', [FormWeldingController::class, 'updateDetail'])->middleware(['checkRole:IT']);
     Route::post('/daily-report/welding/detail/update', [FormWeldingController::class, 'updateForm'])->middleware(['checkRole:IT']);
+    Route::delete('/daily-report/welding/delete/{id}', [FormWeldingController::class, 'destroy'])->middleware(['checkRole:IT']);
 
      //Master Press
      Route::get('press/shop', [MstPressController::class, 'shopview'])->middleware(['checkRole:IT']);

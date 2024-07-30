@@ -85,7 +85,7 @@
                                                                 </div>
                                                                 <div class="col-md-3">
                                                                     <label for="photo_shop">Documentation (if needed)</label>
-                                                                    <input readonly type="file" name="photo_shop[{{ $data['shop_name'] }}][]" class="form-control form-control-sm" disabled>
+                                                                    <button type="button" class="btn btn-primary btn-sm show-image" data-image-path="{{ $data['photo_shop'] }}">Show Image</button>
                                                                 </div>
                                                             </div>
 
@@ -154,8 +154,8 @@
                                                                                                 <textarea readonly name="production[{{ $model['model_name'] }}][remarks][]" class="form-control form-control-sm" rows="2">{{ $model['remarks'] }}</textarea>
                                                                                             </div>
                                                                                             <div class="col-md-8">
-                                                                                                <label>Photo</label>
-                                                                                                <input readonly type="file" name="photo_ng[{{ $model['model_name'] }}][]" class="form-control form-control-sm" disabled>
+                                                                                                <label>Photo: </label>
+                                                                                                <button type="button" class="btn btn-primary btn-sm show-image" data-image-path="{{ $model['photo_ng'] }}">Show Image</button>
                                                                                             </div>
                                                                                         </div>
                                                                                     </td>
@@ -180,4 +180,44 @@
         </div>
     </div>
 </main>
+<!-- Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Image" class="img-fluid" />
+                <p id="noImageText" style="display: none;">No images uploaded</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const imageButtons = document.querySelectorAll('.show-image');
+        const modalImage = document.getElementById('modalImage');
+        const noImageText = document.getElementById('noImageText');
+        const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+
+        imageButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const imagePath = button.getAttribute('data-image-path');
+                if (imagePath) {
+                    modalImage.src = '/' + imagePath;  // Adjust the path as per your requirement
+                    modalImage.style.display = 'block';
+                    noImageText.style.display = 'none';
+                } else {
+                    modalImage.style.display = 'none';
+                    noImageText.style.display = 'block';
+                }
+                imageModal.show();
+            });
+        });
+    });
+</script>
+
 @endsection
+
