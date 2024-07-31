@@ -14,6 +14,8 @@ use App\Models\WeldingMstShop;
 use App\Models\WeldingMstStation;
 use App\Models\Dropdown;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\WeldingDailyReportExport;
 
 class FormWeldingController extends Controller
 {
@@ -518,7 +520,10 @@ class FormWeldingController extends Controller
             return redirect()->back()->withInput()->withErrors(['failed' => 'Failed to update daily report data. Please try again. Error: ' . $e->getMessage()]);
         }
     }
-
+    public function exportExcel(Request $request){
+        $month = $request->input('month');
+       return Excel::download(new WeldingDailyReportExport($month), "welding_daily_report_export.xlsx");
+   }
     public function destroy($id)
     {
         DB::beginTransaction();

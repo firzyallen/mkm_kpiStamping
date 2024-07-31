@@ -12,6 +12,8 @@ use App\Models\PressActualFormNg;
 use App\Models\PressMstModel;
 use App\Models\PressMstShop;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PressDailyReportExport;
 
 
 class FormPressController extends Controller
@@ -455,5 +457,11 @@ class FormPressController extends Controller
             DB::rollBack();
             return redirect('/daily-report/press')->with('failed', 'Failed to delete daily report. Please try again. Error: ' . $e->getMessage());
         }
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $month = $request->input('month');
+        return Excel::download(new PressDailyReportExport($month), "press_daily_report_export.xlsx");
     }
 }
