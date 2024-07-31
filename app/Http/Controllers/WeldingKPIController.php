@@ -49,20 +49,33 @@ class WeldingKPIController extends Controller
                     $item->formatted_date = Carbon::parse($item->date)->format('D j');
                     return $item;
                 });*/
-            foreach ($stations as $station){
-                foreach ($models as $model){
-                    $otdpData[$model->model_name] = DB::table('welding_model_otdps')
-                        ->whereMonth('date', $currentMonth)
-                        ->whereYear('date', $currentYear)
-                        ->where('shop_id', $shop->id)
-                        ->where('model_id', $model->id)
-                        ->get()
-                        ->map(function ($item) {
-                            $item->formatted_date = Carbon::parse($item->date)->format('D j');
-                            return $item;
-                        });
-                    }
+            $filteredModels = [];
+            $filteredStations = [];
+            $filteredStations = $stations->filter(function ($station) use ($shop) {
+                return $station->shop_id == $shop->id;
+            });
+            foreach($filteredStations as $station){
+                $filterModel = $models->filter(function ($model) use ($station) {
+                    return $model->station_id == $station->id;
+                });
+                foreach($filterModel as $model){
+                    $filteredModels[$model->model_name] = $model;
+                }
             }
+            foreach($filteredModels as $model){
+                $otdpData[$model->model_name] = DB::table('welding_model_otdps')
+                    ->whereMonth('date', $currentMonth)
+                    ->whereYear('date', $currentYear)
+                    ->where('shop_id', $shop->id)
+                    ->where('model_id', $model->id)
+                    ->get()
+                    ->map(function ($item) {
+                        $item->formatted_date = Carbon::parse($item->date)->format('D j');
+                        return $item;
+                    });
+            }
+            
+            
             $fttData = DB::table('welding_ftts')
                 ->whereMonth('date', $currentMonth)
                 ->whereYear('date', $currentYear)
@@ -78,8 +91,8 @@ class WeldingKPIController extends Controller
                 'otdp' => $otdpData,
                 'ftt' => $fttData
             ];
+            $otdpData =[];
 
-            
             $kpiStatuses[$shop->shop_name]['hpu'] = $this->computeKpiHPUStatus($hpuData->whereBetween('date', [$startDate, $endDate]));
             foreach($kpiData[$shop->shop_name]['otdp'] as $modelotdp){
                 $kpiStatuses[$shop->shop_name]['otdp'][$modelotdp[0]->model_name] = $this->computeKpiOTDPStatus($modelotdp->whereBetween('date', [$startDate, $endDate]));
