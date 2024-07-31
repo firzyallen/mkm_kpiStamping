@@ -7,10 +7,9 @@
                 <div class="page-header-content pt-4">
                     <h1 class="page-header-title">
                         <div class="page-header-icon"><i data-feather="tool"></i></div>
-                        Edit Downtime Report
+                        Update Downtime Report Form
                     </h1>
                 </div>
-            </div>
         </header>
         <!-- Main page content-->
         <div class="container-fluid px-4 mt-n10">
@@ -19,7 +18,8 @@
                 <!-- Main content -->
                 <section class="content">
                     <div class="container-fluid">
-                        <form action="{{ url('/downtime-report/update-form/' . encrypt($header->id)) }}" method="POST">
+                        <form action="{{ url('/downtime-report/update-details', ['id' => encrypt($header->id)]) }}"
+                            method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="header_id" value="{{ $header->id }}">
@@ -27,7 +27,11 @@
                                 <div class="col-12">
                                     <div class="card">
                                         <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h3 class="card-title">Downtime Report Form</h3>
+                                            <h3 class="card-title">Downtime Report Form for Section:
+                                                <strong>{{ $header->section->section_name }}</strong>, Shift:
+                                                <strong>{{ $header->shift }}</strong>, Date:
+                                                <strong>{{ \Carbon\Carbon::parse($header->date)->format('d-m-Y') }}</strong>
+                                            </h3>
                                             <button type="submit" class="btn btn-primary">Update</button>
                                         </div>
                                         <div class="card-body">
@@ -43,65 +47,113 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody id="downtime-table">
-                                                        @foreach ($header->details as $detail)
-                                                            @foreach ($detail->actuals as $actual)
+                                                        @forelse ($formattedData as $index => $data)
+                                                            @foreach ($data['actuals'] as $actualIndex => $actual)
                                                                 <tr>
                                                                     <td>
                                                                         <div class="form-group">
                                                                             <label for="shop">Shop <span
                                                                                     class="text-danger">*</span></label>
-                                                                            <input type="text" name="shop[]"
-                                                                                class="form-control"
-                                                                                value="{{ $detail->shop->shop_name }}"
-                                                                                readonly>
+                                                                            <select name="shop[]"
+                                                                                class="form-control shop-select" required>
+                                                                                <option value="">Select Shop</option>
+                                                                                @foreach ($shops as $shop)
+                                                                                    @if ($shop->section_id == $header->section_id)
+                                                                                        <option value="{{ $shop->id }}"
+                                                                                            {{ $shop->id == $data['shop_id'] ? 'selected' : '' }}>
+                                                                                            {{ $shop->shop_name }}
+                                                                                        </option>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            </select>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="machine">Machine <span
                                                                                     class="text-danger">*</span></label>
-                                                                            <input type="text" name="machine[]"
+                                                                            <select name="machine[]"
+                                                                                class="form-control machine-select"
+                                                                                required>
+                                                                                <option value="">Select Machine
+                                                                                </option>
+                                                                                @foreach ($machines as $machine)
+                                                                                    @if ($machine->shop_id == $data['shop_id'])
+                                                                                        <option value="{{ $machine->id }}"
+                                                                                            {{ $machine->id == $actual['machine_id'] ? 'selected' : '' }}>
+                                                                                            {{ $machine->machine_name }}
+                                                                                        </option>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            </select>
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label for="reporter">Reporter <span
+                                                                                    class="text-danger">*</span></label>
+                                                                            <input type="text" name="reporter[]"
                                                                                 class="form-control"
-                                                                                value="{{ $actual->machine->machine_name }}"
-                                                                                readonly>
+                                                                                value="{{ $data['reporter'] }}" required
+                                                                                placeholder="Enter reporter name">
+                                                                        </div>
+                                                                        <div class="form-group">
+                                                                            <label for="photo">Photo</label>
+                                                                            <input type="file" name="photo[]"
+                                                                                class="form-control">
+                                                                            @if ($actual['photo'])
+                                                                                <img src="{{ asset($actual['photo']) }}"
+                                                                                    alt="Photo"
+                                                                                    class="img-thumbnail mt-2"
+                                                                                    style="width: 150px;">
+                                                                            @endif
                                                                         </div>
                                                                     </td>
                                                                     <td>
                                                                         <div class="form-group">
                                                                             <label for="downtime-cause">Downtime Cause <span
                                                                                     class="text-danger">*</span></label>
-                                                                            <input type="text" name="downtime_cause[]"
-                                                                                class="form-control"
-                                                                                value="{{ $actual->category }}" readonly>
+                                                                            <select name="downtime_cause[]"
+                                                                                class="form-control downtime-cause"
+                                                                                required>
+                                                                                <option value="">Select Downtime
+                                                                                </option>
+                                                                                @foreach ($downtimeCategories as $category => $shop_call)
+                                                                                    <option value="{{ $category }}"
+                                                                                        {{ $category == $actual['category'] ? 'selected' : '' }}
+                                                                                        data-code="{{ $shop_call }}">
+                                                                                        {{ $category }}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                            </select>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="shop-call">Shop Call</label>
                                                                             <input type="text" name="shop_call[]"
                                                                                 class="form-control shop-call"
-                                                                                value="{{ $actual->shop_call }}" readonly>
+                                                                                value="{{ $actual['shop_call'] }}"
+                                                                                readonly>
                                                                         </div>
                                                                     </td>
                                                                     <td>
                                                                         <div class="form-group">
                                                                             <label for="problem">Problem <span
                                                                                     class="text-danger">*</span></label>
-                                                                            <textarea name="problem[]" class="form-control" rows="3" required>{{ $actual->problem }}</textarea>
+                                                                            <textarea name="problem[]" class="form-control" rows="3" required>{{ $actual['problem'] }}</textarea>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="cause">Cause</label>
-                                                                            <textarea name="cause[]" class="form-control" rows="3" placeholder="Enter the cause details">{{ $actual->cause }}</textarea>
+                                                                            <textarea name="cause[]" class="form-control" rows="3">{{ $actual['cause'] }}</textarea>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="action">Action</label>
-                                                                            <textarea name="action[]" class="form-control" rows="3" placeholder="Enter the action details">{{ $actual->action }}</textarea>
+                                                                            <textarea name="action[]" class="form-control" rows="3">{{ $actual['action'] }}</textarea>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="judgement">Judgement</label>
                                                                             <select name="judgement[]" class="form-control">
                                                                                 <option value="">Select Judgement
                                                                                 </option>
-                                                                                @foreach ($judgements as $key => $value)
-                                                                                    <option value="{{ $value }}"
-                                                                                        {{ $actual->judgement == $value ? 'selected' : '' }}>
-                                                                                        {{ $key }}
+                                                                                @foreach ($judgements as $judgement => $code)
+                                                                                    <option value="{{ $code }}"
+                                                                                        {{ $code == $actual['judgement'] ? 'selected' : '' }}>
+                                                                                        {{ $judgement }}
                                                                                     </option>
                                                                                 @endforeach
                                                                             </select>
@@ -113,26 +165,26 @@
                                                                                     class="text-danger">*</span></label>
                                                                             <input type="time" name="start_time[]"
                                                                                 class="form-control start-time"
-                                                                                value="{{ $actual->start_time }}" required>
+                                                                                value="{{ \Carbon\Carbon::parse($actual['start_time'])->format('H:i') }}"
+                                                                                required>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="end_time">End Time</label>
                                                                             <input type="time" name="end_time[]"
                                                                                 class="form-control end-time"
-                                                                                value="{{ $actual->end_time }}">
+                                                                                value="{{ $actual['end_time'] ? \Carbon\Carbon::parse($actual['end_time'])->format('H:i') : '' }}">
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="balance">Balance</label>
                                                                             <input type="text" name="balance[]"
                                                                                 class="form-control balance"
-                                                                                value="{{ $actual->balance }}" readonly
-                                                                                placeholder="Automatically calculated">
+                                                                                value="{{ $actual['balance'] }}" readonly>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="percentage">Percentage</label>
                                                                             <input type="text" name="percentage[]"
                                                                                 class="form-control"
-                                                                                value="{{ $actual->percentage }}"
+                                                                                value="{{ $actual['percentage'] }}"
                                                                                 placeholder="Write it in decimal (e.g., 0.23)">
                                                                         </div>
                                                                     </td>
@@ -142,9 +194,16 @@
                                                                     </td>
                                                                 </tr>
                                                             @endforeach
-                                                        @endforeach
+                                                        @empty
+                                                            <tr>
+                                                                <td colspan="5" class="text-center">No downtime reports
+                                                                    found. Please add a new report below.</td>
+                                                            </tr>
+                                                        @endforelse
                                                     </tbody>
                                                 </table>
+                                                <button type="button" class="btn btn-success add-downtime-row">Add
+                                                    Downtime</button>
                                             </div>
                                         </div>
                                     </div>
@@ -163,93 +222,105 @@
             // Function to add new downtime row
             $(document).on('click', '.add-downtime-row', function() {
                 var newRow = `
-            <tr>
-                <td>
-                    <div class="form-group">
-                        <label for="shop">Shop <span class="text-danger">*</span></label>
-                        <select name="shop[]" class="form-control shop-select" required>
-                            <option value="">Select Shop</option>
-                            @foreach ($shops as $shop)
-                                <option value="{{ $shop->shop_id }}">{{ $shop->shop_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="machine">Machine <span class="text-danger">*</span></label>
-                        <select name="machine[]" class="form-control machine-select" required disabled>
-                            <option value="">Select Machine</option>
-                            @foreach ($machines as $machine)
-                                <option value="{{ $machine->id }}" data-shop="{{ $machine->shop_id }}">{{ $machine->machine_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group">
-                        <label for="downtime-cause">Downtime Cause <span class="text-danger">*</span></label>
-                        <select name="downtime_cause[]" class="form-control downtime-cause" required>
-                            <option value="">Select Downtime</option>
-                            @foreach ($downtimeCategories as $key => $value)
-                                <option value="{{ $value }}" data-code="{{ $value }}">{{ $key }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="shop-call">Shop Call</label>
-                        <input type="text" name="shop_call[]" class="form-control shop-call" readonly>
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group">
-                        <label for="problem">Problem <span class="text-danger">*</span></label>
-                        <textarea name="problem[]" class="form-control" rows="3" required placeholder="Enter the problem details"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="cause">Cause</label>
-                        <textarea name="cause[]" class="form-control" rows="3" placeholder="Enter the cause details"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="action">Action</label>
-                        <textarea name="action[]" class="form-control" rows="3" placeholder="Enter the action details"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="judgement">Judgement</label>
-                        <select name="judgement[]" class="form-control">
-                            <option value="">Select Judgement</option>
-                            @foreach ($judgements as $key => $value)
-                                <option value="{{ $value }}">{{ $key }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </td>
-                <td>
-                    <div class="form-group">
-                        <label for="start_time">Start Time <span class="text-danger">*</span></label>
-                        <input type="time" name="start_time[]" class="form-control start-time" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="end_time">End Time</label>
-                        <input type="time" name="end_time[]" class="form-control end-time">
-                    </div>
-                    <div class="form-group">
-                        <label for="balance">Balance</label>
-                        <input type="text" name="balance[]" class="form-control balance" readonly placeholder="Automatically calculated">
-                    </div>
-                    <div class="form-group">
-                        <label for="percentage">Percentage</label>
-                        <input type="text" name="percentage[]" class="form-control" placeholder="Write it in decimal (e.g., 0.23)">
-                    </div>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-danger remove-downtime-row">-</button>
-                </td>
-            </tr>`;
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <label for="shop">Shop <span class="text-danger">*</span></label>
+                            <select name="shop[]" class="form-control shop-select" required>
+                                <option value="">Select Shop</option>
+                                @foreach ($shops as $shop)
+                                    @if ($shop->section_id == $header->section_id)
+                                        <option value="{{ $shop->id }}">{{ $shop->shop_name }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="machine">Machine <span class="text-danger">*</span></label>
+                            <select name="machine[]" class="form-control machine-select" required disabled>
+                                <option value="">Select Machine</option>
+                                @foreach ($machines as $machine)
+                                    <option value="{{ $machine->id }}" data-shop="{{ $machine->shop_id }}">{{ $machine->machine_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reporter">Reporter <span class="text-danger">*</span></label>
+                            <input type="text" name="reporter[]" class="form-control" required placeholder="Enter reporter name">
+                        </div>
+                        <div class="form-group">
+                            <label for="photo">Photo</label>
+                            <input type="file" name="photo[]" class="form-control">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <label for="downtime-cause">Downtime Cause <span class="text-danger">*</span></label>
+                            <select name="downtime_cause[]" class="form-control downtime-cause" required>
+                                <option value="">Select Downtime</option>
+                                @foreach ($downtimeCategories as $category => $shop_call)
+                                    <option value="{{ $category }}" data-code="{{ $shop_call }}">{{ $category }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="shop-call">Shop Call</label>
+                            <input type="text" name="shop_call[]" class="form-control shop-call" readonly>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <label for="problem">Problem <span class="text-danger">*</span></label>
+                            <textarea name="problem[]" class="form-control" rows="3" required placeholder="Enter the problem details"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="cause">Cause</label>
+                            <textarea name="cause[]" class="form-control" rows="3" placeholder="Enter the cause details"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="action">Action</label>
+                            <textarea name="action[]" class="form-control" rows="3" placeholder="Enter the action details"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="judgement">Judgement</label>
+                            <select name="judgement[]" class="form-control">
+                                <option value="">Select Judgement</option>
+                                @foreach ($judgements as $judgement => $code)
+                                    <option value="{{ $code }}">{{ $judgement }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <label for="start_time">Start Time <span class="text-danger">*</span></label>
+                            <input type="time" name="start_time[]" class="form-control start-time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_time">End Time</label>
+                            <input type="time" name="end_time[]" class="form-control end-time">
+                        </div>
+                        <div class="form-group">
+                            <label for="balance">Balance</label>
+                            <input type="text" name="balance[]" class="form-control balance" readonly placeholder="Automatically calculated">
+                        </div>
+                        <div class="form-group">
+                            <label for="percentage">Percentage</label>
+                            <input type="text" name="percentage[]" class="form-control" placeholder="Write it in decimal (e.g., 0.23)">
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-danger remove-downtime-row">-</button>
+                    </td>
+                </tr>`;
                 $('#downtime-table').append(newRow);
             });
 
-            // Function to remove downtime row
+            // Function to remove downtime row with confirmation
             $(document).on('click', '.remove-downtime-row', function() {
-                $(this).closest('tr').remove();
+                if (confirm("Are you sure you want to remove this downtime row?")) {
+                    $(this).closest('tr').remove();
+                }
             });
 
             // Function to fetch machines based on the selected shop
@@ -273,9 +344,9 @@
                 var selectedCause = $(this).find(':selected').data('code');
                 var shopCallInput = $(this).closest('tr').find('.shop-call');
                 shopCallInput.val('');
-                @foreach ($downtimeCategories as $key => $value)
-                    if (selectedCause === "{{ $value }}") {
-                        shopCallInput.val("{{ $value }}");
+                @foreach ($downtimeCategories as $category => $shop_call)
+                    if (selectedCause === "{{ $shop_call }}") {
+                        shopCallInput.val("{{ $shop_call }}");
                     }
                 @endforeach
             });
