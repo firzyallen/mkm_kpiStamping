@@ -13,6 +13,8 @@ use App\Models\FactbMstModel;
 use App\Models\FactbMstShop;
 use App\Models\Dropdown;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\FactoryBDailyReportExport;
 
 class FormFactoryBController extends Controller
 {
@@ -424,6 +426,11 @@ class FormFactoryBController extends Controller
             return redirect('/daily-report/factoryb')->with('failed', 'Failed to update daily report data. Please try again. Error: ' . $e->getMessage());
         }
     }
+
+    public function exportExcel(Request $request){
+        $month = $request->input('month');
+       return Excel::download(new FactoryBDailyReportExport($month), "factoryb_daily_report_export.xlsx");
+   }
 
 }
 

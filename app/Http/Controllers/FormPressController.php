@@ -12,6 +12,8 @@ use App\Models\PressActualFormNg;
 use App\Models\PressMstModel;
 use App\Models\PressMstShop;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PressDailyReportExport;
 
 
 class FormPressController extends Controller
@@ -458,7 +460,10 @@ class FormPressController extends Controller
     }
 }
 
-
+    public function exportExcel(Request $request){
+        $month = $request->input('month');
+    return Excel::download(new PressDailyReportExport($month), "press_daily_report_export.xlsx");
+    }
 
 
 }
