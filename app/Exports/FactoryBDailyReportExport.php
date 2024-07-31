@@ -55,8 +55,8 @@ class FactoryBDailyReportExport implements FromView, ShouldAutoSize
                 'fah.created_at',
                 'fah.updated_at'
             )
-            ->orderBy('fh.date')
-            ->orderBy('fs.shop_name')
+            ->orderBy('fah.date')
+            ->orderBy('fms.shop_name')
             ->get();
 
         return view('exports.factory_b_daily_report', [
