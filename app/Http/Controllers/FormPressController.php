@@ -414,51 +414,46 @@ class FormPressController extends Controller
             }
             DB::commit();
             return redirect('/daily-report/press')->with('status', 'Daily report data updated successfully.');
-         }
-        catch (\Exception $e) {
-        DB::rollBack();
-        return redirect('/daily-report/press')->with('failed', 'Failed to update daily report data. Please try again. Error: ' . $e->getMessage());
-    }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect('/daily-report/press')->with('failed', 'Failed to update daily report data. Please try again. Error: ' . $e->getMessage());
+        }
     }
 
     public function destroy($id)
-{
-    DB::beginTransaction();
+    {
+        DB::beginTransaction();
 
-    try {
-        // Decrypt the header ID
-        $headerId = decrypt($id);
+        try {
+            // Decrypt the header ID
+            $headerId = decrypt($id);
 
-        // Find the header
-        $header = PressActualHeader::findOrFail($headerId);
+            // Find the header
+            $header = PressActualHeader::findOrFail($headerId);
 
-        // Get all details associated with the header
-        $details = PressActualFormDetail::where('header_id', $headerId)->get();
+            // Get all details associated with the header
+            $details = PressActualFormDetail::where('header_id', $headerId)->get();
 
-        // Loop through details and delete associated productions and ng records
-        foreach ($details as $detail) {
-            $productions = PressActualFormProduction::where('details_id', $detail->id)->get();
+            // Loop through details and delete associated productions and ng records
+            foreach ($details as $detail) {
+                $productions = PressActualFormProduction::where('details_id', $detail->id)->get();
 
-            foreach ($productions as $production) {
-                PressActualFormNg::where('production_id', $production->id)->delete();
-                $production->delete();
+                foreach ($productions as $production) {
+                    PressActualFormNg::where('production_id', $production->id)->delete();
+                    $production->delete();
+                }
+
+                $detail->delete();
             }
 
-            $detail->delete();
+            // Finally, delete the header
+            $header->delete();
+
+            DB::commit();
+            return redirect('/daily-report/press')->with('status', 'Daily report deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect('/daily-report/press')->with('failed', 'Failed to delete daily report. Please try again. Error: ' . $e->getMessage());
         }
-
-        // Finally, delete the header
-        $header->delete();
-
-        DB::commit();
-        return redirect('/daily-report/press')->with('status', 'Daily report deleted successfully.');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return redirect('/daily-report/press')->with('failed', 'Failed to delete daily report. Please try again. Error: ' . $e->getMessage());
     }
-}
-
-
-
-
 }

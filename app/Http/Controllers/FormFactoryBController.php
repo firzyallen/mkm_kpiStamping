@@ -13,10 +13,13 @@ use App\Models\FactbMstModel;
 use App\Models\FactbMstShop;
 use App\Models\Dropdown;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\FactoryBDailyReportExport;
 
 class FormFactoryBController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $items = FactbActualHeader::all();
         $categories = DB::table('dropdowns')->where('category', 'Shift')->get();
 
@@ -31,16 +34,16 @@ class FormFactoryBController extends Controller
             'date' => 'required|date',
             'pic' => 'required|string|max:255',
         ]);
-    
+
         // Check for existing data with the same date and shift
         $existingHeader = FactbActualHeader::where('date', $request->date)
-                                           ->where('shift', $request->shift)
-                                           ->first();
-    
+            ->where('shift', $request->shift)
+            ->first();
+
         if ($existingHeader) {
             return redirect()->back()->withInput()->withErrors(['error' => 'Daily Report for this date and shift already exists.']);
         }
-    
+
         // Create a new instance of the FactbActualHeader model
         $header = new FactbActualHeader();
         $header->date = $request->date;
@@ -48,17 +51,18 @@ class FormFactoryBController extends Controller
         $header->pic = $request->pic;
         $header->revision = 0;
         $header->created_by = auth()->user()->name;
-    
+
         // Save the new FactbActualHeader record to the database
         $header->save();
-    
+
         // Redirect back or return a response as needed
         $encryptedId = encrypt($header->id);
         return redirect()->route('form.daily-report.factoryb', ['id' => $encryptedId])->with('status', 'Daily Report header created successfully.');
     }
-    
 
-    public function formChecksheet($id) {
+
+    public function formChecksheet($id)
+    {
         $id = decrypt($id);
         $item = FactbActualHeader::findOrFail($id);
         $shops = FactbMstShop::all();
@@ -72,10 +76,9 @@ class FormFactoryBController extends Controller
                 'model_name' => $model->model_name,
             ];
         }
-        if($item->shift == 'Night'){
+        if ($item->shift == 'Night') {
             $working_hour = 6.75;
-        }
-        elseif($item->shift =='Day'){
+        } elseif ($item->shift == 'Day') {
             $carbonDate = Carbon::parse($item->date);
             if ($carbonDate->isFriday()) {
                 $working_hour = 7;
@@ -89,10 +92,10 @@ class FormFactoryBController extends Controller
     public function storeForm(Request $request)
     {
         DB::beginTransaction();
-    
+
         try {
             $headerId = $request->id;
-    
+
             // Insert data into factb_actual_details table
             foreach ($request->shop as $shop) {
                 $imgPath = null;
@@ -104,7 +107,7 @@ class FormFactoryBController extends Controller
                     $imgPath = 'assets/img/photo_shop/factoryb/shop/' . $fileName;
                 }
                 $shopId = FactbMstShop::where('shop_name', $shop)->value('id');
-    
+
                 $detail = FactbActualDetail::create([
                     'header_id' => $headerId,
                     'shop_id' => $shopId,
@@ -118,19 +121,19 @@ class FormFactoryBController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
-    
+
                 $detailId = $detail->id;
-    
+
                 // Insert data into factb_actual_form_productions table for each model in the shop
                 foreach ($request->production as $modelName => $production) {
                     $imgPathNG = null;
-                        if ($request->hasFile("photo_ng.$modelName.0")) {
-                            $file = $request->file("photo_ng.$modelName.0");
-                            $fileName = uniqid() . '_' . $file->getClientOriginalName();
-                            $destinationPath = public_path('assets/img/photo_shop/factoryb/ng/');
-                            $file->move($destinationPath, $fileName);
-                            $imgPathNG = 'assets/img/photo_shop/factoryb/ng/' . $fileName;
-                        }
+                    if ($request->hasFile("photo_ng.$modelName.0")) {
+                        $file = $request->file("photo_ng.$modelName.0");
+                        $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                        $destinationPath = public_path('assets/img/photo_shop/factoryb/ng/');
+                        $file->move($destinationPath, $fileName);
+                        $imgPathNG = 'assets/img/photo_shop/factoryb/ng/' . $fileName;
+                    }
                     $modelId = FactbMstModel::where('model_name', $modelName)->value('id');
                     $modelShopId = FactbMstModel::where('model_name', $modelName)->value('shop_id');
                     if ($modelShopId == $shopId) {
@@ -156,7 +159,7 @@ class FormFactoryBController extends Controller
                             'created_at' => now(),
                             'updated_at' => now(),
                         ])->id;
-    
+
                         // Insert NG data into factb_actual_form_ngs table
                         FactbActualFormNg::create([
                             'production_id' => $productionId,
@@ -172,7 +175,7 @@ class FormFactoryBController extends Controller
                     }
                 }
             }
-    
+
             DB::commit();
             return redirect('/daily-report/factoryb')->with('status', 'Daily report data saved successfully.');
         } catch (\Exception $e) {
@@ -180,7 +183,7 @@ class FormFactoryBController extends Controller
             return redirect('/daily-report/factoryb')->with('failed', 'Failed to save daily report data. Please try again. Error: ' . $e->getMessage());
         }
     }
-    
+
 
     public function showDetail($id)
     {
@@ -286,7 +289,6 @@ class FormFactoryBController extends Controller
 
     public function updateForm(Request $request)
     {
-        dd($request);
         DB::beginTransaction();
 
         try {
@@ -390,7 +392,7 @@ class FormFactoryBController extends Controller
                         }
                         $ng = $request->production[$modelName];
                         $ngRecord = FactbActualFormNg::where('production_id', $productionRecord->id)->first();
-                        
+
                         if ($ngRecord) {
                             $ngRecord->update([
                                 'total_prod' => $totalProd,
@@ -462,5 +464,9 @@ class FormFactoryBController extends Controller
         }
     }
 
+    public function exportExcel(Request $request)
+    {
+        $month = $request->input('month');
+        return Excel::download(new FactoryBDailyReportExport($month), "factoryb_daily_report_export.xlsx");
+    }
 }
-

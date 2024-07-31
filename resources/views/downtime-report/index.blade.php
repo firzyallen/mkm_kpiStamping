@@ -140,7 +140,7 @@
                                                         <th>Section</th>
                                                         <th>Date</th>
                                                         <th>Shift</th>
-                                                        <th>Reporter</th>
+                                                        <th>Created By</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>

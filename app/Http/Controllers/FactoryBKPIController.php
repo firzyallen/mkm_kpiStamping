@@ -16,6 +16,7 @@ class FactoryBKPIController extends Controller
 {
     public function index(Request $request)
     {
+        //dd($request->all());
         $shops = FactbMstShop::all();
 
         $currentMonth = $request->input('month', Carbon::now()->month);
@@ -62,7 +63,7 @@ class FactoryBKPIController extends Controller
                 'ftt' => $fttData
             ];
 
-            
+
             $kpiStatuses[$shop->shop_name]['hpu'] = $this->computeKpiHPUStatus($hpuData->whereBetween('date', [$startDate, $endDate]));
             $kpiStatuses[$shop->shop_name]['otdp'] = $this->computeKpiOTDPStatus($otdpData->whereBetween('date', [$startDate, $endDate]));
             $kpiStatuses[$shop->shop_name]['ftt'] = $this->computeKpiFTTStatus($fttData->whereBetween('date', [$startDate, $endDate]));
@@ -82,11 +83,9 @@ class FactoryBKPIController extends Controller
 
         foreach ($kpiDetails as $detail) {
             if ($detail->HPU > $detail->HPU_Plan) {
-                if ($detail->HPU == NULL){
-
-                }
-                else {
-                return 'red';
+                if ($detail->HPU == NULL) {
+                } else {
+                    return 'red';
                 }
             }
         }
@@ -102,11 +101,9 @@ class FactoryBKPIController extends Controller
 
         foreach ($kpiDetails as $detail) {
             if ($detail->OTDP < $detail->OTDP_Plan) {
-                if ($detail->OTDP == NULL){
-
-                }
-                else {
-                return 'red';
+                if ($detail->OTDP == NULL) {
+                } else {
+                    return 'red';
                 }
             }
         }
@@ -122,11 +119,9 @@ class FactoryBKPIController extends Controller
 
         foreach ($kpiDetails as $detail) {
             if ($detail->FTT < $detail->FTT_Plan) {
-                if ($detail->FTT == NULL){
-
-                }
-                else {
-                return 'red';
+                if ($detail->FTT == NULL) {
+                } else {
+                    return 'red';
                 }
             }
         }
