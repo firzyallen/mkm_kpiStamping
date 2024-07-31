@@ -41,7 +41,7 @@
                 <div class="container-fluid">
                     <div class="card">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h3 class="card-title">KPI Monitoring ({{ $monthName }} {{ $currentYear }})</h3>
+                            <h3 class="card-title">Factory B KPI Monitoring ({{ $monthName }} {{ $currentYear }})</h3>
                         </div>
                         <div class="card-body">
                             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -117,68 +117,6 @@
                                                                 });
                                                             </script>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6 mb-4">
-                                                <div class="card card-custom">
-                                                    <div class="card-header pt-2">
-                                                        <h3>OTDP (Green if: ≥ {{$kpiData[$shop->shop_name]['otdp'][0]->OTDP_Plan}}) 
-                                                            @php
-                                                                $statusClass = '';
-                                                                $statusText = '';
-                                                                switch ($kpiStatuses[$shop->shop_name]['otdp']) {
-                                                                    case 'green':
-                                                                        $statusClass = 'signal green';
-                                                                        $statusText = 'G';
-                                                                        break;
-                                                                    case 'red':
-                                                                        $statusClass = 'signal red';
-                                                                        $statusText = 'R';
-                                                                        break;
-                                                                    case 'grey':
-                                                                        $statusClass = 'signal grey';
-                                                                        $statusText = 'N/A';
-                                                                        break;
-                                                                }
-                                                            @endphp
-                                                            <span class="{{ $statusClass }}">{{ $statusText }}</span></h3>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <canvas id="barChartOtdp-{{ $shop->id }}"></canvas>
-                                                        <script>
-                                                            var ctxOtdp = document.getElementById('barChartOtdp-{{ $shop->id }}').getContext('2d');
-                                                            var otdpChart = new Chart(ctxOtdp, {
-                                                                type: 'bar',
-                                                                data: {
-                                                                    labels: @json($kpiData[$shop->shop_name]['otdp']->pluck('formatted_date')),
-                                                                    datasets: [
-                                                                        {
-                                                                            label: 'Actual',
-                                                                            data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
-                                                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                                            borderColor: 'rgba(75, 192, 192, 1)',
-                                                                            borderWidth: 1
-                                                                        },
-                                                                        {
-                                                                            label: 'Plan',
-                                                                            data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
-                                                                            type: 'line',
-                                                                            borderColor: 'rgba(255, 99, 132, 1)',
-                                                                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                                                            fill: false,
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                options: {
-                                                                    scales: {
-                                                                        y: {
-                                                                            beginAtZero: true
-                                                                        }
-                                                                    }
-                                                                }
-                                                            });
-                                                        </script>
                                                     </div>
                                                 </div>
                                             </div>
@@ -278,6 +216,68 @@
                                                     <div class="card-body">
                                                         <!-- Downtime chart placeholder -->
                                                         <p>Downtime data will be displayed here once available.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-4">
+                                                <div class="card card-custom">
+                                                    <div class="card-header pt-2">
+                                                        <h3>OTDP (Green if: ≥ {{$kpiData[$shop->shop_name]['otdp'][0]->OTDP_Plan}}) 
+                                                            @php
+                                                                $statusClass = '';
+                                                                $statusText = '';
+                                                                switch ($kpiStatuses[$shop->shop_name]['otdp']) {
+                                                                    case 'green':
+                                                                        $statusClass = 'signal green';
+                                                                        $statusText = 'G';
+                                                                        break;
+                                                                    case 'red':
+                                                                        $statusClass = 'signal red';
+                                                                        $statusText = 'R';
+                                                                        break;
+                                                                    case 'grey':
+                                                                        $statusClass = 'signal grey';
+                                                                        $statusText = 'N/A';
+                                                                        break;
+                                                                }
+                                                            @endphp
+                                                            <span class="{{ $statusClass }}">{{ $statusText }}</span></h3>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <canvas id="barChartOtdp-{{ $shop->id }}"></canvas>
+                                                        <script>
+                                                            var ctxOtdp = document.getElementById('barChartOtdp-{{ $shop->id }}').getContext('2d');
+                                                            var otdpChart = new Chart(ctxOtdp, {
+                                                                type: 'bar',
+                                                                data: {
+                                                                    labels: @json($kpiData[$shop->shop_name]['otdp']->pluck('formatted_date')),
+                                                                    datasets: [
+                                                                        {
+                                                                            label: 'Actual',
+                                                                            data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
+                                                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                                            borderColor: 'rgba(75, 192, 192, 1)',
+                                                                            borderWidth: 1
+                                                                        },
+                                                                        {
+                                                                            label: 'Plan',
+                                                                            data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
+                                                                            type: 'line',
+                                                                            borderColor: 'rgba(255, 99, 132, 1)',
+                                                                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                                            fill: false,
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                options: {
+                                                                    scales: {
+                                                                        y: {
+                                                                            beginAtZero: true
+                                                                        }
+                                                                    }
+                                                                }
+                                                            });
+                                                        </script>
                                                     </div>
                                                 </div>
                                             </div>

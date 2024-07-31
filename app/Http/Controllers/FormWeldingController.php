@@ -524,5 +524,46 @@ class FormWeldingController extends Controller
         $month = $request->input('month');
        return Excel::download(new WeldingDailyReportExport($month), "welding_daily_report_export.xlsx");
    }
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Decrypt the header ID
+            $headerId = decrypt($id);
+
+            // Find the header
+            $header = WeldingActualHeader::findOrFail($headerId);
+
+            // Get all details associated with the header
+            $details = WeldingActualDetail::where('header_id', $headerId)->get();
+
+            // Loop through details and delete associated productions and ng records
+            foreach ($details as $detail) {
+                $station_details = WeldingActualStationDetail::where('details_id', $detail->id)->get();
+                foreach($station_details as $station_detail){
+                    $productions = WeldingActualFormProduction::where('station_details_id', $station_detail->id)->get();
+
+                    foreach ($productions as $production) {
+                        WeldingActualFormNg::where('production_id', $production->id)->delete();
+                        $production->delete();
+                    }
+                    $station_detail->delete();
+                }
+
+                $detail->delete();
+            }
+
+            // Finally, delete the header
+            $header->delete();
+
+            DB::commit();
+            return redirect('/daily-report/welding')->with('status', 'Daily report deleted successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect('/daily-report/welding')->with('failed', 'Failed to delete daily report. Please try again. Error: ' . $e->getMessage());
+        }
+    }
+
 
 }
