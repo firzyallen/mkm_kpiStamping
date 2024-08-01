@@ -17,12 +17,9 @@ use App\Http\Controllers\FormWeldingController;
 use App\Http\Controllers\FormPressController;
 use App\Http\Controllers\DowntimeFormController;
 
-use App\Http\Controllers\PressKPIController;
 use App\Http\Controllers\FactoryBKPIController;
 use App\Http\Controllers\WeldingKPIController;
 use App\Http\Controllers\PressKPIController;
-use App\Http\Controllers\FormPressController;
-use App\Http\Controllers\DowntimeFormController;
 
 /*
 |--------------------------------------------------------------------------

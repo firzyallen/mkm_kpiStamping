@@ -101,19 +101,19 @@
                                                                         data: {
                                                                             labels: @json($kpiData[$shop->shop_name]['hpu']->pluck('formatted_date')),
                                                                             datasets: [{
-                                                                                    label: 'Actual',
-                                                                                    data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
-                                                                                    backgroundColor: '#A6CAD8',
-                                                                                    borderColor: 'rgba(75, 192, 192, 1)',
-                                                                                    borderWidth: 1
-                                                                                },
-                                                                                {
                                                                                     label: 'Plan',
                                                                                     data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
                                                                                     type: 'line',
-                                                                                    borderColor: '#004355',
-                                                                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                                                    backgroundColor: '#004355',
+                                                                                    borderColor: '#3A7085',
                                                                                     fill: false,
+                                                                                },
+                                                                                {
+                                                                                    label: 'Actual',
+                                                                                    data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
+                                                                                    backgroundColor: '#A6CAD8',
+                                                                                    borderColor: '#007A93',
+                                                                                    borderWidth: 1
                                                                                 }
                                                                             ]
                                                                         },
@@ -166,19 +166,19 @@
                                                                     data: {
                                                                         labels: @json($kpiData[$shop->shop_name]['ftt']->pluck('formatted_date')),
                                                                         datasets: [{
-                                                                                label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
-                                                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                                                borderColor: 'rgba(75, 192, 192, 1)',
-                                                                                borderWidth: 1
-                                                                            },
-                                                                            {
                                                                                 label: 'Plan',
                                                                                 data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
                                                                                 type: 'line',
-                                                                                borderColor: 'rgba(255, 99, 132, 1)',
-                                                                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                                                backgroundColor: '#004355',
+                                                                                borderColor: '#3A7085',
                                                                                 fill: false,
+                                                                            },
+                                                                            {
+                                                                                label: 'Actual',
+                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
+                                                                                backgroundColor: '#A6CAD8',
+                                                                                borderColor: '#007A93',
+                                                                                borderWidth: 1
                                                                             }
                                                                         ]
                                                                     },
@@ -267,19 +267,19 @@
                                                                     data: {
                                                                         labels: @json($kpiData[$shop->shop_name]['otdp']->pluck('formatted_date')),
                                                                         datasets: [{
-                                                                                label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
-                                                                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                                                                borderColor: 'rgba(75, 192, 192, 1)',
-                                                                                borderWidth: 1
-                                                                            },
-                                                                            {
                                                                                 label: 'Plan',
                                                                                 data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
                                                                                 type: 'line',
-                                                                                borderColor: 'rgba(255, 99, 132, 1)',
-                                                                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                                                backgroundColor: '#004355',
+                                                                                borderColor: '#3A7085',
                                                                                 fill: false,
+                                                                            },
+                                                                            {
+                                                                                label: 'Actual',
+                                                                                data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
+                                                                                backgroundColor: '#A6CAD8',
+                                                                                borderColor: '#007A93',
+                                                                                borderWidth: 1
                                                                             }
                                                                         ]
                                                                     },

@@ -16,7 +16,6 @@ class FactoryBKPIController extends Controller
 {
     public function index(Request $request)
     {
-        //dd($request->all());
         $shops = FactbMstShop::all();
 
         $currentMonth = $request->input('month', Carbon::now()->month);
