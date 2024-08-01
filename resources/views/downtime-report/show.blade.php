@@ -87,7 +87,7 @@
                                                                 <img src="{{ asset($actual['photo']) }}"
                                                                     alt="Downtime Photo" class="img-thumbnail"
                                                                     width="100" height="100" data-bs-toggle="modal"
-                                                                    data-bs-target="#photoModal{{ $loop->parent->index }}{{ $loop->index }}">
+                                                                    data-bs-target="#photoModal{{ $loop->parent->index }}{{ $loop->index }}" onclick="this.requestFullscreen()">
                                                             @endif
                                                         </td>
                                                     </tr>

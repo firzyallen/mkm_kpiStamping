@@ -290,7 +290,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Image" class="img-fluid" />
+                <img id="modalImage" src="" alt="Image" class="img-fluid" onclick="this.requestFullscreen()"/>
                 <p id="noImageText" style="display: none;">No images uploaded</p>
             </div>
         </div>

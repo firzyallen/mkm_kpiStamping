@@ -154,7 +154,7 @@
                                                             <form action="{{ url('/daily-report/welding/delete/' . encrypt($data->id)) }}" method="POST" style="display:inline;" id="delete-form-{{ $data->id }}">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <a title="Delete Report" onclick="confirmDelete({{ $data->id }})" class="btn btn-primary btn-sm me-2"><i class="fas fa-trash"></i></a>
+                                                                <a title="Delete Report" onclick="confirmDelete({{ $data->id }})" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
                                                             </form>
                                                         </td>
                                                     </tr>
