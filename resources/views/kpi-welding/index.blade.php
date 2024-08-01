@@ -469,7 +469,7 @@
                                                                                 @if($detail->photo_shop)
                                                                                 <div class="row mb-3">
                                                                                     <div class="col-md-12 text-center">
-                                                                                        <img src="{{ asset( $detail->photo_shop) }}" class="img-fluid" alt="Shop Detail Image">
+                                                                                        <img src="{{ asset( $detail->photo_shop) }}" class="img-fluid" alt="Shop Detail Image" onclick="this.requestFullscreen()">
                                                                                     </div>
                                                                                 </div>
                                                                                 @endif
@@ -545,7 +545,7 @@
                                                                                 @if($detail->photo_ng)
                                                                                 <div class="row mb-3">
                                                                                     <div class="col-md-12 text-center">
-                                                                                        <img src="{{ asset( $detail->photo_ng) }}" class="img-fluid" alt="NG Image">
+                                                                                        <img src="{{ asset( $detail->photo_ng) }}" class="img-fluid" alt="NG Image" onclick="this.requestFullscreen()">
                                                                                     </div>
                                                                                 </div>
                                                                                 @endif
@@ -625,7 +625,7 @@
                                                                                 @if($detail->photo)
                                                                                 <div class="row mb-3">
                                                                                     <div class="col-md-12 text-center">
-                                                                                        <img src="{{ asset( $detail->photo) }}" class="img-fluid" alt="Downtime Image">
+                                                                                        <img src="{{ asset( $detail->photo) }}" class="img-fluid" alt="Downtime Image" onclick="this.requestFullscreen()">
                                                                                     </div>
                                                                                 </div>
                                                                                 @endif
