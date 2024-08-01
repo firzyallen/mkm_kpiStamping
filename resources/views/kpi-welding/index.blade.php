@@ -73,7 +73,7 @@
                                                                         break;
                                                                     case 'grey':
                                                                         $statusClass = 'signal grey';
-                                                                        $statusText = 'N/A';
+                                                                        $statusText = 'N';
                                                                         break;
                                                                 }
                                                             @endphp
@@ -123,7 +123,34 @@
                                             <div class="col-md-6 mb-4">
                                                 <div class="card card-custom">
                                                     <div class="card-header pt-2">
-                                                        <h3>FTT (Green if: ≥ {{$kpiData[$shop->shop_name]['ftt'][0]->FTT_Plan}}) 
+                                                        <!--{$kpiData[$shop->shop_name]['ftt'][0]->FTT_Plan}-->
+                                                        @php
+                                                            $fttPlan = '';
+                                                            switch ($shop->id) {
+                                                                case 1:
+                                                                    $fttPlan = '98.5';
+                                                                    break;
+                                                                case 2:
+                                                                    $fttPlan = '98.5';
+                                                                    break;
+                                                                case 3:
+                                                                    $fttPlan = '98.5';
+                                                                    break;
+                                                                case 4:
+                                                                    $fttPlan = '98.5';
+                                                                    break;
+                                                                case 5:
+                                                                    $fttPlan = '98.5';
+                                                                    break;
+                                                                case 6:
+                                                                    $fttPlan = '98.5';
+                                                                    break;
+                                                                case 7:
+                                                                    $fttPlan = '98.5';
+                                                                    break;
+                                                            }
+                                                        @endphp
+                                                        <h3>FTT (Green if: ≥ {{$fttPlan}}) 
                                                             @php
                                                                 $statusClass = '';
                                                                 $statusText = '';
@@ -138,7 +165,7 @@
                                                                         break;
                                                                     case 'grey':
                                                                         $statusClass = 'signal grey';
-                                                                        $statusText = 'N/A';
+                                                                        $statusText = 'N';
                                                                         break;
                                                                 }
                                                             @endphp
@@ -211,11 +238,89 @@
                                             <div class="col-md-6 mb-4">
                                                 <div class="card card-custom">
                                                     <div class="card-header pt-2">
-                                                        <h3>Downtime</h3>
+                                                        <!--ideally should be {$kpiData[$shop->shop_name]['ftt'][0]->Downtime_Plan}, but if no downtime data then will error so hard code it for now-->
+                                                        <h3>Downtime (Green if: ≥ 0.81) 
+                                                            @php
+                                                                $statusClass = '';
+                                                                $statusText = '';
+                                                                switch ($kpiStatuses[$shop->shop_name]['downtime']) {
+                                                                    case 'green':
+                                                                        $statusClass = 'signal green';
+                                                                        $statusText = 'G';
+                                                                        break;
+                                                                    case 'red':
+                                                                        $statusClass = 'signal red';
+                                                                        $statusText = 'R';
+                                                                        break;
+                                                                    case 'grey':
+                                                                        $statusClass = 'signal grey';
+                                                                        $statusText = 'N';
+                                                                        break;
+                                                                }
+                                                            @endphp
+                                                            <span class="{{ $statusClass }}">{{ $statusText }}</span></h3>
                                                     </div>
                                                     <div class="card-body">
-                                                        <!-- Downtime chart placeholder -->
-                                                        <p>Downtime data will be displayed here once available.</p>
+                                                        <canvas id="barChartDowntime-{{ $shop->id }}"></canvas>
+                                                        <script>
+                                                            var ctxFtt = document.getElementById('barChartDowntime-{{ $shop->id }}').getContext('2d');
+                                                            var fttChart = new Chart(ctxFtt, {
+                                                                type: 'bar',
+                                                                data: {
+                                                                    labels: @json($kpiData[$shop->shop_name]['downtime']->pluck('formatted_date')),
+                                                                    datasets: [
+                                                                        {
+                                                                            label: 'Actual',
+                                                                            data: @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')),
+                                                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                                                            borderColor: 'rgba(75, 192, 192, 1)',
+                                                                            borderWidth: 1
+                                                                        },
+                                                                        {
+                                                                            label: 'Plan',
+                                                                            data: @json($kpiData[$shop->shop_name]['ftt']->pluck('Downtime_Plan')),
+                                                                            type: 'line',
+                                                                            borderColor: 'rgba(255, 99, 132, 1)',
+                                                                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                                                            fill: false,
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                options: {
+                                                                    scales: {
+                                                                        y: {
+                                                                            
+                                                                            ticks: {
+                                                                                beginAtZero: true,
+                                                                                steps: 10,
+                                                                                stepSize: 10,
+                                                                                max: 100
+                                                                            },
+                                                                            title: {
+                                                                                display: true,
+                                                                                text: 'Downtime'
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    plugins: {
+                                                                        tooltip: {
+                                                                            callbacks: {
+                                                                                title: function(tooltipItem) {
+                                                                                    return tooltipItem[0].label;
+                                                                                },
+                                                                                label: function(context) {
+                                                                                    if (context.dataset.label === 'Actual') {
+                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                                                    } else {
+                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            });
+                                                        </script>
                                                     </div>
                                                 </div>
                                             </div>
@@ -225,7 +330,34 @@
                                                     <div class="col-md-6 mb-4">
                                                         <div class="card card-custom">
                                                             <div class="card-header pt-2">
-                                                                <h3>OTDP ({{ $model->model_name }}) (Green if: ≥ {{$kpiData[$shop->shop_name]['otdp'][$model->model_name]->first()->OTDP_Plan}}) 
+                                                            <!--{ $model->model_name }}) (Green if: ≥ {$kpiData[$shop->shop_name]['otdp'][$model->model_name]->first()->OTDP_Plan}-->
+                                                            @php
+                                                            $otdpPlan = '';
+                                                            switch ($shop->id) {
+                                                                case 1:
+                                                                    $otdpPlan = '98.5';
+                                                                    break;
+                                                                case 2:
+                                                                    $otdpPlan = '98.5';
+                                                                    break;
+                                                                case 3:
+                                                                    $otdpPlan = '98.5';
+                                                                    break;
+                                                                case 4:
+                                                                    $otdpPlan = '99.5';
+                                                                    break;
+                                                                case 5:
+                                                                    $otdpPlan = '98.5';
+                                                                    break;
+                                                                case 6:
+                                                                    $otdpPlan = '98.5';
+                                                                    break;
+                                                                case 7:
+                                                                    $otdpPlan = '98.5';
+                                                                    break;
+                                                            }
+                                                        @endphp
+                                                                <h3>OTDP ({{ $model->model_name }}) (Green if: ≥ {{$otdpPlan}}) 
                                                                     @php
                                                                         $statusClass = '';
                                                                         $statusText = '';
@@ -240,7 +372,7 @@
                                                                                 break;
                                                                             case 'grey':
                                                                                 $statusClass = 'signal grey';
-                                                                                $statusText = 'N/A';
+                                                                                $statusText = 'N';
                                                                                 break;
                                                                         }
                                                                     @endphp
@@ -438,6 +570,89 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="col-md-6 mb-4">
+                                                <div class="card card-custom">
+                                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                                        <h3 class="card-title">Downtime Details</h3>
+                                                        <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#downtimedetailsCardContent-{{ $shop->id }}" aria-expanded="false" aria-controls="downtimedetailsCardContent-{{ $shop->id }}">
+                                                            <i style="color: black;" class="fas fa-chevron-down"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="collapse" id="downtimedetailsCardContent-{{ $shop->id }}">
+                                                        <div class="card-body">
+                                                            <!-- Table for The Shop Details -->
+                                                            <div class="table-responsive">
+                                                                <table id="tableDowntimeDetails" class="table table-bordered table-striped">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>No</th>
+                                                                            <th>Date</th>
+                                                                            <th>Shift</th>
+                                                                            <th>Machine</th>
+                                                                            <th>Category</th>
+                                                                            <th>Action</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @php
+                                                                            $no = 1;
+                                                                        @endphp
+                                                                        @foreach ($downtimeDetails->where('shop_name', $shop->shop_name) as $detail)
+                                                                            <tr>
+                                                                                <td>{{ $no++ }}</td>
+                                                                                <td>{{ $detail->date }}</td>
+                                                                                <td>{{ $detail->shift }}</td>
+                                                                                <td>{{ $detail->machine_name }}</td>
+                                                                                <td>{{ $detail->category }}</td>
+                                                                                <td>
+                                                                                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal-detail-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}-{{ $detail->id }}">Detail</button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                                @foreach ($downtimeDetails->where('shop_name', $shop->shop_name) as $detail)
+                                                                <!-- Modal for showing spare parts used in historical problem -->
+                                                                <div class="modal fade" id="modal-detail-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}-{{ $detail->id }}" tabindex="-1" aria-labelledby="modal-detail-label-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}-{{ $detail->id }}" aria-hidden="true">
+                                                                    <div class="modal-dialog modal-lg">
+                                                                        <div class="modal-content">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title" id="modal-detail-label-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}">Detail of Report</h5>
+                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                            
+                                                                                @if($detail->photo)
+                                                                                <div class="row mb-3">
+                                                                                    <div class="col-md-12 text-center">
+                                                                                        <img src="{{ asset( $detail->photo) }}" class="img-fluid" alt="Downtime Image">
+                                                                                    </div>
+                                                                                </div>
+                                                                                @endif
+                                                                                <hr>
+                                                                                <div class="row mb-3">
+                                                                                    <div class="col-md-6">
+                                                                                        <h6><strong>Problem:</strong> {{ $detail->problem }}</h6>
+                                                                                        <h6><strong>Cause:</strong> {{ $detail->cause ?? "Cause haven't been found yet." }}</h6>
+                                                                                        <h6><strong>Action:</strong> {{ $detail->action ?? "No remarks"}}</h6>
+                                                                                        <h6><strong>Judgement:</strong> {{ $detail->judgement ?? "Judgement is not reported yet."}}</h6>
+                                                                                        <h6><strong>Start Time:</strong> {{ $detail->start_time}}</h6>
+                                                                                        <h6><strong>End Time:</strong> {{ $detail->end_time ?? "End time is not reported yet."}}</h6>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
@@ -543,6 +758,11 @@
                         .yellow {
                             background-color: yellow;
                             color: black;
+                        }
+
+                        .grey {
+                            background-color: darkgrey;
+                            
                         }
 
                         .red {

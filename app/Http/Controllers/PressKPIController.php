@@ -9,6 +9,7 @@ use App\Models\PressOtdp;
 use App\Models\PressFtt;
 use App\Models\PressMstShop;
 use App\Models\PressShopDetail;
+use App\Models\PressDowntimeDetail;
 use App\Models\PressNgDetail;
 use Carbon\Carbon;
 
@@ -55,23 +56,35 @@ class PressKPIController extends Controller
                     $item->formatted_date = Carbon::parse($item->date)->format('D j');
                     return $item;
                 });
+            $downtimeData = DB::table('press_downtimes')
+                ->whereMonth('date', $currentMonth)
+                ->whereYear('date', $currentYear)
+                ->where('shop_name', $shop->shop_name)
+                ->get()
+                ->map(function ($item) {
+                    $item->formatted_date = Carbon::parse($item->date)->format('D j');
+                    return $item;
+                });
 
             $kpiData[$shop->shop_name] = [
                 'hpu' => $hpuData,
                 'otdp' => $otdpData,
-                'ftt' => $fttData
+                'ftt' => $fttData,
+                'downtime' => $downtimeData
             ];
 
             
             $kpiStatuses[$shop->shop_name]['hpu'] = $this->computeKpiHPUStatus($hpuData->whereBetween('date', [$startDate, $endDate]));
             $kpiStatuses[$shop->shop_name]['otdp'] = $this->computeKpiOTDPStatus($otdpData->whereBetween('date', [$startDate, $endDate]));
             $kpiStatuses[$shop->shop_name]['ftt'] = $this->computeKpiFTTStatus($fttData->whereBetween('date', [$startDate, $endDate]));
+            $kpiStatuses[$shop->shop_name]['downtime'] = $this->computeKpiDowntimeStatus($downtimeData->whereBetween('date', [$startDate, $endDate]));
         }
         $shopDetails = PressShopDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
         $ngDetails = PressNgDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
+        $downtimeDetails = PressDowntimeDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
         $monthName = Carbon::createFromDate(null, $currentMonth)->format('F');
 
-        return view('kpi-press.index', compact('shops', 'kpiData', 'shopDetails', 'kpiStatuses', 'ngDetails', 'monthName', 'currentYear', 'currentMonth'));
+        return view('kpi-press.index', compact('shops', 'kpiData', 'shopDetails', 'kpiStatuses', 'ngDetails', 'monthName', 'currentYear', 'currentMonth', 'downtimeDetails'));
     }
 
     private function computeKpiHPUStatus($kpiDetails)
@@ -133,4 +146,24 @@ class PressKPIController extends Controller
 
         return 'green';
     }
+
+    private function computeKpiDowntimeStatus($kpiDetails)
+        {
+            if ($kpiDetails->isEmpty()) {
+                return 'grey';
+            }
+
+            foreach ($kpiDetails as $detail) {
+                if ($detail->Downtime > $detail->Downtime_Plan) {
+                    if ($detail->Downtime == NULL){
+
+                    }
+                    else {
+                    return 'red';
+                    }
+                }
+            }
+
+            return 'green';
+        }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use App\Models\WeldingHpu;
 use App\Models\WeldingOtdp;
@@ -11,6 +12,7 @@ use App\Models\WeldingMstShop;
 use App\Models\WeldingMstModel;
 use App\Models\WeldingMstStation;
 use App\Models\WeldingShopDetail;
+use App\Models\WeldingDowntimeDetail;
 use App\Models\WeldingNgDetail;
 use Carbon\Carbon;
 
@@ -86,23 +88,36 @@ class WeldingKPIController extends Controller
                     return $item;
                 });
 
+                $downtimeData = DB::table('welding_downtimes')
+                    ->whereMonth('date', $currentMonth)
+                    ->whereYear('date', $currentYear)
+                    ->where('shop_name', $shop->shop_name)
+                    ->get()
+                    ->map(function ($item) {
+                        $item->formatted_date = Carbon::parse($item->date)->format('D j');
+                        return $item;
+                    });
+
             $kpiData[$shop->shop_name] = [
                 'hpu' => $hpuData,
                 'otdp' => $otdpData,
-                'ftt' => $fttData
+                'ftt' => $fttData,
+                'downtime' => $downtimeData
             ];
             $otdpData =[];
 
             $kpiStatuses[$shop->shop_name]['hpu'] = $this->computeKpiHPUStatus($hpuData->whereBetween('date', [$startDate, $endDate]));
-            foreach($kpiData[$shop->shop_name]['otdp'] as $modelotdp){
-                $kpiStatuses[$shop->shop_name]['otdp'][$modelotdp[0]->model_name] = $this->computeKpiOTDPStatus($modelotdp->whereBetween('date', [$startDate, $endDate]));
+            foreach($filteredModels as $modelotdp){
+                $kpiStatuses[$shop->shop_name]['otdp'][$modelotdp->model_name] = $this->computeKpiOTDPStatus($kpiData[$shop->shop_name]['otdp'][$modelotdp->model_name]->whereBetween('date', [$startDate, $endDate]));
             }
             $kpiStatuses[$shop->shop_name]['ftt'] = $this->computeKpiFTTStatus($fttData->whereBetween('date', [$startDate, $endDate]));
+            $kpiStatuses[$shop->shop_name]['downtime'] = $this->computeKpiDowntimeStatus($downtimeData->whereBetween('date', [$startDate, $endDate]));
         }
         $shopDetails = WeldingShopDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
         $ngDetails = WeldingNgDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
         $monthName = Carbon::createFromDate(null, $currentMonth)->format('F');
-        return view('kpi-welding.index', compact('shops', 'kpiData', 'shopDetails', 'kpiStatuses', 'ngDetails', 'monthName', 'currentYear', 'currentMonth', 'models', 'stations'));
+        $downtimeDetails = WeldingDowntimeDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
+        return view('kpi-welding.index', compact('shops', 'kpiData', 'shopDetails', 'kpiStatuses', 'ngDetails', 'monthName', 'currentYear', 'currentMonth', 'models', 'stations', 'downtimeDetails'));
     }
 
     private function computeKpiHPUStatus($kpiDetails)
@@ -164,4 +179,23 @@ class WeldingKPIController extends Controller
 
         return 'green';
     }
+    private function computeKpiDowntimeStatus($kpiDetails)
+        {
+            if ($kpiDetails->isEmpty()) {
+                return 'grey';
+            }
+
+            foreach ($kpiDetails as $detail) {
+                if ($detail->Downtime > $detail->Downtime_Plan) {
+                    if ($detail->Downtime == NULL){
+
+                    }
+                    else {
+                    return 'red';
+                    }
+                }
+            }
+
+            return 'green';
+        }
 }
