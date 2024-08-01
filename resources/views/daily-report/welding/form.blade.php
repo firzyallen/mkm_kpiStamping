@@ -173,7 +173,7 @@
                                                                                                 </div>
                                                                                                 <div class="col-md-8">
                                                                                                     <label>Photo</label>
-                                                                                                    <input type="file" name="photo_ng[{{ $model['model_name'] }}][]" class="form-control form-control-sm">
+                                                                                                    <input type="file" name="photo_ng[{{ $model['model_name'] }}][]" class="form-control form-control-sm" multiple>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </td>

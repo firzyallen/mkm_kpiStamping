@@ -154,11 +154,43 @@
                                                                                                 <textarea readonly name="production[{{ $model['model_name'] }}][remarks][]" class="form-control form-control-sm" rows="2">{{ $model['remarks'] }}</textarea>
                                                                                             </div>
                                                                                             <div class="col-md-8">
+                                                                                                @php
+                                                                                                    $images = json_decode($model['photo_ng'], true);
+                                                                                                @endphp
                                                                                                 <label>Photo: </label>
-                                                                                                <button type="button" class="btn btn-primary btn-sm show-image" data-image-path="{{ $model['photo_ng'] }}">Show Image</button>
+                                                                                                <button class="btn btn-primary btn-sm show-ng-image-btn" data-images="{{ htmlspecialchars(json_encode($images), ENT_QUOTES, 'UTF-8') }}">Show Image</button>
                                                                                             </div>
                                                                                         </div>
                                                                                     </td>
+                                                                                    <!-- Modal for Not Goods Images -->
+                                                                                    <div class="modal fade" id="ngImageModal" tabindex="-1" aria-labelledby="ngImageModalLabel" aria-hidden="true">
+                                                                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                                                                        <div class="modal-content">
+                                                                                            <div class="modal-header">
+                                                                                            <h5 class="modal-title" id="ngImageModalLabel">Not Goods Image Preview</h5>
+                                                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                                            </div>
+                                                                                            <div class="modal-body">
+                                                                                            <div id="ngCarousel" class="carousel slide" data-bs-ride="carousel">
+                                                                                                <div class="carousel-inner" id="ngCarouselInner">
+                                                                                                <!-- Images will be injected here by JavaScript -->
+                                                                                                </div>
+                                                                                                <button class="carousel-control-prev" type="button" data-bs-target="#ngCarousel" data-bs-slide="prev">
+                                                                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                                                                <span class="visually-hidden">Previous</span>
+                                                                                                </button>
+                                                                                                <button class="carousel-control-next" type="button" data-bs-target="#ngCarousel" data-bs-slide="next">
+                                                                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                                                                <span class="visually-hidden">Next</span>
+                                                                                                </button>
+                                                                                            </div>
+                                                                                            </div>
+                                                                                            <div class="modal-footer">
+                                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        </div>
+                                                                                    </div>
                                                                                 </tr>
                                                                             @endforeach
                                                                         </tbody>
@@ -196,6 +228,33 @@
     </div>
 </div>
 <script>
+
+    // Handle click event on show not goods image button
+    $('.show-ng-image-btn').click(function() {
+        event.preventDefault();
+    var images = $(this).data('images');
+
+    // Ensure images is an array
+    if (typeof images === 'string') {
+        images = JSON.parse(images.replace(/&quot;/g,'"'));
+    }
+
+    var ngCarouselInner = $('#ngCarouselInner');
+    ngCarouselInner.empty(); // Clear existing images
+
+    var isActive = 'active';
+
+    images.forEach(function(image) {
+        ngCarouselInner.append(`
+            <div class="carousel-item ${isActive}">
+                <img src="{{ asset('${image}') }}" class="d-block w-100 img-fluid" alt="Image Preview">
+            </div>
+        `);
+        isActive = ''; // Only the first item should be active
+    });
+
+    $('#ngImageModal').modal('show');
+});
     document.addEventListener('DOMContentLoaded', function () {
         const imageButtons = document.querySelectorAll('.show-image');
         const modalImage = document.getElementById('modalImage');

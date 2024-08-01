@@ -96,7 +96,7 @@
                                                                         <div class="form-group">
                                                                             <label for="photo">Photo</label>
                                                                             <input type="file" name="photo[]"
-                                                                                class="form-control">
+                                                                                class="form-control" multiple>
                                                                             @if ($actual['photo'])
                                                                                 <img src="{{ asset($actual['photo']) }}"
                                                                                     alt="Photo"
@@ -250,7 +250,7 @@
                         </div>
                         <div class="form-group">
                             <label for="photo">Photo</label>
-                            <input type="file" name="photo[]" class="form-control">
+                            <input type="file" name="photo[]" class="form-control" multiple>
                         </div>
                     </td>
                     <td>

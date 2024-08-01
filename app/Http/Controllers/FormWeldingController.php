@@ -167,7 +167,7 @@ class FormWeldingController extends Controller
                     if (!isset($request->production)) {
                         throw new \Exception('Production data is missing for station: ' . $stationName);
                     }
-
+                    $imgPathNG = [];
                     foreach ($request->production as $modelName => $production) {
 
                         $output8 = $production['output8'][0] ?? 0;
@@ -198,13 +198,16 @@ class FormWeldingController extends Controller
                             ]);
 
                             // Insert NG data into welding_actual_form_ngs table
-                            $imgPathNG = null;
+                            $imgPathNG = [];
                             if ($request->hasFile("photo_ng.$modelName.0")) {
-                                $file = $request->file("photo_ng.$modelName.0");
-                                $fileName = uniqid() . '_' . $file->getClientOriginalName();
-                                $destinationPath = public_path('assets/img/photo_shop/welding/ng/');
-                                $file->move($destinationPath, $fileName);
-                                $imgPathNG = 'assets/img/photo_shop/welding/ng/' . $fileName;
+                                foreach ($request->photo_ng[$modelName] as $ngFile) {
+                                    if($ngFile){
+                                        $ngFileName = uniqid() . '_' . $ngFile->getClientOriginalName();
+                                        $ngDestinationPath = public_path('assets/img/photo_shop/welding/ng/');
+                                        $ngFile->move($ngDestinationPath, $ngFileName);
+                                        $imgPathNG[] = 'assets/img/photo_shop/welding/ng/' . $ngFileName;
+                                    }
+                                }
                             }
                             WeldingActualFormNg::create([
                                 'production_id' => $productionRecord->id,
@@ -212,7 +215,7 @@ class FormWeldingController extends Controller
                                 'reject' => $production['reject'][0] ?? null,
                                 'rework' => $production['rework'][0] ?? null,
                                 'remarks' => $production['remarks'][0] ?? null,
-                                'photo_ng' => $imgPathNG,
+                                'photo_ng' => json_encode($imgPathNG),
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ]);
@@ -430,7 +433,7 @@ class FormWeldingController extends Controller
                     }
 
                     $stationDetailId = $stationDetail->id;
-
+                    $imgPathNG = [];
                     foreach ($request->production as $modelName => $production) {
                         $output8 = $production['output8'][0] ?? 0;
                         $output2 = $production['output2'][0] ?? 0;
@@ -473,13 +476,16 @@ class FormWeldingController extends Controller
                                     'updated_at' => now(),
                                 ]);
                             }
-                            $imgPathNG = null;
+                            $imgPathNG = [];
                             if ($request->hasFile("photo_ng.$modelName.0")) {
-                                $file = $request->file("photo_ng.$modelName.0");
-                                $fileName = uniqid() . '_' . $file->getClientOriginalName();
-                                $destinationPath = public_path('assets/img/photo_shop/welding/ng/');
-                                $file->move($destinationPath, $fileName);
-                                $imgPathNG = 'assets/img/photo_shop/welding/ng/' . $fileName;
+                                foreach ($request->photo_ng[$modelName] as $ngFile) {
+                                    if($ngFile){
+                                        $ngFileName = uniqid() . '_' . $ngFile->getClientOriginalName();
+                                        $ngDestinationPath = public_path('assets/img/photo_shop/welding/ng/');
+                                        $ngFile->move($ngDestinationPath, $ngFileName);
+                                        $imgPathNG[] = 'assets/img/photo_shop/welding/ng/' . $ngFileName;
+                                    }
+                                }
                             }
                             $ng = $request->production[$modelName];
                             $ngRecord = WeldingActualFormNg::where('production_id', $productionRecord->id)->first();
@@ -492,7 +498,7 @@ class FormWeldingController extends Controller
                                     'reject' => $ng['reject'][0] ?? null,
                                     'rework' => $ng['rework'][0] ?? null,
                                     'remarks' => $ng['remarks'][0] ?? null,
-                                    'photo_ng' => $imgPathNG,
+                                    'photo_ng' => json_encode($imgPathNG),
                                     'updated_at' => now(),
                                 ]);
                             } else {
@@ -503,7 +509,7 @@ class FormWeldingController extends Controller
                                     'reject' => $ng['reject'][0] ?? null,
                                     'rework' => $ng['rework'][0] ?? null,
                                     'remarks' => $ng['remarks'][0] ?? null,
-                                    'photo_ng' => $imgPathNG,
+                                    'photo_ng' => json_encode($imgPathNG),
                                     'created_at' => now(),
                                     'updated_at' => now(),
                                 ]);
