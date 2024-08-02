@@ -427,11 +427,6 @@ class FormFactoryBController extends Controller
         }
     }
 
-    public function exportExcel(Request $request){
-        $month = $request->input('month');
-       return Excel::download(new FactoryBDailyReportExport($month), "factoryb_daily_report_export.xlsx");
-    }
-
     public function destroy($id)
     {
         DB::beginTransaction();
