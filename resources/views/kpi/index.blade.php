@@ -90,7 +90,8 @@
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
                                 <h3 class="card-title">Factory B KPI Monitoring ({{ $monthName }} {{ $currentYear }})
-                                </h3>
+                                    (Status: {{ $startDate ?? $previousDay->format('Y-m-d') }} to
+                                    {{ $endDate ?? $previousDay->format('Y-m-d') }})</h3>
                             </div>
                             <div class="card-body pt-2">
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -186,16 +187,16 @@
                                                             @php
                                                                 $fttPlan = '';
                                                                 switch ($shop->id) {
-                                                                    case 1:
+                                                                    case 6:
                                                                         $fttPlan = '97.5';
                                                                         break;
-                                                                    case 2:
+                                                                    case 7:
                                                                         $fttPlan = '95.0';
                                                                         break;
-                                                                    case 3:
+                                                                    case 8:
                                                                         $fttPlan = '95.0';
                                                                         break;
-                                                                    case 4:
+                                                                    case 9:
                                                                         $fttPlan = '95.0';
                                                                         break;
                                                                 }
@@ -391,16 +392,16 @@
                                                             @php
                                                                 $otdpPlan = '';
                                                                 switch ($shop->id) {
-                                                                    case 1:
+                                                                    case 6:
                                                                         $otdpPlan = '97.0';
                                                                         break;
-                                                                    case 2:
+                                                                    case 7:
                                                                         $otdpPlan = '98.0';
                                                                         break;
-                                                                    case 3:
+                                                                    case 8:
                                                                         $otdpPlan = '98.0';
                                                                         break;
-                                                                    case 4:
+                                                                    case 9:
                                                                         $otdpPlan = '98.0';
                                                                         break;
                                                                 }
@@ -604,70 +605,99 @@
                                                                                     <td>{{ $detail->shift }}</td>
                                                                                     <td>{{ $detail->model_name }}</td>
                                                                                     <td>
+                                                                                        @php
+                                                                                            $images = json_decode(
+                                                                                                $detail->photo_ng,
+                                                                                                true,
+                                                                                            );
+                                                                                        @endphp
                                                                                         <button
-                                                                                            class="btn btn-sm btn-primary"
-                                                                                            data-bs-toggle="modal"
-                                                                                            data-bs-target="#modal-detail-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}-{{ $detail->model_id }}">Detail</button>
+                                                                                            class="btn btn-primary btn-sm show-ng-image-btn"
+                                                                                            data-images="{{ htmlspecialchars(json_encode($images), ENT_QUOTES, 'UTF-8') }}">Detail</button>
                                                                                     </td>
+                                                                                    <!-- Modal for Not Goods Images -->
+                                                                                    <div class="modal fade"
+                                                                                        id="ngImageModal" tabindex="-1"
+                                                                                        aria-labelledby="ngImageModalLabel"
+                                                                                        aria-hidden="true">
+                                                                                        <div
+                                                                                            class="modal-dialog modal-dialog-centered modal-lg">
+                                                                                            <div class="modal-content">
+                                                                                                <div class="modal-header">
+                                                                                                    <h5 class="modal-title"
+                                                                                                        id="ngImageModalLabel">
+                                                                                                        Not Goods Image
+                                                                                                        Preview</h5>
+                                                                                                    <button type="button"
+                                                                                                        class="btn-close"
+                                                                                                        data-bs-dismiss="modal"
+                                                                                                        aria-label="Close"></button>
+                                                                                                </div>
+                                                                                                <div class="modal-body">
+                                                                                                    <div class="row mb-3">
+                                                                                                        <div
+                                                                                                            class="col-md-12 text-center">
+                                                                                                            <div id="ngCarousel"
+                                                                                                                class="carousel slide"
+                                                                                                                data-bs-ride="carousel">
+                                                                                                                <div class="carousel-inner"
+                                                                                                                    id="ngCarouselInner">
+                                                                                                                    <!-- Images will be injected here by JavaScript -->
+                                                                                                                </div>
+                                                                                                                <button
+                                                                                                                    class="carousel-control-prev"
+                                                                                                                    type="button"
+                                                                                                                    data-bs-target="#ngCarousel"
+                                                                                                                    data-bs-slide="prev">
+                                                                                                                    <span
+                                                                                                                        class="carousel-control-prev-icon"
+                                                                                                                        aria-hidden="true"></span>
+                                                                                                                    <span
+                                                                                                                        class="visually-hidden">Previous</span>
+                                                                                                                </button>
+                                                                                                                <button
+                                                                                                                    class="carousel-control-next"
+                                                                                                                    type="button"
+                                                                                                                    data-bs-target="#ngCarousel"
+                                                                                                                    data-bs-slide="next">
+                                                                                                                    <span
+                                                                                                                        class="carousel-control-next-icon"
+                                                                                                                        aria-hidden="true"></span>
+                                                                                                                    <span
+                                                                                                                        class="visually-hidden">Next</span>
+                                                                                                                </button>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                        <hr>
+                                                                                                        <div
+                                                                                                            class="row mb-3">
+                                                                                                            <div
+                                                                                                                class="col-md-6">
+                                                                                                                <h6><strong>Reject:</strong>
+                                                                                                                    {{ $detail->reject }}
+                                                                                                                </h6>
+                                                                                                                <h6><strong>Rework:</strong>
+                                                                                                                    {{ $detail->rework }}
+                                                                                                                </h6>
+                                                                                                                <h6><strong>Remarks:</strong>
+                                                                                                                    {{ $detail->remarks ?? 'No remarks' }}
+                                                                                                                </h6>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div class="modal-footer">
+                                                                                                    <button type="button"
+                                                                                                        class="btn btn-secondary"
+                                                                                                        data-bs-dismiss="modal">Close</button>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
                                                                                 </tr>
                                                                             @endforeach
                                                                         </tbody>
                                                                     </table>
-                                                                    @foreach ($ngDetails->where('shop_id', $shop->id) as $detail)
-                                                                        <!-- Modal for showing spare parts used in historical problem -->
-                                                                        <div class="modal fade"
-                                                                            id="modal-detail-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}-{{ $detail->model_id }}"
-                                                                            tabindex="-1"
-                                                                            aria-labelledby="modal-detail-label-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}-{{ $detail->model_id }}"
-                                                                            aria-hidden="true">
-                                                                            <div class="modal-dialog modal-lg">
-                                                                                <div class="modal-content">
-                                                                                    <div class="modal-header">
-                                                                                        <h5 class="modal-title"
-                                                                                            id="modal-detail-label-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}">
-                                                                                            Detail of Report</h5>
-                                                                                        <button type="button"
-                                                                                            class="btn-close"
-                                                                                            data-bs-dismiss="modal"
-                                                                                            aria-label="Close"></button>
-                                                                                    </div>
-                                                                                    <div class="modal-body">
-
-                                                                                        @if ($detail->photo_ng)
-                                                                                            <div class="row mb-3">
-                                                                                                <div
-                                                                                                    class="col-md-12 text-center">
-                                                                                                    <img src="{{ asset($detail->photo_ng) }}"
-                                                                                                        class="img-fluid"
-                                                                                                        alt="NG Image"
-                                                                                                        onclick="this.requestFullscreen()">
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        @endif
-                                                                                        <hr>
-                                                                                        <div class="row mb-3">
-                                                                                            <div class="col-md-6">
-                                                                                                <h6><strong>Reject:</strong>
-                                                                                                    {{ $detail->reject }}
-                                                                                                </h6>
-                                                                                                <h6><strong>Rework:</strong>
-                                                                                                    {{ $detail->rework }}
-                                                                                                </h6>
-                                                                                                <h6><strong>Remarks:</strong>
-                                                                                                    {{ $detail->remarks ?? 'No remarks' }}
-                                                                                                </h6>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                    <div class="modal-footer">
-                                                                                        <button type="button"
-                                                                                            class="btn btn-secondary"
-                                                                                            data-bs-dismiss="modal">Close</button>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    @endforeach
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -772,11 +802,11 @@
                                                                                                 </h6>
                                                                                                 <h6><strong>Start
                                                                                                         Time:</strong>
-                                                                                                    {{ $detail->start_time }}
+                                                                                                    {{ \Carbon\Carbon::parse($detail->start_time)->format('H:i') }}
                                                                                                 </h6>
                                                                                                 <h6><strong>End
                                                                                                         Time:</strong>
-                                                                                                    {{ $detail->end_time ?? 'End time is not reported yet.' }}
+                                                                                                    {{ $detail->end_time ? \Carbon\Carbon::parse($detail->end_time)->format('H:i') : 'End time is not reported yet.' }}
                                                                                                 </h6>
                                                                                             </div>
                                                                                         </div>
@@ -839,7 +869,7 @@
                                                 <label for="start_date">Status Start Date</label>
                                                 <input type="date" name="start_date" id="start_date"
                                                     class="form-control"
-                                                    value="{{ $startDate ?? now()->startOfMonth()->format('Y-m-d') }}">
+                                                    value="{{ $startDate ?? $previousDay->format('Y-m-d') }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -847,7 +877,7 @@
                                                 <label for="end_date"> Status End Date</label>
                                                 <input type="date" name="end_date" id="end_date"
                                                     class="form-control"
-                                                    value="{{ $endDate ?? now()->endOfMonth()->format('Y-m-d') }}">
+                                                    value="{{ $endDate ?? $previousDay->format('Y-m-d') }}">
                                             </div>
                                         </div>
                                         <div class="col-12 mt-3">
@@ -859,6 +889,27 @@
 
                         </div>
                         <script>
+                            // Handle click event on show not goods image button
+                            $('.show-ng-image-btn').click(function() {
+                                event.preventDefault();
+                                var images = $(this).data('images');
+                                // Ensure images is an array
+                                if (typeof images === 'string') {
+                                    images = JSON.parse(images.replace(/&quot;/g, '"'));
+                                }
+                                var ngCarouselInner = $('#ngCarouselInner');
+                                ngCarouselInner.empty(); // Clear existing images
+                                var isActive = 'active';
+                                images.forEach(function(image) {
+                                    ngCarouselInner.append(`
+                                        <div class="carousel-item ${isActive}">
+                                            <img src="{{ asset('${image}') }}" class="d-block w-100 img-fluid" alt="Image Preview" onclick="this.requestFullscreen()">
+                                        </div>
+                                    `);
+                                    isActive = ''; // Only the first item should be active
+                                });
+                                $('#ngImageModal').modal('show');
+                            });
                             document.getElementById('settingsCardHeader').addEventListener('click', function() {
                                 var cardBody = document.getElementById('settingsCardBody');
                                 cardBody.classList.toggle('d-none');

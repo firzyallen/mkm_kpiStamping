@@ -21,8 +21,9 @@ class FactoryBKPIController extends Controller
 
         $currentMonth = $request->input('month', Carbon::now()->month);
         $currentYear = $request->input('year', Carbon::now()->year);
-        $startDate = $request->input('start_date', now()->startOfMonth()->format('Y-m-d'));
-        $endDate = $request->input('end_date', now()->endOfMonth()->format('Y-m-d'));
+        $previousDay = Carbon::now()->subDay();
+        $startDate = $request->input('start_date', $previousDay->format('Y-m-d'));
+        $endDate = $request->input('end_date', $previousDay->format('Y-m-d'));
 
         $kpiData = [];
 
@@ -85,7 +86,7 @@ class FactoryBKPIController extends Controller
         $downtimeDetails = FactbDowntimeDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
         $monthName = Carbon::createFromDate(null, $currentMonth)->format('F');
 
-        return view('kpi.index', compact('shops', 'kpiData', 'shopDetails', 'kpiStatuses', 'ngDetails', 'monthName', 'currentYear', 'currentMonth', 'downtimeDetails'));
+        return view('kpi.index', compact('shops', 'kpiData', 'shopDetails', 'kpiStatuses', 'ngDetails', 'monthName', 'currentYear', 'currentMonth', 'downtimeDetails', 'previousDay', 'startDate', 'endDate'));
     }
 
     private function computeKpiHPUStatus($kpiDetails)

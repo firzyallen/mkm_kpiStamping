@@ -89,7 +89,9 @@
                     <div class="container-fluid">
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h3 class="card-title">Press KPI Monitoring ({{ $monthName }} {{ $currentYear }})</h3>
+                                <h3 class="card-title">Press KPI Monitoring ({{ $monthName }} {{ $currentYear }})
+                                    (Status: {{ $startDate ?? $previousDay->format('Y-m-d') }} to
+                                    {{ $endDate ?? $previousDay->format('Y-m-d') }})</h3>
                             </div>
                             <div class="card-body pt-2">
                                 <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -849,11 +851,11 @@
                                                                                                 </h6>
                                                                                                 <h6><strong>Start
                                                                                                         Time:</strong>
-                                                                                                    {{ $detail->start_time }}
+                                                                                                    {{ \Carbon\Carbon::parse($detail->start_time)->format('H:i') }}
                                                                                                 </h6>
                                                                                                 <h6><strong>End
                                                                                                         Time:</strong>
-                                                                                                    {{ $detail->end_time ?? 'End time is not reported yet.' }}
+                                                                                                    {{ $detail->end_time ? \Carbon\Carbon::parse($detail->end_time)->format('H:i') : 'End time is not reported yet.' }}
                                                                                                 </h6>
                                                                                             </div>
                                                                                         </div>
@@ -916,7 +918,7 @@
                                                 <label for="start_date">Status Start Date</label>
                                                 <input type="date" name="start_date" id="start_date"
                                                     class="form-control"
-                                                    value="{{ $startDate ?? now()->startOfMonth()->format('Y-m-d') }}">
+                                                    value="{{ $startDate ?? $previousDay->format('Y-m-d') }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -924,7 +926,7 @@
                                                 <label for="end_date"> Status End Date</label>
                                                 <input type="date" name="end_date" id="end_date"
                                                     class="form-control"
-                                                    value="{{ $endDate ?? now()->endOfMonth()->format('Y-m-d') }}">
+                                                    value="{{ $endDate ?? $previousDay->format('Y-m-d') }}">>
                                             </div>
                                         </div>
                                         <div class="col-12 mt-3">

@@ -33,7 +33,6 @@ class MstWeldingController extends Controller
         // Create a new instance of WeldingMstModel model and fill it with request data
         $shop = new WeldingMstShop();
         $shop->shop_name = $request->shop;
-
         // Save the new section to the database
         $shop->save();
 

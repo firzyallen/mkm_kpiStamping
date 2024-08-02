@@ -152,7 +152,7 @@ class FormPressController extends Controller
                         Log::error("Production data: " . print_r($request->production[$shop], true));
                         throw new \Exception("Model key is missing for production at index $index for shop $shop");
                     }
-
+                    
                     $imgPathNG = null;
                     if ($request->hasFile("ng.$shop.photo_ng.$index")) {
                         $file = $request->file("ng.$shop.photo_ng.$index");
