@@ -23,7 +23,7 @@ class FormPressController extends Controller
      */
     public function index()
     {
-        $items = PressActualHeader::all();
+        $items = PressActualHeader::orderBy('date', 'desc')->get();
         $categories = DB::table('dropdowns')->where('category', 'Shift')->get();
 
         return view('daily-report.press.index', compact('items', 'categories'));
