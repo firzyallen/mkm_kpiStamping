@@ -116,6 +116,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/downtime-report/update/{id}', [DowntimeFormController::class, 'updateDetail'])->middleware(['checkRole:IT']);
     Route::put('/downtime-report/update-details/{id}', [DowntimeFormController::class, 'updateForm'])->middleware(['checkRole:IT']);
     Route::delete('/downtime-report/delete/{id}', [DowntimeFormController::class, 'destroy'])->name('downtime-report.destroy');
+    Route::post('/downtime-report/export', [DowntimeFormController::class, 'exportExcel'])->middleware(['checkRole:IT']);
 
     // Routes for PressMstShop
     Route::get('/masterpress/shop', [MstPressController::class, 'indexShop'])->middleware(['checkRole:IT']);

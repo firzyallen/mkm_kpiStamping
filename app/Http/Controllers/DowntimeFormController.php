@@ -11,6 +11,8 @@ use App\Models\UnifiedShop;
 use App\Models\DowntimeMstMachine;
 use App\Models\Dropdown;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DowntimeDailyReportExport;
 
 class DowntimeFormController extends Controller
 {
@@ -353,5 +355,11 @@ class DowntimeFormController extends Controller
         $header->delete();
 
         return redirect('/downtime-report')->with('status', 'Downtime report deleted successfully.');
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $month = $request->input('month');
+        return Excel::download(new DowntimeDailyReportExport($month), "downtime_daily_report_export.xlsx");
     }
 }
