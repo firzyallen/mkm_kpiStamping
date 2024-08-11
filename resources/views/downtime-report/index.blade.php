@@ -29,6 +29,31 @@
                                     <div class="card-header">
                                         <h3 class="card-title">Downtime Reports</h3>
                                     </div>
+                                    <!-- Export Modal -->
+                                    <div class="modal fade" id="modal-export" tabindex="-1" aria-labelledby="modal-export-label" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modal-export-label">Export to Excel</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="{{ url('/downtime-report/export') }}" method="POST">
+                                                    @csrf
+                                                    <div class="modal-body">
+                                                        <div class="form-group mb-3">
+                                                            <label for="export-month">Select Month</label>
+                                                            <input type="month" class="form-control" id="export-month" name="month" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Export</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <!-- End Export Modal -->
                                     <!-- /.card-header -->
                                     <div class="card-body">
                                         <div class="row">
@@ -37,6 +62,10 @@
                                                     data-bs-toggle="modal" data-bs-target="#modal-add">
                                                     <i class="fas fa-plus-square"></i> Add Downtime Report
                                                 </button>
+                                                <button type="button" class="btn btn-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#modal-export">
+                                                    <i class="fas fa-file-excel"></i> Export to Excel
+                                                </button>
+    
 
                                                 <!-- Modal -->
                                                 <div class="modal fade" id="modal-add" tabindex="-1"

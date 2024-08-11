@@ -20,7 +20,7 @@ class FormFactoryBController extends Controller
 {
     public function index()
     {
-        $items = FactbActualHeader::all();
+        $items = FactbActualHeader::orderBy('date', 'desc')->get();
         $categories = DB::table('dropdowns')->where('category', 'Shift')->get();
 
         return view('daily-report.factoryb.index', compact('items', 'categories'));

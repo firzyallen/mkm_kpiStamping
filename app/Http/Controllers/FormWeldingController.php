@@ -21,7 +21,7 @@ class FormWeldingController extends Controller
 {
     public function index()
     {
-        $items = WeldingActualHeader::all();
+        $items = WeldingActualHeader::orderBy('date', 'desc')->get();
         $categories = DB::table('dropdowns')->where('category', 'Shift')->get();
 
         return view('daily-report.welding.index', compact('items', 'categories'));
