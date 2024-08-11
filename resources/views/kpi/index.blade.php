@@ -2,6 +2,63 @@
 
 @section('content')
     <style>
+        #settingsCardHeader {
+            cursor: pointer;
+        }
+
+        h3 {
+            font-size: 20px;
+        }
+
+        .signal {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            border-radius: 70%;
+            line-height: 25px;
+            text-align: center;
+            color: white;
+            font-size-adjust: 0.45;
+            font-weight: bold;
+        }
+
+        .green {
+            background-color: green;
+        }
+
+
+        .yellow {
+            background-color: yellow;
+            color: black;
+        }
+
+        .grey {
+            background-color: darkgrey;
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .indicator-table {
+            width: auto;
+            border-collapse: collapse;
+            margin: 0 auto;
+            font-size: 0.9rem;
+        }
+
+        .indicator-table th,
+        .indicator-table td {
+            border: 1px solid #dee2e6;
+            padding: 4px;
+            text-align: center;
+        }
+
+        .indicator-table th {
+            background-color: #f8f9fa;
+        }
+    </style>
+    <style>
         #lblGreetings {
             font-size: 1rem;
         }
@@ -19,9 +76,7 @@
 
         .card-custom {
             height: 430px;
-            /* Adjust the height as needed */
             width: 100%;
-            /* Adjust the width as needed */
             position: relative;
             display: flex;
             flex-direction: column;
@@ -30,7 +85,6 @@
 
         .card-custom .card-header {
             flex-shrink: 0;
-            /* Prevent shrinking to fit the content */
         }
 
         .card-custom .card-body {
@@ -40,25 +94,23 @@
             overflow: hidden;
         }
 
+
         .chart-container {
             margin: 0 auto;
-            /* Center the chart BOLEH DI-DELETE just in case*/
-            width: 80%;
-            height: 100%;
+            /* width: 80%;
+                    height: 100%; */
         }
 
         .chart-custom {
             width: 100% !important;
             height: 100% !important;
-            /* Let the canvas take the full height of the container */
         }
 
-        body {
-            transform: scale(0.7);
-            transform-origin: top left;
-            width: 142.857%;
-            /* 100 / 70 */
-        }
+        /* body {
+                        transform: scale(0.7);
+                        transform-origin: top left;
+                        width: 142.857%;
+                    } */
 
         .nav-fixed #layoutSidenav #layoutSidenav_nav {
             width: 15rem;
@@ -138,52 +190,16 @@
                                                             </h3>
                                                         </div>
                                                         <div class="card-body">
-
                                                             <div class="chart-container">
                                                                 <canvas id="barChartHpu-{{ $shop->id }}"
                                                                     class="chart-custom"></canvas>
                                                             </div>
-                                                            <script>
-                                                                var ctxHpu = document.getElementById('barChartHpu-{{ $shop->id }}').getContext('2d');
-                                                                var hpuChart = new Chart(ctxHpu, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
-                                                                                label: 'Plan',
-                                                                                data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
-                                                                                type: 'line',
-                                                                                backgroundColor: '#004355',
-                                                                                borderColor: '#3A7085',
-                                                                                fill: false,
-                                                                            }, {
-                                                                                label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
-                                                                                backgroundColor: '#A6CAD8',
-                                                                                borderColor: '#007A93',
-                                                                                borderWidth: 2
-                                                                            },
-
-                                                                        ]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            y: {
-                                                                                beginAtZero: true
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-                                                            </script>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 mb-4">
                                                     <div class="card card-custom">
                                                         <div class="card-header pt-2">
-                                                            <!--{$kpiData[$shop->shop_name]['ftt'][0]->FTT_Plan}-->
                                                             @php
                                                                 $fttPlan = '';
                                                                 switch ($shop->id) {
@@ -229,71 +245,12 @@
                                                                 <canvas id="barChartFtt-{{ $shop->id }}"
                                                                     class="chart-custom"></canvas>
                                                             </div>
-                                                            <script>
-                                                                var ctxFtt = document.getElementById('barChartFtt-{{ $shop->id }}').getContext('2d');
-                                                                var fttChart = new Chart(ctxFtt, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
-                                                                            label: 'Plan',
-                                                                            data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
-                                                                            type: 'line',
-                                                                            backgroundColor: '#004355',
-                                                                            borderColor: '#3A7085',
-                                                                            fill: false,
-                                                                        }, {
-                                                                            label: 'Actual',
-                                                                            data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
-                                                                            backgroundColor: '#A6CAD8',
-                                                                            borderColor: '#007A93',
-                                                                            borderWidth: 2
-                                                                        }]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            y: {
-
-                                                                                ticks: {
-                                                                                    beginAtZero: true,
-                                                                                    steps: 10,
-                                                                                    stepSize: 10,
-                                                                                    max: 100
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'FTT'
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            tooltip: {
-                                                                                callbacks: {
-                                                                                    title: function(tooltipItem) {
-                                                                                        return tooltipItem[0].label;
-                                                                                    },
-                                                                                    label: function(context) {
-                                                                                        if (context.dataset.label === 'Actual') {
-                                                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                                                        } else {
-                                                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-                                                            </script>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 mb-4">
                                                     <div class="card card-custom">
                                                         <div class="card-header pt-2">
-                                                            <!--ideally should be {$kpiData[$shop->shop_name]['ftt'][0]->Downtime_Plan}, but if no downtime data then will error so hard code it for now-->
                                                             <h3>Downtime (Green if: ≥ 0.81)
                                                                 @php
                                                                     $statusClass = '';
@@ -324,71 +281,12 @@
                                                                 <canvas id="barChartDowntime-{{ $shop->id }}"
                                                                     class="chart-custom"></canvas>
                                                             </div>
-                                                            <script>
-                                                                var ctxFtt = document.getElementById('barChartDowntime-{{ $shop->id }}').getContext('2d');
-                                                                var fttChart = new Chart(ctxFtt, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
-                                                                            label: 'Plan',
-                                                                            data: @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan')),
-                                                                            type: 'line',
-                                                                            backgroundColor: '#004355',
-                                                                            borderColor: '#3A7085',
-                                                                            fill: false,
-                                                                        }, {
-                                                                            label: 'Actual',
-                                                                            data: @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')),
-                                                                            backgroundColor: '#A6CAD8',
-                                                                            borderColor: '#007A93',
-                                                                            borderWidth: 2
-                                                                        }]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            y: {
-
-                                                                                ticks: {
-                                                                                    beginAtZero: true,
-                                                                                    steps: 10,
-                                                                                    stepSize: 10,
-                                                                                    max: 100
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'Downtime'
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            tooltip: {
-                                                                                callbacks: {
-                                                                                    title: function(tooltipItem) {
-                                                                                        return tooltipItem[0].label;
-                                                                                    },
-                                                                                    label: function(context) {
-                                                                                        if (context.dataset.label === 'Actual') {
-                                                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                                                        } else {
-                                                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-                                                            </script>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 mb-4">
                                                     <div class="card card-custom">
                                                         <div class="card-header pt-2">
-                                                            <!--{$kpiData[$shop->shop_name]['otdp'][0]->OTDP_Plan}-->
                                                             @php
                                                                 $otdpPlan = '';
                                                                 switch ($shop->id) {
@@ -434,38 +332,6 @@
                                                                 <canvas id="barChartOtdp-{{ $shop->id }}"
                                                                     class="chart-custom"></canvas>
                                                             </div>
-                                                            <script>
-                                                                var ctxOtdp = document.getElementById('barChartOtdp-{{ $shop->id }}').getContext('2d');
-                                                                var otdpChart = new Chart(ctxOtdp, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
-                                                                            label: 'Plan',
-                                                                            data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
-                                                                            type: 'line',
-                                                                            backgroundColor: '#004355',
-                                                                            borderColor: '#3A7085',
-                                                                            fill: false,
-                                                                        }, {
-                                                                            label: 'Actual',
-                                                                            data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
-                                                                            backgroundColor: '#A6CAD8',
-                                                                            borderColor: '#007A93',
-                                                                            borderWidth: 2
-                                                                        }]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            y: {
-                                                                                beginAtZero: true
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-                                                            </script>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -485,7 +351,6 @@
                                                         <div class="collapse"
                                                             id="shopdetailsCardContent-{{ $shop->id }}">
                                                             <div class="card-body">
-                                                                <!-- Table for The Shop Details -->
                                                                 <div class="table-responsive">
                                                                     <table id="tableShopDetails"
                                                                         class="table table-bordered table-striped">
@@ -517,7 +382,6 @@
                                                                         </tbody>
                                                                     </table>
                                                                     @foreach ($shopDetails->where('shop_id', $shop->id) as $detail)
-                                                                        <!-- Modal for showing spare parts used in historical problem -->
                                                                         <div class="modal fade"
                                                                             id="modal-detail-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}"
                                                                             tabindex="-1"
@@ -535,7 +399,6 @@
                                                                                             aria-label="Close"></button>
                                                                                     </div>
                                                                                     <div class="modal-body">
-
                                                                                         @if ($detail->photo_shop)
                                                                                             <div class="row mb-3">
                                                                                                 <div
@@ -581,7 +444,6 @@
                                                         <div class="collapse"
                                                             id="ngdetailsCardContent-{{ $shop->id }}">
                                                             <div class="card-body">
-                                                                <!-- Table for The Shop Details -->
                                                                 <div class="table-responsive">
                                                                     <table id="tableNGDetails"
                                                                         class="table table-bordered table-striped">
@@ -615,7 +477,6 @@
                                                                                             class="btn btn-primary btn-sm show-ng-image-btn"
                                                                                             data-images="{{ htmlspecialchars(json_encode($images), ENT_QUOTES, 'UTF-8') }}">Detail</button>
                                                                                     </td>
-                                                                                    <!-- Modal for Not Goods Images -->
                                                                                     <div class="modal fade"
                                                                                         id="ngImageModal" tabindex="-1"
                                                                                         aria-labelledby="ngImageModalLabel"
@@ -642,7 +503,6 @@
                                                                                                                 data-bs-ride="carousel">
                                                                                                                 <div class="carousel-inner"
                                                                                                                     id="ngCarouselInner">
-                                                                                                                    <!-- Images will be injected here by JavaScript -->
                                                                                                                 </div>
                                                                                                                 <button
                                                                                                                     class="carousel-control-prev"
@@ -719,7 +579,6 @@
                                                         <div class="collapse"
                                                             id="downtimedetailsCardContent-{{ $shop->id }}">
                                                             <div class="card-body">
-                                                                <!-- Table for The Shop Details -->
                                                                 <div class="table-responsive">
                                                                     <table id="tableDowntimeDetails"
                                                                         class="table table-bordered table-striped">
@@ -755,7 +614,6 @@
                                                                         </tbody>
                                                                     </table>
                                                                     @foreach ($downtimeDetails->where('shop_name', $shop->shop_name) as $detail)
-                                                                        <!-- Modal for showing spare parts used in historical problem -->
                                                                         <div class="modal fade"
                                                                             id="modal-detail-{{ $detail->date }}-{{ $detail->shift }}-{{ $shop->id }}-{{ $detail->id }}"
                                                                             tabindex="-1"
@@ -773,7 +631,6 @@
                                                                                             aria-label="Close"></button>
                                                                                     </div>
                                                                                     <div class="modal-body">
-
                                                                                         @if ($detail->photo)
                                                                                             <div class="row mb-3">
                                                                                                 <div
@@ -886,11 +743,11 @@
                                     </div>
                                 </form>
                             </div>
-
                         </div>
+
                         <script>
                             // Handle click event on show not goods image button
-                            $('.show-ng-image-btn').click(function() {
+                            $('.show-ng-image-btn').click(function(event) {
                                 event.preventDefault();
                                 var images = $(this).data('images');
                                 // Ensure images is an array
@@ -910,99 +767,111 @@
                                 });
                                 $('#ngImageModal').modal('show');
                             });
+
                             document.getElementById('settingsCardHeader').addEventListener('click', function() {
                                 var cardBody = document.getElementById('settingsCardBody');
                                 cardBody.classList.toggle('d-none');
                             });
 
                             $(document).ready(function() {
-                                var table = $("#tableShopDetails").DataTable({
+                                $('#tableShopDetails').DataTable({
+                                    "responsive": true,
+                                    "lengthChange": false,
+                                    "autoWidth": false,
+                                });
+
+                                $('#tableNGDetails').DataTable({
+                                    "responsive": true,
+                                    "lengthChange": false,
+                                    "autoWidth": false,
+                                });
+
+                                $('#tableDowntimeDetails').DataTable({
                                     "responsive": true,
                                     "lengthChange": false,
                                     "autoWidth": false,
                                 });
                             });
 
-                            $(document).ready(function() {
-                                var table = $("#tableNGDetails").DataTable({
-                                    "responsive": true,
-                                    "lengthChange": false,
-                                    "autoWidth": false,
-                                });
+                            document.addEventListener('DOMContentLoaded', function() {
+                                @foreach ($shops as $shop)
+                                    createChart('barChartHpu-{{ $shop->id }}', @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
+                                        @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')));
+                                    createChart('barChartFtt-{{ $shop->id }}', @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
+                                        @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')));
+                                    createChart('barChartDowntime-{{ $shop->id }}', @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan')),
+                                        @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')));
+                                    createChart('barChartOtdp-{{ $shop->id }}', @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
+                                        @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')));
+                                @endforeach
                             });
 
-                            $(document).ready(function() {
-                                var table = $("#tableDowntimeDetails").DataTable({
-                                    "responsive": true,
-                                    "lengthChange": false,
-                                    "autoWidth": false,
+                            function createChart(canvasId, planData, actualData) {
+                                // Debugging: Log the initial data
+                                console.log(`Creating chart for ${canvasId}`);
+                                console.log('Initial Plan Data:', planData);
+                                console.log('Initial Actual Data:', actualData);
+
+                                // Fill missing or null values with 0
+                                planData = Array.from({
+                                    length: 31
+                                }, (_, i) => planData[i] != null ? planData[i] : 0);
+                                actualData = Array.from({
+                                    length: 31
+                                }, (_, i) => actualData[i] != null ? actualData[i] : 0);
+
+                                // Debugging: Log the filtered data
+                                console.log('Filtered Plan Data:', planData);
+                                console.log('Filtered Actual Data:', actualData);
+
+                                var ctx = document.getElementById(canvasId).getContext('2d');
+                                var chart = new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: @json($kpiData[$shop->shop_name]['hpu']->pluck('formatted_date')),
+                                        datasets: [{
+                                                label: 'Plan',
+                                                data: planData,
+                                                type: 'line',
+                                                backgroundColor: '#004355',
+                                                borderColor: '#3A7085',
+                                                fill: false,
+                                            },
+                                            {
+                                                label: 'Actual',
+                                                data: actualData,
+                                                backgroundColor: '#A6CAD8',
+                                                borderColor: '#007A93',
+                                                borderWidth: 2
+                                            }
+                                        ]
+                                    },
+                                    options: {
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                                min: 0 // Ensure y-axis starts at 0
+                                            }
+                                        },
+                                        plugins: {
+                                            tooltip: {
+                                                callbacks: {
+                                                    title: function(tooltipItem) {
+                                                        return tooltipItem[0].label;
+                                                    },
+                                                    label: function(context) {
+                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 });
-                            });
+                            }
                         </script>
 
-                        <style>
-                            #settingsCardHeader {
-                                cursor: pointer;
-                            }
 
-                            h3 {
-                                font-size: 20px;
-                            }
 
-                            .signal {
-                                display: inline-block;
-                                width: 25px;
-                                /* Reduced width */
-                                height: 25px;
-                                /* Reduced height */
-                                border-radius: 70%;
-                                line-height: 25px;
-                                /* Match line-height to height */
-                                text-align: center;
-                                color: white;
-                                font-size-adjust: 0.45;
-                                font-weight: bold;
-                            }
-
-                            .green {
-                                background-color: green;
-                            }
-
-                            .yellow {
-                                background-color: yellow;
-                                color: black;
-                            }
-
-                            .grey {
-                                background-color: darkgrey;
-
-                            }
-
-                            .red {
-                                background-color: red;
-                            }
-
-                            .indicator-table {
-                                width: auto;
-                                /* Adjusted width to auto */
-                                border-collapse: collapse;
-                                margin: 0 auto;
-                                font-size: 0.9rem;
-                                /* Adjusted font size */
-                            }
-
-                            .indicator-table th,
-                            .indicator-table td {
-                                border: 1px solid #dee2e6;
-                                padding: 4px;
-                                /* Reduced padding */
-                                text-align: center;
-                            }
-
-                            .indicator-table th {
-                                background-color: #f8f9fa;
-                            }
-                        </style>
                     </div>
                 </section>
             </div>

@@ -19,7 +19,8 @@ use App\Exports\WeldingDailyReportExport;
 
 class FormWeldingController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $items = WeldingActualHeader::all();
         $categories = DB::table('dropdowns')->where('category', 'Shift')->get();
 
@@ -37,8 +38,8 @@ class FormWeldingController extends Controller
 
         // Check for existing data with the same date and shift
         $existingHeader = WeldingActualHeader::where('date', $request->date)
-                                            ->where('shift', $request->shift)
-                                            ->first();
+            ->where('shift', $request->shift)
+            ->first();
 
         if ($existingHeader) {
             return redirect()->back()->withInput()->withErrors(['error' => 'Daily Report for this date and shift already exists.']);
@@ -60,40 +61,40 @@ class FormWeldingController extends Controller
     }
 
 
-    public function formChecksheet($id) {
+    public function formChecksheet($id)
+    {
         $id = decrypt($id);
         $item = WeldingActualHeader::findOrFail($id);
         $shops = WeldingMstShop::all();
         $stations = WeldingMstStation::all();
-    
+
         $formattedData = [];
         foreach ($shops as $shop) {
             $shopData = [
                 'shop_name' => $shop->shop_name,
                 'stations' => [],
             ];
-            
+
             $shopStations = $stations->where('shop_id', $shop->id);
             foreach ($shopStations as $station) {
                 $stationData = [
                     'station_name' => $station->station_name,
                     'models' => [],
                 ];
-                
+
                 $models = WeldingMstModel::where('station_id', $station->id)->get();
                 foreach ($models as $model) {
                     $stationData['models'][] = [
                         'model_name' => $model->model_name,
                     ];
                 }
-                
+
                 $shopData['stations'][] = $stationData;
             }
 
-            if($item->shift == 'Night'){
+            if ($item->shift == 'Night') {
                 $working_hour = 6.75;
-            }
-            elseif($item->shift =='Day'){
+            } elseif ($item->shift == 'Day') {
                 $carbonDate = Carbon::parse($item->date);
                 if ($carbonDate->isFriday()) {
                     $working_hour = 7;
@@ -101,13 +102,13 @@ class FormWeldingController extends Controller
                     $working_hour = 7.58;
                 }
             }
-            
+
             $formattedData[] = $shopData;
         }
-    
+
         return view('daily-report.welding.form', compact('formattedData', 'item', 'id', 'working_hour'));
     }
-    
+
     public function storeForm(Request $request)
     {
         DB::beginTransaction();
@@ -201,7 +202,7 @@ class FormWeldingController extends Controller
                             $imgPathNG = [];
                             if ($request->hasFile("photo_ng.$modelName.0")) {
                                 foreach ($request->photo_ng[$modelName] as $ngFile) {
-                                    if($ngFile){
+                                    if ($ngFile) {
                                         $ngFileName = uniqid() . '_' . $ngFile->getClientOriginalName();
                                         $ngDestinationPath = public_path('assets/img/photo_shop/welding/ng/');
                                         $ngFile->move($ngDestinationPath, $ngFileName);
@@ -479,7 +480,7 @@ class FormWeldingController extends Controller
                             $imgPathNG = [];
                             if ($request->hasFile("photo_ng.$modelName.0")) {
                                 foreach ($request->photo_ng[$modelName] as $ngFile) {
-                                    if($ngFile){
+                                    if ($ngFile) {
                                         $ngFileName = uniqid() . '_' . $ngFile->getClientOriginalName();
                                         $ngDestinationPath = public_path('assets/img/photo_shop/welding/ng/');
                                         $ngFile->move($ngDestinationPath, $ngFileName);
@@ -489,30 +490,56 @@ class FormWeldingController extends Controller
                             }
                             $ng = $request->production[$modelName];
                             $ngRecord = WeldingActualFormNg::where('production_id', $productionRecord->id)->first();
-                            
+
                             $totalProd = ($production['output8'][0] ?? 0) + ($production['output2'][0] ?? 0) + ($production['output1'][0] ?? 0);
 
-                            if ($ngRecord) {
-                                $ngRecord->update([
-                                    'total_prod' => $totalProd,
-                                    'reject' => $ng['reject'][0] ?? null,
-                                    'rework' => $ng['rework'][0] ?? null,
-                                    'remarks' => $ng['remarks'][0] ?? null,
-                                    'photo_ng' => json_encode($imgPathNG),
-                                    'updated_at' => now(),
-                                ]);
+                            if ($imgPathNG == []) {
+                                $imgPathNG = $ngRecord->photo_ng;
+                                if ($ngRecord) {
+                                    $ngRecord->update([
+                                        'total_prod' => $totalProd,
+                                        'reject' => $ng['reject'][0] ?? null,
+                                        'rework' => $ng['rework'][0] ?? null,
+                                        'remarks' => $ng['remarks'][0] ?? null,
+                                        'photo_ng' => $imgPathNG,
+                                        'updated_at' => now(),
+                                    ]);
+                                } else {
+                                    WeldingActualFormNg::create([
+                                        'production_id' => $productionRecord->id,
+                                        'model_id' => $modelId,
+                                        'total_prod' => $totalProd,
+                                        'reject' => $ng['reject'][0] ?? null,
+                                        'rework' => $ng['rework'][0] ?? null,
+                                        'remarks' => $ng['remarks'][0] ?? null,
+                                        'photo_ng' => $imgPathNG,
+                                        'created_at' => now(),
+                                        'updated_at' => now(),
+                                    ]);
+                                }
                             } else {
-                                WeldingActualFormNg::create([
-                                    'production_id' => $productionRecord->id,
-                                    'model_id' => $modelId,
-                                    'total_prod' => $totalProd,
-                                    'reject' => $ng['reject'][0] ?? null,
-                                    'rework' => $ng['rework'][0] ?? null,
-                                    'remarks' => $ng['remarks'][0] ?? null,
-                                    'photo_ng' => json_encode($imgPathNG),
-                                    'created_at' => now(),
-                                    'updated_at' => now(),
-                                ]);
+                                if ($ngRecord) {
+                                    $ngRecord->update([
+                                        'total_prod' => $totalProd,
+                                        'reject' => $ng['reject'][0] ?? null,
+                                        'rework' => $ng['rework'][0] ?? null,
+                                        'remarks' => $ng['remarks'][0] ?? null,
+                                        'photo_ng' => json_encode($imgPathNG),
+                                        'updated_at' => now(),
+                                    ]);
+                                } else {
+                                    WeldingActualFormNg::create([
+                                        'production_id' => $productionRecord->id,
+                                        'model_id' => $modelId,
+                                        'total_prod' => $totalProd,
+                                        'reject' => $ng['reject'][0] ?? null,
+                                        'rework' => $ng['rework'][0] ?? null,
+                                        'remarks' => $ng['remarks'][0] ?? null,
+                                        'photo_ng' => json_encode($imgPathNG),
+                                        'created_at' => now(),
+                                        'updated_at' => now(),
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -526,10 +553,11 @@ class FormWeldingController extends Controller
             return redirect()->back()->withInput()->withErrors(['failed' => 'Failed to update daily report data. Please try again. Error: ' . $e->getMessage()]);
         }
     }
-    public function exportExcel(Request $request){
+    public function exportExcel(Request $request)
+    {
         $month = $request->input('month');
-       return Excel::download(new WeldingDailyReportExport($month), "welding_daily_report_export.xlsx");
-   }
+        return Excel::download(new WeldingDailyReportExport($month), "welding_daily_report_export.xlsx");
+    }
     public function destroy($id)
     {
         DB::beginTransaction();
@@ -547,7 +575,7 @@ class FormWeldingController extends Controller
             // Loop through details and delete associated productions and ng records
             foreach ($details as $detail) {
                 $station_details = WeldingActualStationDetail::where('details_id', $detail->id)->get();
-                foreach($station_details as $station_detail){
+                foreach ($station_details as $station_detail) {
                     $productions = WeldingActualFormProduction::where('station_details_id', $station_detail->id)->get();
 
                     foreach ($productions as $production) {
@@ -570,6 +598,4 @@ class FormWeldingController extends Controller
             return redirect('/daily-report/welding')->with('failed', 'Failed to delete daily report. Please try again. Error: ' . $e->getMessage());
         }
     }
-
-
 }

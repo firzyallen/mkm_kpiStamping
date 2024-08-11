@@ -2,6 +2,69 @@
 
 @section('content')
     <style>
+        #settingsCardHeader {
+            cursor: pointer;
+        }
+
+        h3 {
+            font-size: 20px;
+        }
+
+        .signal {
+            display: inline-block;
+            width: 25px;
+            /* Reduced width */
+            height: 25px;
+            /* Reduced height */
+            border-radius: 70%;
+            line-height: 25px;
+            /* Match line-height to height */
+            text-align: center;
+            color: white;
+            font-size-adjust: 0.45;
+            font-weight: bold;
+        }
+
+        .green {
+            background-color: green;
+        }
+
+        .yellow {
+            background-color: yellow;
+            color: black;
+        }
+
+        .grey {
+            background-color: darkgrey;
+
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .indicator-table {
+            width: auto;
+            /* Adjusted width to auto */
+            border-collapse: collapse;
+            margin: 0 auto;
+            font-size: 0.9rem;
+            /* Adjusted font size */
+        }
+
+        .indicator-table th,
+        .indicator-table td {
+            border: 1px solid #dee2e6;
+            padding: 4px;
+            /* Reduced padding */
+            text-align: center;
+        }
+
+        .indicator-table th {
+            background-color: #f8f9fa;
+        }
+    </style>
+    <style>
         #lblGreetings {
             font-size: 1rem;
         }
@@ -142,66 +205,6 @@
                                                                 <canvas id="barChartHpu-{{ $shop->id }}"
                                                                     class="chart-custom"></canvas>
                                                             </div>
-                                                            <script>
-                                                                var ctxHpu = document.getElementById('barChartHpu-{{ $shop->id }}').getContext('2d');
-                                                                var hpuChart = new Chart(ctxHpu, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
-                                                                                label: 'Plan',
-                                                                                data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
-                                                                                type: 'line',
-                                                                                backgroundColor: '#004355',
-                                                                                borderColor: '#3A7085',
-                                                                                fill: false,
-                                                                            }, {
-                                                                                label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
-                                                                                backgroundColor: '#A6CAD8',
-                                                                                borderColor: '#007A93',
-                                                                                borderWidth: 2
-                                                                            },
-
-                                                                        ]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            x: {
-                                                                                beginAtZero: true,
-                                                                                ticks: {
-                                                                                    callback: function(value, index, values) {
-                                                                                        // Show labels for dates 1, 4, 8, 12, 16, 20, 24, 28
-                                                                                        return [1, 4, 8, 12, 16, 20, 24, 28].includes(value) ? value : '';
-                                                                                    }
-                                                                                }
-                                                                            }, // diapus gpp ini si x biar labelnya ga muncul
-                                                                            y: {
-                                                                                beginAtZero: true,
-                                                                                min: 0, // Force y-axis to start at 0
-                                                                                max: 2, // Set y-axis maximum to 2
-                                                                                ticks: {
-                                                                                    stepSize: 0.1, // Define step size for better readability
-                                                                                    callback: function(value) {
-                                                                                        return value.toFixed(1); // Ensure values are displayed as fixed-point
-                                                                                    },
-                                                                                    // Added line to force y-axis to start at 0
-                                                                                    beginAtZero: true,
-                                                                                    // Custom tick function to ignore negative values
-                                                                                    min: 0,
-                                                                                    max: 2
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'HPU'
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-                                                            </script>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -263,66 +266,6 @@
                                                                 <canvas id="barChartFtt-{{ $shop->id }}"
                                                                     class="chart-custom"></canvas>
                                                             </div>
-                                                            <script>
-                                                                var ctxFtt = document.getElementById('barChartFtt-{{ $shop->id }}').getContext('2d');
-                                                                var fttChart = new Chart(ctxFtt, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
-                                                                                label: 'Plan',
-                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
-                                                                                type: 'line',
-                                                                                backgroundColor: '#004355',
-                                                                                borderColor: '#3A7085',
-                                                                                fill: false,
-                                                                            }, {
-                                                                                label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
-                                                                                backgroundColor: '#A6CAD8',
-                                                                                borderColor: '#007A93',
-                                                                                borderWidth: 2
-                                                                            },
-
-                                                                        ]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            y: {
-
-                                                                                ticks: {
-                                                                                    beginAtZero: true,
-                                                                                    steps: 10,
-                                                                                    stepSize: 10,
-                                                                                    max: 100
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'FTT'
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            tooltip: {
-                                                                                callbacks: {
-                                                                                    title: function(tooltipItem) {
-                                                                                        return tooltipItem[0].label;
-                                                                                    },
-                                                                                    label: function(context) {
-                                                                                        if (context.dataset.label === 'Actual') {
-                                                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                                                        } else {
-                                                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-                                                            </script>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -360,66 +303,6 @@
                                                                 <canvas id="barChartDowntime-{{ $shop->id }}"
                                                                     class="chart-custom"></canvas>
                                                             </div>
-                                                            <script>
-                                                                var ctxFtt = document.getElementById('barChartDowntime-{{ $shop->id }}').getContext('2d');
-                                                                var fttChart = new Chart(ctxFtt, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
-                                                                                label: 'Plan',
-                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('Downtime_Plan')),
-                                                                                type: 'line',
-                                                                                backgroundColor: '#004355',
-                                                                                borderColor: '#3A7085',
-                                                                                fill: false,
-                                                                            }, {
-                                                                                label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')),
-                                                                                backgroundColor: '#A6CAD8',
-                                                                                borderColor: '#007A93',
-                                                                                borderWidth: 2
-                                                                            },
-
-                                                                        ]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            y: {
-
-                                                                                ticks: {
-                                                                                    beginAtZero: true,
-                                                                                    steps: 10,
-                                                                                    stepSize: 10,
-                                                                                    max: 100
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'Downtime'
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            tooltip: {
-                                                                                callbacks: {
-                                                                                    title: function(tooltipItem) {
-                                                                                        return tooltipItem[0].label;
-                                                                                    },
-                                                                                    label: function(context) {
-                                                                                        if (context.dataset.label === 'Actual') {
-                                                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                                                        } else {
-                                                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-                                                            </script>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -490,40 +373,6 @@
                                                                             id="barChartOtdp-{{ $shop->id }}-{{ $model->id }}"
                                                                             class="chart-custom"></canvas>
                                                                     </div>
-                                                                    <script>
-                                                                        var ctxOtdp = document.getElementById('barChartOtdp-{{ $shop->id }}-{{ $model->id }}').getContext('2d');
-                                                                        var otdpChart = new Chart(ctxOtdp, {
-                                                                            type: 'bar',
-                                                                            data: {
-                                                                                labels: Array.from({
-                                                                                    length: 31
-                                                                                }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                                datasets: [{
-                                                                                        label: 'Plan',
-                                                                                        data: @json($kpiData[$shop->shop_name]['otdp'][$model->model_name]->pluck('OTDP_Plan')),
-                                                                                        type: 'line',
-                                                                                        backgroundColor: '#004355',
-                                                                                        borderColor: '#3A7085',
-                                                                                        fill: false,
-                                                                                    }, {
-                                                                                        label: 'Actual',
-                                                                                        data: @json($kpiData[$shop->shop_name]['otdp'][$model->model_name]->pluck('OTDP')),
-                                                                                        backgroundColor: '#A6CAD8',
-                                                                                        borderColor: '#007A93',
-                                                                                        borderWidth: 2
-                                                                                    },
-
-                                                                                ]
-                                                                            },
-                                                                            options: {
-                                                                                scales: {
-                                                                                    y: {
-                                                                                        beginAtZero: true
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        });
-                                                                    </script>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -954,113 +803,297 @@
 
                         </div>
                         <script>
-                            // Handle click event on show not goods image button
-                            $('.show-ng-image-btn').click(function() {
-                                event.preventDefault();
-                                var images = $(this).data('images');
-                                // Ensure images is an array
-                                if (typeof images === 'string') {
-                                    images = JSON.parse(images.replace(/&quot;/g, '"'));
-                                }
-                                var ngCarouselInner = $('#ngCarouselInner');
-                                ngCarouselInner.empty(); // Clear existing images
-                                var isActive = 'active';
-                                images.forEach(function(image) {
-                                    ngCarouselInner.append(`
-                                        <div class="carousel-item ${isActive}">
-                                            <img src="{{ asset('${image}') }}" class="d-block w-100 img-fluid" alt="Image Preview" onclick="this.requestFullscreen()">
-                                        </div>
-                                    `);
-                                    isActive = ''; // Only the first item should be active
+                            document.addEventListener('DOMContentLoaded', function() {
+                                // Handle click event on show not goods image button
+                                document.querySelectorAll('.show-ng-image-btn').forEach(function(button) {
+                                    button.addEventListener('click', function(event) {
+                                        event.preventDefault();
+                                        var images = JSON.parse(this.getAttribute('data-images').replace(/&quot;/g,
+                                            '"'));
+                                        var ngCarouselInner = document.getElementById('ngCarouselInner');
+                                        ngCarouselInner.innerHTML = ''; // Clear existing images
+                                        var isActive = 'active';
+                                        images.forEach(function(image) {
+                                            ngCarouselInner.innerHTML += `
+                                                <div class="carousel-item ${isActive}">
+                                                    <img src="{{ asset('${image}') }}" class="d-block w-100 img-fluid" alt="Image Preview" onclick="this.requestFullscreen()">
+                                                </div>
+                                            `;
+                                            isActive = ''; // Only the first item should be active
+                                        });
+                                        var ngImageModal = new bootstrap.Modal(document.getElementById('ngImageModal'));
+                                        ngImageModal.show();
+                                    });
                                 });
-                                $('#ngImageModal').modal('show');
-                            });
 
-                            document.getElementById('settingsCardHeader').addEventListener('click', function() {
-                                var cardBody = document.getElementById('settingsCardBody');
-                                cardBody.classList.toggle('d-none');
-                            });
+                                document.getElementById('settingsCardHeader').addEventListener('click', function() {
+                                    var cardBody = document.getElementById('settingsCardBody');
+                                    cardBody.classList.toggle('d-none');
+                                });
 
-                            $(document).ready(function() {
-                                var table = $("#tableShopDetails").DataTable({
+                                $('#tableShopDetails').DataTable({
                                     "responsive": true,
                                     "lengthChange": false,
                                     "autoWidth": false,
                                 });
-                            });
 
-                            $(document).ready(function() {
-                                var table = $("#tableNGDetails").DataTable({
+                                $('#tableNGDetails').DataTable({
                                     "responsive": true,
                                     "lengthChange": false,
                                     "autoWidth": false,
                                 });
+                                $('#tableDowntimeDetails').DataTable({
+                                    "responsive": true,
+                                    "lengthChange": false,
+                                    "autoWidth": false,
+                                });
+
+                                @foreach ($shops as $shop)
+                                    console.log("Data for Shop: {{ $shop->shop_name }}");
+
+                                    var hpuPlanData = @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan'));
+                                    var hpuActualData = @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU'));
+                                    console.log("HPU Plan Data: ", hpuPlanData);
+                                    console.log("HPU Actual Data: ", hpuActualData);
+
+                                    hpuPlanData = hpuPlanData.map(val => parseFloat(val) < 0 || isNaN(parseFloat(val)) ? 0 : parseFloat(
+                                        val));
+                                    hpuActualData = hpuActualData.map(val => parseFloat(val) < 0 || isNaN(parseFloat(val)) ? 0 :
+                                        parseFloat(val));
+                                    console.log("Filtered HPU Plan Data: ", hpuPlanData);
+                                    console.log("Filtered HPU Actual Data: ", hpuActualData);
+
+                                    new Chart(document.getElementById('barChartHpu-{{ $shop->id }}').getContext('2d'), {
+                                        type: 'bar',
+                                        data: {
+                                            labels: Array.from({
+                                                length: 31
+                                            }, (_, i) => i + 1),
+                                            datasets: [{
+                                                label: 'Plan',
+                                                data: hpuPlanData,
+                                                type: 'line',
+                                                backgroundColor: '#004355',
+                                                borderColor: '#3A7085',
+                                                fill: false,
+                                            }, {
+                                                label: 'Actual',
+                                                data: hpuActualData,
+                                                backgroundColor: '#A6CAD8',
+                                                borderColor: '#007A93',
+                                                borderWidth: 2
+                                            }]
+                                        },
+                                        options: {
+                                            scales: {
+                                                x: {
+                                                    beginAtZero: true,
+                                                    ticks: {
+                                                        callback: function(value) {
+                                                            return [1, 4, 8, 12, 16, 20, 24, 28].includes(value) ? value :
+                                                                '';
+                                                        }
+                                                    }
+                                                },
+                                                y: {
+                                                    beginAtZero: true,
+                                                    min: 0,
+                                                    max: 2,
+                                                    ticks: {
+                                                        stepSize: 0.1,
+                                                        callback: function(value) {
+                                                            return value.toFixed(1);
+                                                        }
+                                                    },
+                                                    title: {
+                                                        display: true,
+                                                        text: 'HPU'
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+
+                                    var fttPlanData = @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan'));
+                                    var fttActualData = @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT'));
+                                    console.log("FTT Plan Data: ", fttPlanData);
+                                    console.log("FTT Actual Data: ", fttActualData);
+
+                                    fttPlanData = fttPlanData.map(val => parseFloat(val) < 0 || isNaN(parseFloat(val)) ? 0 : parseFloat(
+                                        val));
+                                    fttActualData = fttActualData.map(val => parseFloat(val) < 0 || isNaN(parseFloat(val)) ? 0 :
+                                        parseFloat(val));
+                                    console.log("Filtered FTT Plan Data: ", fttPlanData);
+                                    console.log("Filtered FTT Actual Data: ", fttActualData);
+
+                                    new Chart(document.getElementById('barChartFtt-{{ $shop->id }}').getContext('2d'), {
+                                        type: 'bar',
+                                        data: {
+                                            labels: Array.from({
+                                                length: 31
+                                            }, (_, i) => i + 1),
+                                            datasets: [{
+                                                label: 'Plan',
+                                                data: fttPlanData,
+                                                type: 'line',
+                                                backgroundColor: '#004355',
+                                                borderColor: '#3A7085',
+                                                fill: false,
+                                            }, {
+                                                label: 'Actual',
+                                                data: fttActualData,
+                                                backgroundColor: '#A6CAD8',
+                                                borderColor: '#007A93',
+                                                borderWidth: 2
+                                            }]
+                                        },
+                                        options: {
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: true,
+                                                    min: 0,
+                                                    max: 100,
+                                                    ticks: {
+                                                        stepSize: 10
+                                                    },
+                                                    title: {
+                                                        display: true,
+                                                        text: 'FTT'
+                                                    }
+                                                }
+                                            },
+                                            plugins: {
+                                                tooltip: {
+                                                    callbacks: {
+                                                        title: function(tooltipItem) {
+                                                            return tooltipItem[0].label;
+                                                        },
+                                                        label: function(context) {
+                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+
+                                    var downtimePlanData = @json($kpiData[$shop->shop_name]['ftt']->pluck('Downtime_Plan'));
+                                    var downtimeActualData = @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime'));
+                                    console.log("Downtime Plan Data: ", downtimePlanData);
+                                    console.log("Downtime Actual Data: ", downtimeActualData);
+
+                                    downtimePlanData = downtimePlanData.map(val => parseFloat(val) < 0 || isNaN(parseFloat(val)) ? 0 :
+                                        parseFloat(val));
+                                    downtimeActualData = downtimeActualData.map(val => parseFloat(val) < 0 || isNaN(parseFloat(val)) ?
+                                        0 : parseFloat(val));
+                                    console.log("Filtered Downtime Plan Data: ", downtimePlanData);
+                                    console.log("Filtered Downtime Actual Data: ", downtimeActualData);
+
+                                    new Chart(document.getElementById('barChartDowntime-{{ $shop->id }}').getContext('2d'), {
+                                        type: 'bar',
+                                        data: {
+                                            labels: Array.from({
+                                                length: 31
+                                            }, (_, i) => i + 1),
+                                            datasets: [{
+                                                label: 'Plan',
+                                                data: downtimePlanData,
+                                                type: 'line',
+                                                backgroundColor: '#004355',
+                                                borderColor: '#3A7085',
+                                                fill: false,
+                                            }, {
+                                                label: 'Actual',
+                                                data: downtimeActualData,
+                                                backgroundColor: '#A6CAD8',
+                                                borderColor: '#007A93',
+                                                borderWidth: 2
+                                            }]
+                                        },
+                                        options: {
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: true,
+                                                    min: 0,
+                                                    max: 100,
+                                                    ticks: {
+                                                        stepSize: 10
+                                                    },
+                                                    title: {
+                                                        display: true,
+                                                        text: 'Downtime'
+                                                    }
+                                                }
+                                            },
+                                            plugins: {
+                                                tooltip: {
+                                                    callbacks: {
+                                                        title: function(tooltipItem) {
+                                                            return tooltipItem[0].label;
+                                                        },
+                                                        label: function(context) {
+                                                            return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+
+                                    @foreach ($stations->where('shop_id', $shop->id) as $station)
+                                        @foreach ($models->where('station_id', $station->id) as $model)
+                                            var otdpPlanData = @json($kpiData[$shop->shop_name]['otdp'][$model->model_name]->pluck('OTDP_Plan'));
+                                            var otdpActualData = @json($kpiData[$shop->shop_name]['otdp'][$model->model_name]->pluck('OTDP'));
+                                            console.log("OTDP Plan Data for Model {{ $model->model_name }}: ", otdpPlanData);
+                                            console.log("OTDP Actual Data for Model {{ $model->model_name }}: ", otdpActualData);
+
+                                            otdpPlanData = otdpPlanData.map(val => parseFloat(val) < 0 || isNaN(parseFloat(val)) ? 0 :
+                                                parseFloat(val));
+                                            otdpActualData = otdpActualData.map(val => parseFloat(val) < 0 || isNaN(parseFloat(val)) ?
+                                                0 : parseFloat(val));
+                                            console.log("Filtered OTDP Plan Data for Model {{ $model->model_name }}: ", otdpPlanData);
+                                            console.log("Filtered OTDP Actual Data for Model {{ $model->model_name }}: ",
+                                                otdpActualData);
+
+                                            new Chart(document.getElementById(
+                                                'barChartOtdp-{{ $shop->id }}-{{ $model->id }}').getContext('2d'), {
+                                                type: 'bar',
+                                                data: {
+                                                    labels: Array.from({
+                                                        length: 31
+                                                    }, (_, i) => i + 1),
+                                                    datasets: [{
+                                                        label: 'Plan',
+                                                        data: otdpPlanData,
+                                                        type: 'line',
+                                                        backgroundColor: '#004355',
+                                                        borderColor: '#3A7085',
+                                                        fill: false,
+                                                    }, {
+                                                        label: 'Actual',
+                                                        data: otdpActualData,
+                                                        backgroundColor: '#A6CAD8',
+                                                        borderColor: '#007A93',
+                                                        borderWidth: 2
+                                                    }]
+                                                },
+                                                options: {
+                                                    scales: {
+                                                        y: {
+                                                            beginAtZero: true,
+                                                            min: 0
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        @endforeach
+                                    @endforeach
+                                @endforeach
                             });
                         </script>
 
-                        <style>
-                            #settingsCardHeader {
-                                cursor: pointer;
-                            }
 
-                            h3 {
-                                font-size: 20px;
-                            }
 
-                            .signal {
-                                display: inline-block;
-                                width: 25px;
-                                /* Reduced width */
-                                height: 25px;
-                                /* Reduced height */
-                                border-radius: 70%;
-                                line-height: 25px;
-                                /* Match line-height to height */
-                                text-align: center;
-                                color: white;
-                                font-size-adjust: 0.45;
-                                font-weight: bold;
-                            }
-
-                            .green {
-                                background-color: green;
-                            }
-
-                            .yellow {
-                                background-color: yellow;
-                                color: black;
-                            }
-
-                            .grey {
-                                background-color: darkgrey;
-
-                            }
-
-                            .red {
-                                background-color: red;
-                            }
-
-                            .indicator-table {
-                                width: auto;
-                                /* Adjusted width to auto */
-                                border-collapse: collapse;
-                                margin: 0 auto;
-                                font-size: 0.9rem;
-                                /* Adjusted font size */
-                            }
-
-                            .indicator-table th,
-                            .indicator-table td {
-                                border: 1px solid #dee2e6;
-                                padding: 4px;
-                                /* Reduced padding */
-                                text-align: center;
-                            }
-
-                            .indicator-table th {
-                                background-color: #f8f9fa;
-                            }
-                        </style>
                     </div>
                 </section>
             </div>

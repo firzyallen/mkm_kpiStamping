@@ -408,27 +408,53 @@ class FormFactoryBController extends Controller
                         $ng = $request->production[$modelName];
                         $ngRecord = FactbActualFormNg::where('production_id', $productionRecord->id)->first();
 
-                        if ($ngRecord) {
-                            $ngRecord->update([
-                                'total_prod' => $totalProd,
-                                'reject' => $ng['reject'][0] ?? null,
-                                'rework' => $ng['rework'][0] ?? null,
-                                'remarks' => $ng['remarks'][0] ?? null,
-                                'photo_ng' => json_encode($imgPathNG),
-                                'updated_at' => now(),
-                            ]);
+                        if ($imgPathNG == []) {
+                            $imgPathNG = $ngRecord->photo_ng;
+                            if ($ngRecord) {
+                                $ngRecord->update([
+                                    'total_prod' => $totalProd,
+                                    'reject' => $ng['reject'][0] ?? null,
+                                    'rework' => $ng['rework'][0] ?? null,
+                                    'remarks' => $ng['remarks'][0] ?? null,
+                                    'photo_ng' => $imgPathNG,
+                                    'updated_at' => now(),
+                                ]);
+                            } else {
+                                FactbActualFormNg::create([
+                                    'production_id' => $productionRecord->id,
+                                    'model_id' => $modelId,
+                                    'total_prod' => $totalProd,
+                                    'reject' => $ng['reject'][0] ?? null,
+                                    'rework' => $ng['rework'][0] ?? null,
+                                    'remarks' => $ng['remarks'][0] ?? null,
+                                    'photo_ng' => $imgPathNG,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                            }
                         } else {
-                            FactbActualFormNg::create([
-                                'production_id' => $productionRecord->id,
-                                'model_id' => $modelId,
-                                'total_prod' => $totalProd,
-                                'reject' => $ng['reject'][0] ?? null,
-                                'rework' => $ng['rework'][0] ?? null,
-                                'remarks' => $ng['remarks'][0] ?? null,
-                                'photo_ng' => $imgPathNG,
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ]);
+                            if ($ngRecord) {
+                                $ngRecord->update([
+                                    'total_prod' => $totalProd,
+                                    'reject' => $ng['reject'][0] ?? null,
+                                    'rework' => $ng['rework'][0] ?? null,
+                                    'remarks' => $ng['remarks'][0] ?? null,
+                                    'photo_ng' => json_encode($imgPathNG),
+                                    'updated_at' => now(),
+                                ]);
+                            } else {
+                                FactbActualFormNg::create([
+                                    'production_id' => $productionRecord->id,
+                                    'model_id' => $modelId,
+                                    'total_prod' => $totalProd,
+                                    'reject' => $ng['reject'][0] ?? null,
+                                    'rework' => $ng['rework'][0] ?? null,
+                                    'remarks' => $ng['remarks'][0] ?? null,
+                                    'photo_ng' => json_encode($imgPathNG),
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                            }
                         }
                     }
                 }
