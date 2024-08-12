@@ -64,8 +64,10 @@
                                                             <div class="form-group mt-4">
                                                                 <div class="row">
                                                                     <div class="col-md-3 mb-3">
-                                                                        <label for="manpower_plan">Man Power Plan</span></label>
-                                                                        <input type="number" step="0.01"
+                                                                        <label for="manpower_plan">Man Power
+                                                                            Plan</span></label>
+                                                                        <input type="text" inputmode="numeric"
+                                                                            step="0.01"
                                                                             name="manpower_plan[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
                                                                             style="width: 100px;" value="0"
@@ -73,7 +75,7 @@
                                                                     </div>
                                                                     <div class="col-md-3 mb-3">
                                                                         <label for="manpower">Man Power Actual</label>
-                                                                        <input type="decimal"
+                                                                        <input type="text" inputmode="numeric"
                                                                             name="manpower[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
                                                                             style="width: 100px;" value="0"
@@ -81,10 +83,10 @@
                                                                     </div>
                                                                     <div class="col-md-3 mb-3">
                                                                         <label for="working_hour">Working Hour</label>
-                                                                        <input type="decimal"
+                                                                        <input type="text" inputmode="numeric"
                                                                             name="working_hour[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
-                                                                            style="width: 100px;" value={{$workingHour}}
+                                                                            style="width: 100px;" value={{ $workingHour }}
                                                                             min="0">
                                                                     </div>
                                                                     <div class="col-md-6 mb-3">
@@ -115,7 +117,8 @@
                                                                                 data-shop="{{ $data['shop_name'] }}">
                                                                                 <tr class="production-row">
                                                                                     <td>
-                                                                                        <label>Status <span class="required">*</span></label>
+                                                                                        <label>Status <span
+                                                                                                class="required">*</span></label>
                                                                                         <select
                                                                                             name="production[{{ $data['shop_name'] }}][status][]"
                                                                                             class="form-control form-control-sm status-select"
@@ -128,7 +131,8 @@
                                                                                             <option value="n">Not
                                                                                                 Finished</option>
                                                                                         </select>
-                                                                                        <label>Model <span class="required">*</span></label>
+                                                                                        <label>Model <span
+                                                                                                class="required">*</span></label>
                                                                                         <select
                                                                                             name="production[{{ $data['shop_name'] }}][model][]"
                                                                                             class="form-control form-control-sm model-select"
@@ -155,15 +159,15 @@
                                                                                         <div class="row">
                                                                                             <div class="col-md-4">
                                                                                                 <label>Production Process
-                                                                                                    </label>
+                                                                                                </label>
                                                                                                 <input type="text"
                                                                                                     name="production[{{ $data['shop_name'] }}][production_process][]"
                                                                                                     class="form-control form-control-sm"
-                                                                                                    placeholder="production process"
-                                                                                                    >
+                                                                                                    placeholder="production process">
                                                                                             </div>
                                                                                             <div class="col-md-4">
-                                                                                                <label>Type <span class="required">*</span></label>
+                                                                                                <label>Type <span
+                                                                                                        class="required">*</span></label>
                                                                                                 <select
                                                                                                     name="production[{{ $data['shop_name'] }}][type][]"
                                                                                                     class="form-control form-control-sm"
@@ -179,64 +183,63 @@
                                                                                             </div>
                                                                                             <div class="col-md-4">
                                                                                                 <label>Manpower</label>
-                                                                                                <input type="number"
+                                                                                                <input type="text"
+                                                                                                    inputmode="numeric"
                                                                                                     step="0.01"
                                                                                                     name="production[{{ $data['shop_name'] }}][manpower][]"
                                                                                                     class="form-control form-control-sm"
                                                                                                     value="0"
-                                                                                                    min="0"
-                                                                                                    >
+                                                                                                    min="0">
                                                                                             </div>
                                                                                             <div class="col-md-4">
                                                                                                 <label>Machine</label>
-                                                                                                <input type="number"
+                                                                                                <input type="text"
+                                                                                                    inputmode="numeric"
                                                                                                     name="production[{{ $data['shop_name'] }}][machine][]"
                                                                                                     class="form-control form-control-sm"
                                                                                                     value="0"
-                                                                                                    min="0"
-                                                                                                    >
+                                                                                                    min="0">
                                                                                             </div>
                                                                                             <div class="col-md-4">
                                                                                                 <label>Setting</label>
-                                                                                                <input type="number"
+                                                                                                <input type="text"
+                                                                                                    inputmode="numeric"
                                                                                                     step="0.01"
                                                                                                     name="production[{{ $data['shop_name'] }}][setting][]"
                                                                                                     class="form-control form-control-sm"
                                                                                                     value="0"
-                                                                                                    min="0"
-                                                                                                    >
+                                                                                                    min="0">
                                                                                             </div>
                                                                                             <div class="col-md-4">
-                                                                                                <label>Plan Production</label>
-                                                                                                <input type="number"
+                                                                                                <label>Plan
+                                                                                                    Production</label>
+                                                                                                <input type="text"
+                                                                                                    inputmode="numeric"
                                                                                                     name="production[{{ $data['shop_name'] }}][plan_prod][]"
                                                                                                     class="form-control form-control-sm"
                                                                                                     value="0"
-                                                                                                    min="0"
-                                                                                                    >
+                                                                                                    min="0">
                                                                                             </div>
                                                                                             <div class="col-md-4">
                                                                                                 <label>Hour From</label>
                                                                                                 <input type="time"
                                                                                                     name="production[{{ $data['shop_name'] }}][hour_from][]"
-                                                                                                    class="form-control form-control-sm"
-                                                                                                    >
+                                                                                                    class="form-control form-control-sm">
                                                                                             </div>
                                                                                             <div class="col-md-4">
                                                                                                 <label>Hour To</label>
                                                                                                 <input type="time"
                                                                                                     name="production[{{ $data['shop_name'] }}][hour_to][]"
-                                                                                                    class="form-control form-control-sm"
-                                                                                                    >
+                                                                                                    class="form-control form-control-sm">
                                                                                             </div>
                                                                                             <div class="col-md-4">
                                                                                                 <label>OK</label>
-                                                                                                <input type="number"
+                                                                                                <input type="text"
+                                                                                                    inputmode="numeric"
                                                                                                     name="production[{{ $data['shop_name'] }}][OK][]"
                                                                                                     class="form-control form-control-sm"
                                                                                                     value="0"
-                                                                                                    min="0"
-                                                                                                    >
+                                                                                                    min="0">
                                                                                             </div>
                                                                                         </div>
                                                                                     </td>
@@ -244,30 +247,30 @@
                                                                                         <div class="row">
                                                                                             <div class="col-md-4">
                                                                                                 <label>Rework</label>
-                                                                                                <input type="number"
+                                                                                                <input type="text"
+                                                                                                    inputmode="numeric"
                                                                                                     name="ng[{{ $data['shop_name'] }}][rework][]"
                                                                                                     class="form-control form-control-sm"
                                                                                                     value="0"
-                                                                                                    min="0"
-                                                                                                    >
+                                                                                                    min="0">
                                                                                             </div>
                                                                                             <div class="col-md-4">
                                                                                                 <label>DMG Part</label>
-                                                                                                <input type="number"
+                                                                                                <input type="text"
+                                                                                                    inputmode="numeric"
                                                                                                     name="ng[{{ $data['shop_name'] }}][dmg_part][]"
                                                                                                     class="form-control form-control-sm"
                                                                                                     value="0"
-                                                                                                    min="0"
-                                                                                                    >
+                                                                                                    min="0">
                                                                                             </div>
                                                                                             <div class="col-md-4">
                                                                                                 <label>DMG RM</label>
-                                                                                                <input type="number"
+                                                                                                <input type="text"
+                                                                                                    inputmode="numeric"
                                                                                                     name="ng[{{ $data['shop_name'] }}][dmg_rm][]"
                                                                                                     class="form-control form-control-sm"
                                                                                                     value="0"
-                                                                                                    min="0"
-                                                                                                    >
+                                                                                                    min="0">
                                                                                             </div>
                                                                                             <div class="col-md-4">
                                                                                                 <label>Remarks</label>
@@ -362,19 +365,19 @@
                             </div>
                             <div class="col-md-4">
                                 <label>Manpower</label>
-                                <input type="number" step="0.01" name="production[${shopName}][manpower][]" class="form-control form-control-sm" value="0" min="0">
+                                <input type="text" inputmode="numeric" step="0.01" name="production[${shopName}][manpower][]" class="form-control form-control-sm" value="0" min="0">
                             </div>
                             <div class="col-md-4">
                                 <label>Machine</label>
-                                <input type="number" name="production[${shopName}][machine][]" class="form-control form-control-sm" value="0" min="0">
+                                <input type="text" inputmode="numeric" name="production[${shopName}][machine][]" class="form-control form-control-sm" value="0" min="0">
                             </div>
                             <div class="col-md-4">
                                 <label>Setting</label>
-                                <input type="number" step="0.01" name="production[${shopName}][setting][]" class="form-control form-control-sm" value="0" min="0">
+                                <input type="text" inputmode="numeric" step="0.01" name="production[${shopName}][setting][]" class="form-control form-control-sm" value="0" min="0">
                             </div>
                             <div class="col-md-4">
                                 <label>Plan Production</label>
-                                <input type="number" name="production[${shopName}][plan_prod][]" class="form-control form-control-sm" value="0" min="0">
+                                <input type="text" inputmode="numeric" name="production[${shopName}][plan_prod][]" class="form-control form-control-sm" value="0" min="0">
                             </div>
                             <div class="col-md-4">
                                 <label>Hour From</label>
@@ -386,7 +389,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label>OK</label>
-                                <input type="number" name="production[${shopName}][OK][]" class="form-control form-control-sm" value="0" min="0">
+                                <input type="text" inputmode="numeric" name="production[${shopName}][OK][]" class="form-control form-control-sm" value="0" min="0">
                             </div>
                         </div>
                     </td>
@@ -394,15 +397,15 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <label>Rework</label>
-                                <input type="number" name="ng[${shopName}][rework][]" class="form-control form-control-sm" value="0" min="0">
+                                <input type="text" inputmode="numeric" name="ng[${shopName}][rework][]" class="form-control form-control-sm" value="0" min="0">
                             </div>
                             <div class="col-md-4">
                                 <label>DMG Part</label>
-                                <input type="number" name="ng[${shopName}][dmg_part][]" class="form-control form-control-sm" value="0" min="0">
+                                <input type="text" inputmode="numeric" name="ng[${shopName}][dmg_part][]" class="form-control form-control-sm" value="0" min="0">
                             </div>
                             <div class="col-md-4">
                                 <label>DMG RM</label>
-                                <input type="number" name="ng[${shopName}][dmg_rm][]" class="form-control form-control-sm" value="0" min="0">
+                                <input type="text" inputmode="numeric" name="ng[${shopName}][dmg_rm][]" class="form-control form-control-sm" value="0" min="0">
                             </div>
                             <div class="col-md-4">
                                 <label>Remarks</label>

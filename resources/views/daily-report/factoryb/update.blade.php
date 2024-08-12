@@ -69,7 +69,7 @@
                                                                 <div class="row">
                                                                     <div class="col-md-3 mb-3">
                                                                         <label for="manpower_plan">Man Power Plan</label>
-                                                                        <input type="decimal"
+                                                                        <input type="text" inputmode="numeric"
                                                                             name="manpower_plan[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
                                                                             style="width: 100px;"
@@ -78,7 +78,7 @@
                                                                     </div>
                                                                     <div class="col-md-3 mb-3">
                                                                         <label for="manpower">Man Power Actual</label>
-                                                                        <input type="decimal"
+                                                                        <input type="text" inputmode="numeric"
                                                                             name="manpower[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
                                                                             style="width: 100px;"
@@ -86,7 +86,7 @@
                                                                     </div>
                                                                     <div class="col-md-3 mb-3">
                                                                         <label for="ot_hour_plan">OT Hour Plan</label>
-                                                                        <input type="decimal"
+                                                                        <input type="text" inputmode="numeric"
                                                                             name="ot_hour_plan[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
                                                                             style="width: 100px;"
@@ -95,7 +95,7 @@
                                                                     </div>
                                                                     <div class="col-md-3 mb-3">
                                                                         <label for="ot_hour">OT Hour</label>
-                                                                        <input type="decimal"
+                                                                        <input type="text" inputmode="numeric"
                                                                             name="ot_hour[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
                                                                             style="width: 100px;"
@@ -103,7 +103,7 @@
                                                                     </div>
                                                                     <div class="col-md-3 mb-3">
                                                                         <label for="working_hour">Working Hour</label>
-                                                                        <input type="decimal"
+                                                                        <input type="text" inputmode="numeric"
                                                                             name="working_hour[{{ $data['shop_name'] }}][]"
                                                                             class="form-control form-control-sm"
                                                                             style="width: 100px;"
@@ -151,7 +151,8 @@
                                                                                                 class="row">
                                                                                                 <div class="col-md-4">
                                                                                                     <label>Hour Prod</label>
-                                                                                                    <input type="decimal"
+                                                                                                    <input type="text"
+                                                                                                        inputmode="numeric"
                                                                                                         name="production[{{ $model['model_name'] }}][hour][]"
                                                                                                         class="form-control form-control-sm"
                                                                                                         style="width: 80px;"
@@ -161,7 +162,8 @@
                                                                                                 <div class="col-md-8">
                                                                                                     <label>Plan
                                                                                                         Production</label>
-                                                                                                    <input type="number"
+                                                                                                    <input type="text"
+                                                                                                        inputmode="numeric"
                                                                                                         name="production[{{ $model['model_name'] }}][plan_prod][]"
                                                                                                         class="form-control form-control-sm"
                                                                                                         style="width: 80px;"
@@ -170,7 +172,8 @@
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
                                                                                                     <label>Output 8</label>
-                                                                                                    <input type="number"
+                                                                                                    <input type="text"
+                                                                                                        inputmode="numeric"
                                                                                                         name="production[{{ $model['model_name'] }}][output8][]"
                                                                                                         class="form-control form-control-sm"
                                                                                                         style="width: 80px;"
@@ -179,7 +182,8 @@
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
                                                                                                     <label>Output 2</label>
-                                                                                                    <input type="number"
+                                                                                                    <input type="text"
+                                                                                                        inputmode="numeric"
                                                                                                         name="production[{{ $model['model_name'] }}][output2][]"
                                                                                                         class="form-control form-control-sm"
                                                                                                         style="width: 80px;"
@@ -188,7 +192,8 @@
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
                                                                                                     <label>Output 1</label>
-                                                                                                    <input type="number"
+                                                                                                    <input type="text"
+                                                                                                        inputmode="numeric"
                                                                                                         name="production[{{ $model['model_name'] }}][output1][]"
                                                                                                         class="form-control form-control-sm"
                                                                                                         style="width: 80px;"
@@ -197,7 +202,8 @@
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
                                                                                                     <label>Cabin</label>
-                                                                                                    <input type="number"
+                                                                                                    <input type="text"
+                                                                                                        inputmode="numeric"
                                                                                                         name="production[{{ $model['model_name'] }}][cabin][]"
                                                                                                         class="form-control form-control-sm"
                                                                                                         style="width: 80px;"
@@ -206,7 +212,8 @@
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
                                                                                                     <label>PPM</label>
-                                                                                                    <input type="number"
+                                                                                                    <input type="text"
+                                                                                                        inputmode="numeric"
                                                                                                         name="production[{{ $model['model_name'] }}][PPM][]"
                                                                                                         class="form-control form-control-sm"
                                                                                                         style="width: 80px;"
@@ -219,7 +226,8 @@
                                                                                             <div class="row">
                                                                                                 <div class="col-md-4">
                                                                                                     <label>Reject</label>
-                                                                                                    <input type="number"
+                                                                                                    <input type="text"
+                                                                                                        inputmode="numeric"
                                                                                                         name="production[{{ $model['model_name'] }}][reject][]"
                                                                                                         class="form-control form-control-sm"
                                                                                                         style="width: 80px;"
@@ -228,7 +236,8 @@
                                                                                                 </div>
                                                                                                 <div class="col-md-4">
                                                                                                     <label>Rework</label>
-                                                                                                    <input type="number"
+                                                                                                    <input type="text"
+                                                                                                        inputmode="numeric"
                                                                                                         name="production[{{ $model['model_name'] }}][rework][]"
                                                                                                         class="form-control form-control-sm"
                                                                                                         style="width: 80px;"
@@ -244,7 +253,8 @@
                                                                                                     <label>Photo</label>
                                                                                                     <input type="file"
                                                                                                         name="photo_ng[{{ $model['model_name'] }}][]"
-                                                                                                        class="form-control form-control-sm" multiple>
+                                                                                                        class="form-control form-control-sm"
+                                                                                                        multiple>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </td>
