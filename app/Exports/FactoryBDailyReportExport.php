@@ -5,7 +5,7 @@ namespace App\Exports;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 
 class FactoryBDailyReportExport implements FromView, ShouldAutoSize
