@@ -53,12 +53,6 @@
             /* Let the canvas take the full height of the container */
         }
 
-        .nav-fixed #layoutSidenav #layoutSidenav_nav {
-            width: 15rem;
-            height: 250vh;
-            z-index: 1038;
-        }
-
         .settings-card {
             cursor: pointer;
         }
