@@ -61,93 +61,93 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/access/{user}', [UserController::class, 'access'])->middleware(['checkRole:IT']);
 
     //KPI Monitoring
-    Route::get('kpi-monitoring/factoryb', [FactoryBKPIController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::get('kpi-monitoring/press', [PressKPIController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::get('kpi-monitoring/welding', [WeldingKPIController::class, 'index'])->middleware(['checkRole:IT']);
+    Route::get('kpi-monitoring/factoryb', [FactoryBKPIController::class, 'index'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('kpi-monitoring/press', [PressKPIController::class, 'index'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('kpi-monitoring/welding', [WeldingKPIController::class, 'index'])->middleware(['checkRole:IT,User,Super Admin']);
 
     //Factory B Form
-    Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/factoryb/store/main', [FormFactoryBController::class, 'storeMain'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/factoryb/form/{id}', [FormFactoryBController::class, 'formChecksheet'])->middleware(['checkRole:IT'])->name('form.daily-report.factoryb');
-    Route::post('/daily-report/factoryb/detail/store', [FormFactoryBController::class, 'storeForm'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/factoryb/detail/{id}', [FormFactoryBController::class, 'showDetail'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/factoryb/update/{id}', [FormFactoryBController::class, 'updateDetail'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/factoryb/detail/update', [FormFactoryBController::class, 'updateForm'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/factoryb/export', [FormFactoryBController::class, 'exportExcel'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/factoryb/store/main', [FormFactoryBController::class, 'storeMain'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/factoryb/form/{id}', [FormFactoryBController::class, 'formChecksheet'])->middleware(['checkRole:IT,User,Super Admin'])->name('form.daily-report.factoryb');
+    Route::post('/daily-report/factoryb/detail/store', [FormFactoryBController::class, 'storeForm'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/factoryb/detail/{id}', [FormFactoryBController::class, 'showDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/factoryb/update/{id}', [FormFactoryBController::class, 'updateDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/factoryb/detail/update', [FormFactoryBController::class, 'updateForm'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/factoryb/export', [FormFactoryBController::class, 'exportExcel'])->middleware(['checkRole:IT,User,Super Admin']);
 
     // Press Form
-    Route::get('/daily-report/press', [FormPressController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/press/store/main', [FormPressController::class, 'storeMain'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/press/form/{id}', [FormPressController::class, 'formPress'])->middleware(['checkRole:IT'])->name('form.daily-report.press');
-    Route::post('/daily-report/press/detail/store', [FormPressController::class, 'storeForm'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/press/detail/{id}', [FormPressController::class, 'showDetail'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/press/update/{id}', [FormPressController::class, 'updateDetail'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/press/detail/update', [FormPressController::class, 'updateForm'])->middleware(['checkRole:IT']);
-    Route::delete('/daily-report/press/delete/{id}', [FormPressController::class, 'destroy'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/press/export', [FormPressController::class, 'exportExcel'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/press', [FormPressController::class, 'index'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/press/store/main', [FormPressController::class, 'storeMain'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/press/form/{id}', [FormPressController::class, 'formPress'])->middleware(['checkRole:IT,User,Super Admin'])->name('form.daily-report.press');
+    Route::post('/daily-report/press/detail/store', [FormPressController::class, 'storeForm'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/press/detail/{id}', [FormPressController::class, 'showDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/press/update/{id}', [FormPressController::class, 'updateDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/press/detail/update', [FormPressController::class, 'updateForm'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::delete('/daily-report/press/delete/{id}', [FormPressController::class, 'destroy'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/press/export', [FormPressController::class, 'exportExcel'])->middleware(['checkRole:IT,User,Super Admin']);
 
     //Factory B Form
-    Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/factoryb/store/main', [FormFactoryBController::class, 'storeMain'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/factoryb/form/{id}', [FormFactoryBController::class, 'formChecksheet'])->middleware(['checkRole:IT'])->name('form.daily-report.factoryb');
-    Route::post('/daily-report/factoryb/detail/store', [FormFactoryBController::class, 'storeForm'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/factoryb/detail/{id}', [FormFactoryBController::class, 'showDetail'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/factoryb/update/{id}', [FormFactoryBController::class, 'updateDetail'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/factoryb/detail/update', [FormFactoryBController::class, 'updateForm'])->middleware(['checkRole:IT']);
-    Route::delete('/daily-report/factoryb/delete/{id}', [FormFactoryBController::class, 'destroy'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/factoryb', [FormFactoryBController::class, 'index'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/factoryb/store/main', [FormFactoryBController::class, 'storeMain'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/factoryb/form/{id}', [FormFactoryBController::class, 'formChecksheet'])->middleware(['checkRole:IT,User,Super Admin'])->name('form.daily-report.factoryb');
+    Route::post('/daily-report/factoryb/detail/store', [FormFactoryBController::class, 'storeForm'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/factoryb/detail/{id}', [FormFactoryBController::class, 'showDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/factoryb/update/{id}', [FormFactoryBController::class, 'updateDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/factoryb/detail/update', [FormFactoryBController::class, 'updateForm'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::delete('/daily-report/factoryb/delete/{id}', [FormFactoryBController::class, 'destroy'])->middleware(['checkRole:IT,User,Super Admin']);
 
     //Welding Form
-    Route::get('/daily-report/welding', [FormWeldingController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/welding/store/main', [FormWeldingController::class, 'storeMain'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/welding/form/{id}', [FormWeldingController::class, 'formChecksheet'])->middleware(['checkRole:IT'])->name('form.daily-report.welding');
-    Route::post('/daily-report/welding/detail/store', [FormWeldingController::class, 'storeForm'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/welding/detail/{id}', [FormWeldingController::class, 'showDetail'])->middleware(['checkRole:IT']);
-    Route::get('/daily-report/welding/update/{id}', [FormWeldingController::class, 'updateDetail'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/welding/detail/update', [FormWeldingController::class, 'updateForm'])->middleware(['checkRole:IT']);
-    Route::delete('/daily-report/welding/delete/{id}', [FormWeldingController::class, 'destroy'])->middleware(['checkRole:IT']);
-    Route::post('/daily-report/welding/export', [FormWeldingController::class, 'exportExcel'])->middleware(['checkRole:IT']);
+    Route::get('/daily-report/welding', [FormWeldingController::class, 'index'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/welding/store/main', [FormWeldingController::class, 'storeMain'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/welding/form/{id}', [FormWeldingController::class, 'formChecksheet'])->middleware(['checkRole:IT,User,Super Admin'])->name('form.daily-report.welding');
+    Route::post('/daily-report/welding/detail/store', [FormWeldingController::class, 'storeForm'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/welding/detail/{id}', [FormWeldingController::class, 'showDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/daily-report/welding/update/{id}', [FormWeldingController::class, 'updateDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/welding/detail/update', [FormWeldingController::class, 'updateForm'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::delete('/daily-report/welding/delete/{id}', [FormWeldingController::class, 'destroy'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/daily-report/welding/export', [FormWeldingController::class, 'exportExcel'])->middleware(['checkRole:IT,User,Super Admin']);
 
     // Downtime Form Controller
-    Route::get('/downtime-report', [DowntimeFormController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::post('/downtime-report/store-header', [DowntimeFormController::class, 'storeHeader'])->middleware(['checkRole:IT']);
-    Route::get('/downtime-report/form/{id}', [DowntimeFormController::class, 'formDowntime'])->middleware(['checkRole:IT'])->name('downtime.form');
-    Route::post('/downtime-report/store-details', [DowntimeFormController::class, 'storeForm'])->middleware(['checkRole:IT']);
-    Route::get('/downtime-report/show/{id}', [DowntimeFormController::class, 'showDetail'])->middleware(['checkRole:IT']);
-    Route::get('/downtime-report/update/{id}', [DowntimeFormController::class, 'updateDetail'])->middleware(['checkRole:IT']);
-    Route::put('/downtime-report/update-details/{id}', [DowntimeFormController::class, 'updateForm'])->middleware(['checkRole:IT']);
+    Route::get('/downtime-report', [DowntimeFormController::class, 'index'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::post('/downtime-report/store-header', [DowntimeFormController::class, 'storeHeader'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/downtime-report/form/{id}', [DowntimeFormController::class, 'formDowntime'])->middleware(['checkRole:IT,User,Super Admin'])->name('downtime.form');
+    Route::post('/downtime-report/store-details', [DowntimeFormController::class, 'storeForm'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/downtime-report/show/{id}', [DowntimeFormController::class, 'showDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::get('/downtime-report/update/{id}', [DowntimeFormController::class, 'updateDetail'])->middleware(['checkRole:IT,User,Super Admin']);
+    Route::put('/downtime-report/update-details/{id}', [DowntimeFormController::class, 'updateForm'])->middleware(['checkRole:IT,User,Super Admin']);
     Route::delete('/downtime-report/delete/{id}', [DowntimeFormController::class, 'destroy'])->name('downtime-report.destroy');
-    Route::post('/downtime-report/export', [DowntimeFormController::class, 'exportExcel'])->middleware(['checkRole:IT']);
+    Route::post('/downtime-report/export', [DowntimeFormController::class, 'exportExcel'])->middleware(['checkRole:IT,User,Super Admin']);
 
     // Routes for PressMstShop
-    Route::get('/masterpress/shop', [MstPressController::class, 'indexShop'])->middleware(['checkRole:IT']);
-    Route::post('/masterpress/shop/store', [MstPressController::class, 'storeShop'])->middleware(['checkRole:IT']);
-    Route::post('/masterpress/shop/update', [MstPressController::class, 'updateShop'])->middleware(['checkRole:IT']);
+    Route::get('/masterpress/shop', [MstPressController::class, 'indexShop'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('/masterpress/shop/store', [MstPressController::class, 'storeShop'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('/masterpress/shop/update', [MstPressController::class, 'updateShop'])->middleware(['checkRole:IT,Super Admin']);
     // Routes for PressMstModel
-    Route::get('/masterpress/model', [MstPressController::class, 'indexModel'])->middleware(['checkRole:IT']);
-    Route::post('/masterpress/model/store', [MstPressController::class, 'storeModel'])->middleware(['checkRole:IT']);
-    Route::put('/masterpress/model/update', [MstPressController::class, 'updateModel'])->middleware(['checkRole:IT']);
+    Route::get('/masterpress/model', [MstPressController::class, 'indexModel'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('/masterpress/model/store', [MstPressController::class, 'storeModel'])->middleware(['checkRole:IT,Super Admin']);
+    Route::put('/masterpress/model/update', [MstPressController::class, 'updateModel'])->middleware(['checkRole:IT,Super Admin']);
 
     //Master Factory B
-    Route::get('factoryb/shop', [MstFactoryBController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::post('factoryb/shop/store', [MstFactoryBController::class, 'store'])->middleware(['checkRole:IT']);
-    Route::patch('factoryb/shop/update', [MstFactoryBController::class, 'update'])->middleware(['checkRole:IT']);
-    Route::get('factoryb/model', [MstFactoryBController::class, 'indexModel'])->middleware(['checkRole:IT']);
-    Route::post('factoryb/model/store', [MstFactoryBController::class, 'storeModel'])->middleware(['checkRole:IT']);
-    Route::patch('factoryb/model/update', [MstFactoryBController::class, 'updateModel'])->middleware(['checkRole:IT']);
+    Route::get('factoryb/shop', [MstFactoryBController::class, 'index'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('factoryb/shop/store', [MstFactoryBController::class, 'store'])->middleware(['checkRole:IT,Super Admin']);
+    Route::patch('factoryb/shop/update', [MstFactoryBController::class, 'update'])->middleware(['checkRole:IT,Super Admin']);
+    Route::get('factoryb/model', [MstFactoryBController::class, 'indexModel'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('factoryb/model/store', [MstFactoryBController::class, 'storeModel'])->middleware(['checkRole:IT,Super Admin']);
+    Route::patch('factoryb/model/update', [MstFactoryBController::class, 'updateModel'])->middleware(['checkRole:IT,Super Admin']);
 
     //Master Welding
-    Route::get('welding/shop', [MstWeldingController::class, 'indexShop'])->middleware(['checkRole:IT']);
-    Route::post('welding/shop/store', [MstWeldingController::class, 'storeShop'])->middleware(['checkRole:IT']);
-    Route::patch('welding/shop/update', [MstWeldingController::class, 'updateShop'])->middleware(['checkRole:IT']);
-    Route::get('welding/station', [MstWeldingController::class, 'indexStation'])->middleware(['checkRole:IT']);
-    Route::post('welding/station/store', [MstWeldingController::class, 'storeStation'])->middleware(['checkRole:IT']);
-    Route::patch('welding/station/update', [MstWeldingController::class, 'updateStation'])->middleware(['checkRole:IT']);
-    Route::get('welding/model', [MstWeldingController::class, 'indexModel'])->middleware(['checkRole:IT']);
-    Route::post('welding/model/store', [MstWeldingController::class, 'storeModel'])->middleware(['checkRole:IT']);
-    Route::patch('welding/model/update', [MstWeldingController::class, 'updateModel'])->middleware(['checkRole:IT']);
+    Route::get('welding/shop', [MstWeldingController::class, 'indexShop'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('welding/shop/store', [MstWeldingController::class, 'storeShop'])->middleware(['checkRole:IT,Super Admin']);
+    Route::patch('welding/shop/update', [MstWeldingController::class, 'updateShop'])->middleware(['checkRole:IT,Super Admin']);
+    Route::get('welding/station', [MstWeldingController::class, 'indexStation'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('welding/station/store', [MstWeldingController::class, 'storeStation'])->middleware(['checkRole:IT,Super Admin']);
+    Route::patch('welding/station/update', [MstWeldingController::class, 'updateStation'])->middleware(['checkRole:IT,Super Admin']);
+    Route::get('welding/model', [MstWeldingController::class, 'indexModel'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('welding/model/store', [MstWeldingController::class, 'storeModel'])->middleware(['checkRole:IT,Super Admin']);
+    Route::patch('welding/model/update', [MstWeldingController::class, 'updateModel'])->middleware(['checkRole:IT,Super Admin']);
 
     //MstDowntimeController Controller
-    Route::get('/masterdowntime', [MstDowntimeController::class, 'index'])->middleware(['checkRole:IT']);
-    Route::post('/masterdowntime/store', [MstDowntimeController::class, 'storeMachine'])->middleware(['checkRole:IT']);
-    Route::patch('/masterdowntime/update', [MstDowntimeController::class, 'updateMachine'])->middleware(['checkRole:IT'])->name('masterdowntime.update');
+    Route::get('/masterdowntime', [MstDowntimeController::class, 'index'])->middleware(['checkRole:IT,Super Admin']);
+    Route::post('/masterdowntime/store', [MstDowntimeController::class, 'storeMachine'])->middleware(['checkRole:IT,Super Admin']);
+    Route::patch('/masterdowntime/update', [MstDowntimeController::class, 'updateMachine'])->middleware(['checkRole:IT,Super Admin'])->name('masterdowntime.update');
 });
