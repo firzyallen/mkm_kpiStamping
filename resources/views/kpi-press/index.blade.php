@@ -53,13 +53,6 @@
             /* Let the canvas take the full height of the container */
         }
 
-        body {
-            transform: scale(0.7);
-            transform-origin: top left;
-            width: 142.857%;
-            /* 100 / 70 */
-        }
-
         .nav-fixed #layoutSidenav #layoutSidenav_nav {
             width: 15rem;
             height: 250vh;
