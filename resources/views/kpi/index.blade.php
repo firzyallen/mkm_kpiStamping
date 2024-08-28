@@ -200,57 +200,6 @@
                                                 <div class="col-md-6 mb-4">
                                                     <div class="card card-custom">
                                                         <div class="card-header pt-2">
-                                                            @php
-                                                                $fttPlan = '';
-                                                                switch ($shop->id) {
-                                                                    case 6:
-                                                                        $fttPlan = '97.5';
-                                                                        break;
-                                                                    case 7:
-                                                                        $fttPlan = '95.0';
-                                                                        break;
-                                                                    case 8:
-                                                                        $fttPlan = '95.0';
-                                                                        break;
-                                                                    case 9:
-                                                                        $fttPlan = '95.0';
-                                                                        break;
-                                                                }
-                                                            @endphp
-                                                            <h3>FTT (Green if: ≥ {{ $fttPlan }})
-                                                                @php
-                                                                    $statusClass = '';
-                                                                    $statusText = '';
-                                                                    switch ($kpiStatuses[$shop->shop_name]['ftt']) {
-                                                                        case 'green':
-                                                                            $statusClass = 'signal green';
-                                                                            $statusText = 'G';
-                                                                            break;
-                                                                        case 'red':
-                                                                            $statusClass = 'signal red';
-                                                                            $statusText = 'R';
-                                                                            break;
-                                                                        case 'grey':
-                                                                            $statusClass = 'signal grey';
-                                                                            $statusText = 'N';
-                                                                            break;
-                                                                    }
-                                                                @endphp
-                                                                <span
-                                                                    class="{{ $statusClass }}">{{ $statusText }}</span>
-                                                            </h3>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="chart-container">
-                                                                <canvas id="barChartFtt-{{ $shop->id }}"
-                                                                    class="chart-custom"></canvas>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 mb-4">
-                                                    <div class="card card-custom">
-                                                        <div class="card-header pt-2">
                                                             <h3>Downtime (Green if: ≥ 0.81)
                                                                 @php
                                                                     $statusClass = '';
@@ -334,6 +283,58 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4">
+                                                    <div class="card card-custom">
+                                                        <div class="card-header pt-2">
+                                                            @php
+                                                                $fttPlan = '';
+                                                                switch ($shop->id) {
+                                                                    case 6:
+                                                                        $fttPlan = '97.5';
+                                                                        break;
+                                                                    case 7:
+                                                                        $fttPlan = '95.0';
+                                                                        break;
+                                                                    case 8:
+                                                                        $fttPlan = '95.0';
+                                                                        break;
+                                                                    case 9:
+                                                                        $fttPlan = '95.0';
+                                                                        break;
+                                                                }
+                                                            @endphp
+                                                            <h3>FTT (Green if: ≥ {{ $fttPlan }})
+                                                                @php
+                                                                    $statusClass = '';
+                                                                    $statusText = '';
+                                                                    switch ($kpiStatuses[$shop->shop_name]['ftt']) {
+                                                                        case 'green':
+                                                                            $statusClass = 'signal green';
+                                                                            $statusText = 'G';
+                                                                            break;
+                                                                        case 'red':
+                                                                            $statusClass = 'signal red';
+                                                                            $statusText = 'R';
+                                                                            break;
+                                                                        case 'grey':
+                                                                            $statusClass = 'signal grey';
+                                                                            $statusText = 'N';
+                                                                            break;
+                                                                    }
+                                                                @endphp
+                                                                <span
+                                                                    class="{{ $statusClass }}">{{ $statusText }}</span>
+                                                            </h3>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div class="chart-container">
+                                                                <canvas id="barChartFtt-{{ $shop->id }}"
+                                                                    class="chart-custom"></canvas>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                                 <div class="col-md-6 mb-4">
                                                     <div class="card">

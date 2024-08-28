@@ -226,111 +226,6 @@
                                                 <div class="col-md-6 mb-4">
                                                     <div class="card card-custom">
                                                         <div class="card-header pt-2">
-                                                            <h3>FTT (Green if: ≥ 98)
-                                                                @php
-                                                                    $statusClass = '';
-                                                                    $statusText = '';
-                                                                    switch ($kpiStatuses[$shop->shop_name]['ftt']) {
-                                                                        case 'green':
-                                                                            $statusClass = 'signal green';
-                                                                            $statusText = 'G';
-                                                                            break;
-                                                                        case 'red':
-                                                                            $statusClass = 'signal red';
-                                                                            $statusText = 'R';
-                                                                            break;
-                                                                        case 'grey':
-                                                                            $statusClass = 'signal grey';
-                                                                            $statusText = 'N';
-                                                                            break;
-                                                                    }
-                                                                @endphp
-                                                                <span
-                                                                    class="{{ $statusClass }}">{{ $statusText }}</span>
-                                                            </h3>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <div class="chart-container">
-                                                                <canvas id="barChartFtt-{{ $shop->id }}"
-                                                                    class="chart-custom"></canvas>
-                                                            </div>
-                                                            <script>
-                                                                var ctxFtt = document.getElementById('barChartFtt-{{ $shop->id }}').getContext('2d');
-                                                                var fttChart = new Chart(ctxFtt, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
-                                                                                label: 'Plan',
-                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
-                                                                                type: 'line',
-                                                                                backgroundColor: '#004355',
-                                                                                borderColor: '#3A7085',
-                                                                                fill: false,
-                                                                            }, {
-                                                                                label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
-                                                                                backgroundColor: '#A6CAD8',
-                                                                                borderColor: '#007A93',
-                                                                                borderWidth: 2
-                                                                            },
-
-                                                                        ]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            x: {
-                                                                                beginAtZero: true,
-                                                                                ticks: {
-                                                                                    callback: function(value, index, values) {
-                                                                                        // Show labels for dates 1, 4, 8, 12, 16, 20, 24, 28
-                                                                                        return [1, 4, 8, 12, 16, 20, 24, 28].includes(value) ? value : '';
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            y: {
-                                                                                beginAtZero: true,
-                                                                                ticks: {
-                                                                                    steps: 10,
-                                                                                    stepSize: 10,
-                                                                                    max: 100
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'FTT'
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            tooltip: {
-                                                                                callbacks: {
-                                                                                    title: function(tooltipItem) {
-                                                                                        return tooltipItem[0].label;
-                                                                                    },
-                                                                                    label: function(context) {
-                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            legend: {
-                                                                                display: true,
-                                                                                labels: {
-                                                                                    usePointStyle: true,
-                                                                                    boxWidth: 10
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                });
-                                                            </script>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 mb-4">
-                                                    <div class="card card-custom">
-                                                        <div class="card-header pt-2">
                                                             <!--ideally should be {$kpiData[$shop->shop_name]['ftt'][0]->Downtime_Plan}, but if no downtime data then will error so hard code it for now-->
                                                             <h3>Downtime (Green if: ≥ 0.81)
                                                                 @php
@@ -506,6 +401,112 @@
                                                                             y: {
                                                                                 beginAtZero: true,
                                                                                 min: 0
+                                                                            }
+                                                                        },
+                                                                        plugins: {
+                                                                            tooltip: {
+                                                                                callbacks: {
+                                                                                    title: function(tooltipItem) {
+                                                                                        return tooltipItem[0].label;
+                                                                                    },
+                                                                                    label: function(context) {
+                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            legend: {
+                                                                                display: true,
+                                                                                labels: {
+                                                                                    usePointStyle: true,
+                                                                                    boxWidth: 10
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                });
+                                                            </script>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-md-6 mb-4">
+                                                    <div class="card card-custom">
+                                                        <div class="card-header pt-2">
+                                                            <h3>FTT (Green if: ≥ 98)
+                                                                @php
+                                                                    $statusClass = '';
+                                                                    $statusText = '';
+                                                                    switch ($kpiStatuses[$shop->shop_name]['ftt']) {
+                                                                        case 'green':
+                                                                            $statusClass = 'signal green';
+                                                                            $statusText = 'G';
+                                                                            break;
+                                                                        case 'red':
+                                                                            $statusClass = 'signal red';
+                                                                            $statusText = 'R';
+                                                                            break;
+                                                                        case 'grey':
+                                                                            $statusClass = 'signal grey';
+                                                                            $statusText = 'N';
+                                                                            break;
+                                                                    }
+                                                                @endphp
+                                                                <span
+                                                                    class="{{ $statusClass }}">{{ $statusText }}</span>
+                                                            </h3>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <div class="chart-container">
+                                                                <canvas id="barChartFtt-{{ $shop->id }}"
+                                                                    class="chart-custom"></canvas>
+                                                            </div>
+                                                            <script>
+                                                                var ctxFtt = document.getElementById('barChartFtt-{{ $shop->id }}').getContext('2d');
+                                                                var fttChart = new Chart(ctxFtt, {
+                                                                    type: 'bar',
+                                                                    data: {
+                                                                        labels: Array.from({
+                                                                            length: 31
+                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
+                                                                        datasets: [{
+                                                                                label: 'Plan',
+                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
+                                                                                type: 'line',
+                                                                                backgroundColor: '#004355',
+                                                                                borderColor: '#3A7085',
+                                                                                fill: false,
+                                                                            }, {
+                                                                                label: 'Actual',
+                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
+                                                                                backgroundColor: '#A6CAD8',
+                                                                                borderColor: '#007A93',
+                                                                                borderWidth: 2
+                                                                            },
+
+                                                                        ]
+                                                                    },
+                                                                    options: {
+                                                                        scales: {
+                                                                            x: {
+                                                                                beginAtZero: true,
+                                                                                ticks: {
+                                                                                    callback: function(value, index, values) {
+                                                                                        // Show labels for dates 1, 4, 8, 12, 16, 20, 24, 28
+                                                                                        return [1, 4, 8, 12, 16, 20, 24, 28].includes(value) ? value : '';
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            y: {
+                                                                                beginAtZero: true,
+                                                                                ticks: {
+                                                                                    steps: 10,
+                                                                                    stepSize: 10,
+                                                                                    max: 100
+                                                                                },
+                                                                                title: {
+                                                                                    display: true,
+                                                                                    text: 'FTT'
+                                                                                }
                                                                             }
                                                                         },
                                                                         plugins: {
