@@ -747,105 +747,89 @@
                         </div>
 
                         <script>
-                            // Handle click event on show not goods image button
-                            $('.show-ng-image-btn').click(function(event) {
-                                event.preventDefault();
-                                var images = $(this).data('images');
-                                // Ensure images is an array
-                                if (typeof images === 'string') {
-                                    images = JSON.parse(images.replace(/&quot;/g, '"'));
-                                }
-                                var ngCarouselInner = $('#ngCarouselInner');
-                                ngCarouselInner.empty(); // Clear existing images
-                                var isActive = 'active';
-                                images.forEach(function(image) {
-                                    ngCarouselInner.append(`
-                                        <div class="carousel-item ${isActive}">
-                                            <img src="{{ asset('${image}') }}" class="d-block w-100 img-fluid" alt="Image Preview" onclick="this.requestFullscreen()">
-                                        </div>
-                                    `);
-                                    isActive = ''; // Only the first item should be active
-                                });
-                                $('#ngImageModal').modal('show');
-                            });
-
-                            document.getElementById('settingsCardHeader').addEventListener('click', function() {
-                                var cardBody = document.getElementById('settingsCardBody');
-                                cardBody.classList.toggle('d-none');
-                            });
-
-                            $(document).ready(function() {
-                                $('#tableShopDetails').DataTable({
-                                    "responsive": true,
-                                    "lengthChange": false,
-                                    "autoWidth": false,
-                                });
-
-                                $('#tableNGDetails').DataTable({
-                                    "responsive": true,
-                                    "lengthChange": false,
-                                    "autoWidth": false,
-                                });
-
-                                $('#tableDowntimeDetails').DataTable({
-                                    "responsive": true,
-                                    "lengthChange": false,
-                                    "autoWidth": false,
-                                });
-                            });
-
+                            // Trigger chart creation when the tab becomes visible
                             document.addEventListener('DOMContentLoaded', function() {
+                                // Function to create charts
+                                function createChartOnVisible(tabId, chartId, planData, actualData, formattedDates) {
+                                    var chartInitialized = false; // Track whether chart is initialized
+
+                                    document.getElementById(tabId).addEventListener('shown.bs.tab', function (event) {
+                                        if (!chartInitialized) { // Create chart only once
+                                            createChart(chartId, planData, actualData, formattedDates);
+                                            chartInitialized = true; // Mark chart as initialized
+                                        }
+                                    });
+                                }
+
                                 @foreach ($shops as $shop)
-                                    createChart('barChartHpu-{{ $shop->id }}', @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
-                                        @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')));
-                                    createChart('barChartFtt-{{ $shop->id }}', @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
-                                        @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')));
-                                    createChart('barChartDowntime-{{ $shop->id }}', @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan')),
-                                        @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')));
-                                    createChart('barChartOtdp-{{ $shop->id }}', @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
-                                        @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')));
+                                    // Create HPU Chart
+                                    createChartOnVisible(
+                                        'nav-{{ $shop->id }}-tab',
+                                        'barChartHpu-{{ $shop->id }}',
+                                        @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
+                                        @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
+                                        @json($kpiData[$shop->shop_name]['hpu']->pluck('formatted_date'))
+                                    );
+
+                                    // Create FTT Chart
+                                    createChartOnVisible(
+                                        'nav-{{ $shop->id }}-tab',
+                                        'barChartFtt-{{ $shop->id }}',
+                                        @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
+                                        @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
+                                        @json($kpiData[$shop->shop_name]['ftt']->pluck('formatted_date'))
+                                    );
+
+                                    // Create Downtime Chart
+                                    createChartOnVisible(
+                                        'nav-{{ $shop->id }}-tab',
+                                        'barChartDowntime-{{ $shop->id }}',
+                                        @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan')),
+                                        @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')),
+                                        @json($kpiData[$shop->shop_name]['downtime']->pluck('formatted_date'))
+                                    );
+
+                                    // Create OTDP Chart
+                                    createChartOnVisible(
+                                        'nav-{{ $shop->id }}-tab',
+                                        'barChartOtdp-{{ $shop->id }}',
+                                        @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
+                                        @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
+                                        @json($kpiData[$shop->shop_name]['otdp']->pluck('formatted_date'))
+                                    );
                                 @endforeach
                             });
 
-                            function createChart(canvasId, planData, actualData) {
-                                // Debugging: Log the initial data
-                                console.log(`Creating chart for ${canvasId}`);
-                                console.log('Initial Plan Data:', planData);
-                                console.log('Initial Actual Data:', actualData);
+                            // Create chart function
+                            function createChart(canvasId, planData, actualData, formattedDates) {
+                                if (!planData || !actualData || planData.length === 0 || actualData.length === 0) {
+                                    console.warn(`No data available for chart with ID: ${canvasId}`);
+                                    return;
+                                }
 
-                                // Fill missing or null values with 0
-                                planData = Array.from({
-                                    length: 31
-                                }, (_, i) => planData[i] != null ? planData[i] : 0);
-                                actualData = Array.from({
-                                    length: 31
-                                }, (_, i) => actualData[i] != null ? actualData[i] : 0);
-
-                                // Debugging: Log the filtered data
-                                console.log('Filtered Plan Data:', planData);
-                                console.log('Filtered Actual Data:', actualData);
+                                // Ensure all missing values are replaced with 0
+                                planData = Array.from({ length: 31 }, (_, i) => planData[i] != null ? planData[i] : 0);
+                                actualData = Array.from({ length: 31 }, (_, i) => actualData[i] != null ? actualData[i] : 0);
 
                                 var ctx = document.getElementById(canvasId).getContext('2d');
                                 var chart = new Chart(ctx, {
                                     type: 'bar',
                                     data: {
-                                        labels: @json($kpiData[$shop->shop_name]['hpu']->pluck('formatted_date')),
+                                        labels: formattedDates,
                                         datasets: [{
-                                                label: 'Plan',
-                                                data: planData,
-                                                type: 'line',
-                                                backgroundColor: '#004355',
-                                                borderColor: '#3A7085',
-                                                fill: false,
-                                            },
-                                            {
-                                                label: 'Actual',
-                                                data: actualData,
-                                                backgroundColor: '#A6CAD8',
-                                                borderColor: '#007A93',
-                                                borderWidth: 2
-                                            }
-                                        ]
+                                            label: 'Plan',
+                                            data: planData,
+                                            type: 'line',
+                                            backgroundColor: '#004355',
+                                            borderColor: '#3A7085',
+                                            fill: false,
+                                        }, {
+                                            label: 'Actual',
+                                            data: actualData,
+                                            backgroundColor: '#A6CAD8',
+                                            borderColor: '#007A93',
+                                            borderWidth: 2
+                                        }]
                                     },
                                     options: {
                                         scales: {
@@ -869,6 +853,7 @@
                                     }
                                 });
                             }
+
                         </script>
 
 
