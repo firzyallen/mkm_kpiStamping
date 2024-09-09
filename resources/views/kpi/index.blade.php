@@ -748,111 +748,132 @@
 
                         <script>
                             // Trigger chart creation when the tab becomes visible
-                            document.addEventListener('DOMContentLoaded', function() {
-                                // Function to create charts
-                                function createChartOnVisible(tabId, chartId, planData, actualData, formattedDates) {
-                                    var chartInitialized = false; // Track whether chart is initialized
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to create charts
+    function createChartOnVisible(tabId, chartId, planData, actualData, formattedDates) {
+        var chartInitialized = false; // Track whether chart is initialized
 
-                                    document.getElementById(tabId).addEventListener('shown.bs.tab', function (event) {
-                                        if (!chartInitialized) { // Create chart only once
-                                            createChart(chartId, planData, actualData, formattedDates);
-                                            chartInitialized = true; // Mark chart as initialized
-                                        }
-                                    });
-                                }
+        document.getElementById(tabId).addEventListener('shown.bs.tab', function (event) {
+            if (!chartInitialized) { // Create chart only once
+                createChart(chartId, planData, actualData, formattedDates);
+                chartInitialized = true; // Mark chart as initialized
+            }
+        });
+    }
 
-                                @foreach ($shops as $shop)
-                                    // Create HPU Chart
-                                    createChartOnVisible(
-                                        'nav-{{ $shop->id }}-tab',
-                                        'barChartHpu-{{ $shop->id }}',
-                                        @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
-                                        @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
-                                        @json($kpiData[$shop->shop_name]['hpu']->pluck('formatted_date'))
-                                    );
+    @foreach ($shops as $shop)
+        // Create HPU Chart for the first active tab (load on page load)
+        @if ($loop->first)
+            createChart('barChartHpu-{{ $shop->id }}',
+                @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
+                @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
+                @json($kpiData[$shop->shop_name]['hpu']->pluck('formatted_date'))
+            );
+            createChart('barChartFtt-{{ $shop->id }}',
+                @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
+                @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
+                @json($kpiData[$shop->shop_name]['ftt']->pluck('formatted_date'))
+            );
+            createChart('barChartDowntime-{{ $shop->id }}',
+                @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan')),
+                @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')),
+                @json($kpiData[$shop->shop_name]['downtime']->pluck('formatted_date'))
+            );
+            createChart('barChartOtdp-{{ $shop->id }}',
+                @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
+                @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
+                @json($kpiData[$shop->shop_name]['otdp']->pluck('formatted_date'))
+            );
+        @endif
 
-                                    // Create FTT Chart
-                                    createChartOnVisible(
-                                        'nav-{{ $shop->id }}-tab',
-                                        'barChartFtt-{{ $shop->id }}',
-                                        @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
-                                        @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
-                                        @json($kpiData[$shop->shop_name]['ftt']->pluck('formatted_date'))
-                                    );
+        // For other tabs, load charts on tab click
+        createChartOnVisible(
+            'nav-{{ $shop->id }}-tab',
+            'barChartHpu-{{ $shop->id }}',
+            @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan')),
+            @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU')),
+            @json($kpiData[$shop->shop_name]['hpu']->pluck('formatted_date'))
+        );
 
-                                    // Create Downtime Chart
-                                    createChartOnVisible(
-                                        'nav-{{ $shop->id }}-tab',
-                                        'barChartDowntime-{{ $shop->id }}',
-                                        @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan')),
-                                        @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')),
-                                        @json($kpiData[$shop->shop_name]['downtime']->pluck('formatted_date'))
-                                    );
+        createChartOnVisible(
+            'nav-{{ $shop->id }}-tab',
+            'barChartFtt-{{ $shop->id }}',
+            @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
+            @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
+            @json($kpiData[$shop->shop_name]['ftt']->pluck('formatted_date'))
+        );
 
-                                    // Create OTDP Chart
-                                    createChartOnVisible(
-                                        'nav-{{ $shop->id }}-tab',
-                                        'barChartOtdp-{{ $shop->id }}',
-                                        @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
-                                        @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
-                                        @json($kpiData[$shop->shop_name]['otdp']->pluck('formatted_date'))
-                                    );
-                                @endforeach
-                            });
+        createChartOnVisible(
+            'nav-{{ $shop->id }}-tab',
+            'barChartDowntime-{{ $shop->id }}',
+            @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan')),
+            @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')),
+            @json($kpiData[$shop->shop_name]['downtime']->pluck('formatted_date'))
+        );
 
-                            // Create chart function
-                            function createChart(canvasId, planData, actualData, formattedDates) {
-                                if (!planData || !actualData || planData.length === 0 || actualData.length === 0) {
-                                    console.warn(`No data available for chart with ID: ${canvasId}`);
-                                    return;
-                                }
+        createChartOnVisible(
+            'nav-{{ $shop->id }}-tab',
+            'barChartOtdp-{{ $shop->id }}',
+            @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
+            @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
+            @json($kpiData[$shop->shop_name]['otdp']->pluck('formatted_date'))
+        );
+    @endforeach
+});
 
-                                // Ensure all missing values are replaced with 0
-                                planData = Array.from({ length: 31 }, (_, i) => planData[i] != null ? planData[i] : 0);
-                                actualData = Array.from({ length: 31 }, (_, i) => actualData[i] != null ? actualData[i] : 0);
+// Create chart function
+function createChart(canvasId, planData, actualData, formattedDates) {
+    if (!planData || !actualData || planData.length === 0 || actualData.length === 0) {
+        console.warn(`No data available for chart with ID: ${canvasId}`);
+        return;
+    }
 
-                                var ctx = document.getElementById(canvasId).getContext('2d');
-                                var chart = new Chart(ctx, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: formattedDates,
-                                        datasets: [{
-                                            label: 'Plan',
-                                            data: planData,
-                                            type: 'line',
-                                            backgroundColor: '#004355',
-                                            borderColor: '#3A7085',
-                                            fill: false,
-                                        }, {
-                                            label: 'Actual',
-                                            data: actualData,
-                                            backgroundColor: '#A6CAD8',
-                                            borderColor: '#007A93',
-                                            borderWidth: 2
-                                        }]
-                                    },
-                                    options: {
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true,
-                                                min: 0 // Ensure y-axis starts at 0
-                                            }
-                                        },
-                                        plugins: {
-                                            tooltip: {
-                                                callbacks: {
-                                                    title: function(tooltipItem) {
-                                                        return tooltipItem[0].label;
-                                                    },
-                                                    label: function(context) {
-                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-                            }
+    // Ensure all missing values are replaced with 0
+    planData = Array.from({ length: 31 }, (_, i) => planData[i] != null ? planData[i] : 0);
+    actualData = Array.from({ length: 31 }, (_, i) => actualData[i] != null ? actualData[i] : 0);
+
+    var ctx = document.getElementById(canvasId).getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: formattedDates,
+            datasets: [{
+                label: 'Plan',
+                data: planData,
+                type: 'line',
+                backgroundColor: '#004355',
+                borderColor: '#3A7085',
+                fill: false,
+            }, {
+                label: 'Actual',
+                data: actualData,
+                backgroundColor: '#A6CAD8',
+                borderColor: '#007A93',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0 // Ensure y-axis starts at 0
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItem) {
+                            return tooltipItem[0].label;
+                        },
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.raw.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
 
                         </script>
 
