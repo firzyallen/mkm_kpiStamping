@@ -110,96 +110,97 @@ class FormPressController extends Controller
      * Store the newly created press daily report details and actuals in storage.
      */
     public function storeForm(Request $request)
-    {
-        DB::beginTransaction();
+{
+    DB::beginTransaction();
 
-        try {
-            $headerId = $request->header_id;
-            $shift = $request->shift; // Assuming shift is passed in the request
+    try {
+        $headerId = $request->header_id;
+        $shift = $request->shift; // Assuming shift is passed in the request
 
-            foreach ($request->shop as $shop) {
-                // Debugging: Log request data for each shop
-                Log::info("Processing shop: $shop");
-                Log::info("Manpower: " . print_r($request->manpower[$shop], true));
-                Log::info("Production data: " . print_r($request->production[$shop], true));
+        foreach ($request->shop as $shop) {
+            // Debugging: Log request data for each shop
+            Log::info("Processing shop: $shop");
+            Log::info("Manpower: " . print_r($request->manpower[$shop], true));
+            Log::info("Production data: " . print_r($request->production[$shop], true));
 
-                $imgPath = null;
-                if ($request->hasFile("photo_shop.$shop.0")) {
-                    $file = $request->file("photo_shop.$shop.0");
-                    $fileName = uniqid() . '_' . $file->getClientOriginalName();
-                    $destinationPath = public_path('assets/img/photo_shop/press/shop/');
-                    $file->move($destinationPath, $fileName);
-                    $imgPath = 'assets/img/photo_shop/press/shop/' . $fileName;
-                }
-                $shopId = PressMstShop::where('shop_name', $shop)->value('id');
-
-                $detail = PressActualFormDetail::create([
-                    'header_id' => $headerId,
-                    'shop_id' => $shopId,
-                    'manpower' => $request->manpower[$shop][0],
-                    'manpower_plan' => $request->manpower_plan[$shop][0],
-                    'working_hour' => $request->working_hour[$shop][0],
-                    'notes' => $request->notes[$shop][0] ?? null,
-                    'photo_shop' => $imgPath,
-                ]);
-
-                $detailId = $detail->id;
-
-                foreach ($request->production[$shop]['model'] as $index => $model) {
-                    // Ensure each production item has the required keys
-                    if (!isset($model)) {
-                        Log::error("Model key is missing for production at index $index for shop $shop");
-                        Log::error("Production data: " . print_r($request->production[$shop], true));
-                        throw new \Exception("Model key is missing for production at index $index for shop $shop");
-                    }
-                    
-                    $imgPathNG = null;
-                    if ($request->hasFile("ng.$shop.photo_ng.$index")) {
-                        $file = $request->file("ng.$shop.photo_ng.$index");
-                        $fileName = uniqid() . '_' . $file->getClientOriginalName();
-                        $destinationPath = public_path('assets/img/photo_shop/press/ng/');
-                        $file->move($destinationPath, $fileName);
-                        $imgPathNG = 'assets/img/photo_shop/press/ng/' . $fileName;
-                    }
-                    $modelId = PressMstModel::where('model_name', $model)->value('id');
-
-                    $productionId = PressActualFormProduction::create([
-                        'details_id' => $detailId,
-                        'model_id' => $modelId,
-                        'prod_process' => $request->production[$shop]['production_process'][$index],
-                        'status' => $request->production[$shop]['status'][$index],
-                        'type' => $request->production[$shop]['type'][$index],
-                        'inc_material' => $request->production[$shop]['inc_material'][$index] ?? null,
-                        'machine' => $request->production[$shop]['machine'][$index] ?? 0,
-                        'setting' => $request->production[$shop]['setting'][$index] ?? 0,
-                        'hour_from' => $request->production[$shop]['hour_from'][$index] ?? null,
-                        'hour_to' => $request->production[$shop]['hour_to'][$index] ?? null,
-                        'plan_prod' => $request->production[$shop]['plan_prod'][$index] ?? 0,
-                        'OK' => $request->production[$shop]['OK'][$index] ?? 0,
-                        'manpower' => $request->production[$shop]['manpower'][$index] ?? 0,
-                    ])->id;
-
-                    PressActualFormNg::create([
-                        'production_id' => $productionId,
-                        'model_id' => $modelId,
-                        'OK' => $request->production[$shop]['OK'][$index] ?? 0,
-                        'rework' => $request->ng[$shop]['rework'][$index] ?? 0,
-                        'dmg_part' => $request->ng[$shop]['dmg_part'][$index] ?? 0,
-                        'dmg_rm' => $request->ng[$shop]['dmg_rm'][$index] ?? 0,
-                        'remarks' => $request->ng[$shop]['remarks'][$index] ?? null,
-                        'photo_ng' => $imgPathNG,
-                    ]);
-                }
+            $imgPath = null;
+            if ($request->hasFile("photo_shop.$shop.0")) {
+                $file = $request->file("photo_shop.$shop.0");
+                $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                $destinationPath = public_path('assets/img/photo_shop/press/shop/');
+                $file->move($destinationPath, $fileName);
+                $imgPath = 'assets/img/photo_shop/press/shop/' . $fileName;
             }
 
-            DB::commit();
-            return redirect('/daily-report/press')->with('status', 'Daily report data saved successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error saving daily report data: ' . $e->getMessage());
-            return redirect('/daily-report/press')->with('failed', 'Failed to save daily report data. Please try again. Error: ' . $e->getMessage());
+            $shopId = PressMstShop::where('shop_name', $shop)->value('id');
+
+            $detail = PressActualFormDetail::create([
+                'header_id' => $headerId,
+                'shop_id' => $shopId,
+                'manpower' => $request->manpower[$shop][0],
+                'manpower_plan' => $request->manpower_plan[$shop][0],
+                'working_hour' => $request->working_hour[$shop][0],
+                'notes' => $request->notes[$shop][0] ?? null,
+                'photo_shop' => $imgPath,
+            ]);
+
+            $detailId = $detail->id;
+
+            // Check if the 'model' key exists in the production data for this shop
+            if (!isset($request->production[$shop]['model'])) {
+                Log::warning("Model key is missing for shop: $shop");
+                continue; // Skip to the next shop
+            }
+
+            foreach ($request->production[$shop]['model'] as $index => $model) {
+                $imgPathNG = null;
+                if ($request->hasFile("ng.$shop.photo_ng.$index")) {
+                    $file = $request->file("ng.$shop.photo_ng.$index");
+                    $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                    $destinationPath = public_path('assets/img/photo_shop/press/ng/');
+                    $file->move($destinationPath, $fileName);
+                    $imgPathNG = 'assets/img/photo_shop/press/ng/' . $fileName;
+                }
+                $modelId = PressMstModel::where('model_name', $model)->value('id');
+
+                $productionId = PressActualFormProduction::create([
+                    'details_id' => $detailId,
+                    'model_id' => $modelId,
+                    'prod_process' => $request->production[$shop]['production_process'][$index],
+                    'status' => $request->production[$shop]['status'][$index],
+                    'type' => $request->production[$shop]['type'][$index],
+                    'inc_material' => $request->production[$shop]['inc_material'][$index] ?? null,
+                    'machine' => $request->production[$shop]['machine'][$index] ?? 0,
+                    'setting' => $request->production[$shop]['setting'][$index] ?? 0,
+                    'hour_from' => $request->production[$shop]['hour_from'][$index] ?? null,
+                    'hour_to' => $request->production[$shop]['hour_to'][$index] ?? null,
+                    'plan_prod' => $request->production[$shop]['plan_prod'][$index] ?? 0,
+                    'OK' => $request->production[$shop]['OK'][$index] ?? 0,
+                    'manpower' => $request->production[$shop]['manpower'][$index] ?? 0,
+                ])->id;
+
+                PressActualFormNg::create([
+                    'production_id' => $productionId,
+                    'model_id' => $modelId,
+                    'OK' => $request->production[$shop]['OK'][$index] ?? 0,
+                    'rework' => $request->ng[$shop]['rework'][$index] ?? 0,
+                    'dmg_part' => $request->ng[$shop]['dmg_part'][$index] ?? 0,
+                    'dmg_rm' => $request->ng[$shop]['dmg_rm'][$index] ?? 0,
+                    'remarks' => $request->ng[$shop]['remarks'][$index] ?? null,
+                    'photo_ng' => $imgPathNG,
+                ]);
+            }
         }
+
+        DB::commit();
+        return redirect('/daily-report/press')->with('status', 'Daily report data saved successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error saving daily report data: ' . $e->getMessage());
+        return redirect('/daily-report/press')->with('failed', 'Failed to save daily report data. Please try again. Error: ' . $e->getMessage());
     }
+}
+
 
     /**
      * Display the specified press daily report.

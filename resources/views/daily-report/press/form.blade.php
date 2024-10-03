@@ -122,7 +122,7 @@
                                                                                         <select
                                                                                             name="production[{{ $data['shop_name'] }}][status][]"
                                                                                             class="form-control form-control-sm status-select"
-                                                                                            required>
+                                                                                            >
                                                                                             <option value="" disabled
                                                                                                 selected>Select Status
                                                                                             </option>
@@ -136,7 +136,7 @@
                                                                                         <select
                                                                                             name="production[{{ $data['shop_name'] }}][model][]"
                                                                                             class="form-control form-control-sm model-select"
-                                                                                            required>
+                                                                                            >
                                                                                             <option value="" disabled
                                                                                                 selected>Select Model
                                                                                             </option>
@@ -157,21 +157,23 @@
                                                                                     </td>
                                                                                     <td>
                                                                                         <div class="row">
-                                                                                            <div class="col-md-4">
-                                                                                                <label>Production Process
-                                                                                                </label>
-                                                                                                <input type="text"
-                                                                                                    name="production[{{ $data['shop_name'] }}][production_process][]"
-                                                                                                    class="form-control form-control-sm"
-                                                                                                    placeholder="production process">
-                                                                                            </div>
+                                                                                        <div class="col-md-4">
+                                                                                            <label>Production Process</label>
+                                                                                            <select name="production[{{ $data['shop_name'] }}][production_process][]" class="form-control form-control-sm">
+                                                                                                <option value="">Select Production Process</option>
+                                                                                                <option value="Blank">Blank</option>
+                                                                                                <option value="Flow">Flow</option>
+                                                                                                <option value="STP/PI">STP/PI</option>
+                                                                                            </select>
+                                                                                        </div>
+
                                                                                             <div class="col-md-4">
                                                                                                 <label>Type <span
                                                                                                         class="required">*</span></label>
                                                                                                 <select
                                                                                                     name="production[{{ $data['shop_name'] }}][type][]"
                                                                                                     class="form-control form-control-sm"
-                                                                                                    required>
+                                                                                                    >
                                                                                                     <option value=""
                                                                                                         disabled selected>
                                                                                                         Select Type</option>
@@ -192,14 +194,15 @@
                                                                                                     min="0">
                                                                                             </div>
                                                                                             <div class="col-md-4">
-                                                                                                <label>Machine</label>
-                                                                                                <input type="text"
-                                                                                                    inputmode="numeric"
-                                                                                                    name="production[{{ $data['shop_name'] }}][machine][]"
-                                                                                                    class="form-control form-control-sm"
-                                                                                                    value="0"
-                                                                                                    min="0">
-                                                                                            </div>
+                                                                                            <label>Machine</label>
+                                                                                            <select name="production[{{ $data['shop_name'] }}][machine][]" class="form-control form-control-sm">
+                                                                                                <option value="1">1</option>
+                                                                                                <option value="2">2</option>
+                                                                                                <option value="3">3</option>
+                                                                                                <option value="4">4</option>
+                                                                                            </select>
+                                                                                        </div>
+
                                                                                             <div class="col-md-4">
                                                                                                 <label>Setting</label>
                                                                                                 <input type="text"
@@ -336,13 +339,13 @@
                 <tr class="production-row">
                     <td>
                         <label>Status <span class="required">*</span></label>
-                        <select name="production[${shopName}][status][]" class="form-control form-control-sm status-select" required>
+                        <select name="production[${shopName}][status][]" class="form-control form-control-sm status-select" >
                             <option value="" disabled selected>Select Status</option>
                             <option value="f">Finished</option>
                             <option value="n">Not Finished</option>
                         </select>
                         <label>Model <span class="required">*</span></label>
-                        <select name="production[${shopName}][model][]" class="form-control form-control-sm model-select" required>
+                        <select name="production[${shopName}][model][]" class="form-control form-control-sm model-select" >
                             <option value="" disabled selected>Select Model</option>
                             ${modelsOptions}
                         </select>
@@ -353,11 +356,17 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <label>Production Process</label>
-                                <input type="text" name="production[${shopName}][production_process][]" class="form-control form-control-sm" placeholder="production process">
+                                <select name="production[${shopName}][production_process][]" class="form-control form-control-sm">
+                                    <option value="">Select Production Process</option>
+                                    <option value="Blank">Blank</option>
+                                    <option value="Flow">Flow</option>
+                                    <option value="STP/PI">STP/PI</option>
+                                </select>
                             </div>
+
                             <div class="col-md-4">
                                 <label>Type <span class="required">*</span></label>
-                                <select name="production[${shopName}][type][]" class="form-control form-control-sm" required>
+                                <select name="production[${shopName}][type][]" class="form-control form-control-sm" >
                                     <option value="" disabled selected>Select Type</option>
                                     <option value="OEM">OEM</option>
                                     <option value="Part">Part</option>
@@ -369,8 +378,14 @@
                             </div>
                             <div class="col-md-4">
                                 <label>Machine</label>
-                                <input type="text" inputmode="numeric" name="production[${shopName}][machine][]" class="form-control form-control-sm" value="0" min="0">
+                                <select name="production[${shopName}][machine][]" class="form-control form-control-sm">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </select>
                             </div>
+
                             <div class="col-md-4">
                                 <label>Setting</label>
                                 <input type="text" inputmode="numeric" step="0.01" name="production[${shopName}][setting][]" class="form-control form-control-sm" value="0" min="0">

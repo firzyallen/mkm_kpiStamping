@@ -176,17 +176,14 @@
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label for="balance">Balance</label>
-                                                                            <input type="text" name="balance[]"
-                                                                                class="form-control balance"
-                                                                                value="{{ $actual['balance'] }}" readonly>
+                                                                            <input type="text" name="balance[]" class="form-control balance" readonly placeholder="Enter balance">
                                                                         </div>
+
                                                                         <div class="form-group">
                                                                             <label for="percentage">Percentage</label>
-                                                                            <input type="text" name="percentage[]"
-                                                                                class="form-control"
-                                                                                value="{{ $actual['percentage'] }}"
-                                                                                placeholder="Write it in decimal (e.g., 0.23)">
+                                                                            <input type="text" name="percentage[]" class="form-control percentage" readonly placeholder="Automatically calculated">
                                                                         </div>
+
                                                                     </td>
                                                                     <td>
                                                                         <button type="button"
@@ -351,19 +348,48 @@
                 @endforeach
             });
 
-            // Function to calculate balance time
-            $(document).on('change', '.start-time, .end-time', function() {
-                var row = $(this).closest('tr');
-                var startTime = row.find('.start-time').val();
-                var endTime = row.find('.end-time').val();
+          // Function to calculate balance time and percentage
+$(document).on('change', '.start-time, .end-time', function() {
+    var row = $(this).closest('tr');
+    var startTime = row.find('.start-time').val();
+    var endTime = row.find('.end-time').val();
 
-                if (startTime && endTime) {
-                    var start = new Date('1970-01-01T' + startTime + 'Z');
-                    var end = new Date('1970-01-01T' + endTime + 'Z');
-                    var diff = (end - start) / (1000 * 60 * 60); // Calculate difference in hours
-                    row.find('.balance').val(diff.toFixed(2));
-                }
-            });
+    var freeTimeIntervals = [
+        { start: "07:30", end: "07:40" },
+        { start: "09:40", end: "09:50" },
+        { start: "11:50", end: "12:30" },
+        { start: "14:20", end: "14:30" },
+        { start: "16:15", end: "16:30" }
+    ];
+
+    if (startTime && endTime) {
+        var start = new Date('1970-01-01T' + startTime + 'Z');
+        var end = new Date('1970-01-01T' + endTime + 'Z');
+        var diff = (end - start) / (1000 * 60 * 60); // Calculate difference in hours
+
+        freeTimeIntervals.forEach(function(interval) {
+            var freeStart = new Date('1970-01-01T' + interval.start + 'Z');
+            var freeEnd = new Date('1970-01-01T' + interval.end + 'Z');
+
+            if (start < freeEnd && end > freeStart) {
+                var overlapStart = start < freeStart ? freeStart : start;
+                var overlapEnd = end > freeEnd ? freeEnd : end;
+
+                var freeDiff = (overlapEnd - overlapStart) / (1000 * 60 * 60); // Free time in hours
+                diff -= freeDiff;
+            }
+        });
+
+        row.find('.balance').val(diff.toFixed(2));
+
+        // Calculate percentage
+        var percentage = (diff / 7.58) * 100;
+        row.find('.percentage').val(percentage.toFixed(2) + '%'); // Populate percentage field with %
+    }
+});
+
+
+
         });
     </script>
 @endsection

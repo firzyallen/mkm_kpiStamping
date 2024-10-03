@@ -73,7 +73,8 @@ class DowntimeFormController extends Controller
             'Machine & PLN Off' => 'ME/MTC',
             'Tooling' => 'ME/MTC',
             'Quality Material' => 'QM',
-            'Manpower, Repair, IDLE (Downtime Process)' => 'OP'
+            'Manpower, Repair, IDLE (Downtime Process)' => 'OP',
+            'Model Change' => 'OP'
         ];
 
         $judgements = [
@@ -204,7 +205,8 @@ class DowntimeFormController extends Controller
             'Machine & PLN Off' => 'ME/MTC',
             'Tooling' => 'ME/MTC',
             'Quality Material' => 'QM',
-            'Manpower, Repair, IDLE (Downtime Process)' => 'OP'
+            'Manpower, Repair, IDLE (Downtime Process)' => 'OP',
+            'Model Change' => 'OP'
         ];
 
         $judgements = [
