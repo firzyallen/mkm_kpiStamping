@@ -169,7 +169,7 @@ class FormPressController extends Controller
                     'prod_process' => $request->production[$shop]['production_process'][$index],
                     'status' => $request->production[$shop]['status'][$index],
                     'type' => $request->production[$shop]['type'][$index],
-                    'inc_material' => $request->production[$shop]['inc_material'][$index] ?? null,
+                    'inc_material' => is_numeric($request->production[$shop]['inc_material'][$index]) ? $request->production[$shop]['inc_material'][$index] : null, // Cast or set as null
                     'machine' => $request->production[$shop]['machine'][$index] ?? 0,
                     'setting' => $request->production[$shop]['setting'][$index] ?? 0,
                     'hour_from' => $request->production[$shop]['hour_from'][$index] ?? null,
@@ -178,6 +178,7 @@ class FormPressController extends Controller
                     'OK' => $request->production[$shop]['OK'][$index] ?? 0,
                     'manpower' => $request->production[$shop]['manpower'][$index] ?? 0,
                 ])->id;
+
 
                 PressActualFormNg::create([
                     'production_id' => $productionId,
