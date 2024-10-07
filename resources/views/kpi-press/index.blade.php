@@ -359,7 +359,7 @@ planSeries.bullets.push(function(root, series, dataItem) {
                                                                             categoryField: "date",
                                                                             renderer: xRenderer,
                                                                             tooltip: am5.Tooltip.new(root, {
-                                                                                labelText: "Date: {date}" // Correctly display the date in the tooltip
+                                                                                labelText: "{date}" // Correctly display the date in the tooltip
                                                                             })
                                                                         })
                                                                     );
