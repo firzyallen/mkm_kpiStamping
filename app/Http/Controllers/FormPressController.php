@@ -169,16 +169,15 @@ class FormPressController extends Controller
                     'prod_process' => $request->production[$shop]['production_process'][$index],
                     'status' => $request->production[$shop]['status'][$index],
                     'type' => $request->production[$shop]['type'][$index],
-                    'inc_material' => isset($request->production[$shop]['inc_material'][$index]) ? (float)str_replace(',', '.', $request->production[$shop]['inc_material'][$index]) : null, // Handle commas
+                    'inc_material' => is_numeric($request->production[$shop]['inc_material'][$index]) ? $request->production[$shop]['inc_material'][$index] : null, // Cast or set as null
                     'machine' => $request->production[$shop]['machine'][$index] ?? 0,
-                    'setting' => isset($request->production[$shop]['setting'][$index]) ? (float)str_replace(',', '.', $request->production[$shop]['setting'][$index]) : 0, // Replace commas with periods
+                    'setting' => $request->production[$shop]['setting'][$index] ?? 0,
                     'hour_from' => $request->production[$shop]['hour_from'][$index] ?? null,
                     'hour_to' => $request->production[$shop]['hour_to'][$index] ?? null,
-                    'plan_prod' => isset($request->production[$shop]['plan_prod'][$index]) ? (float)str_replace(',', '.', $request->production[$shop]['plan_prod'][$index]) : 0, // Handle commas
-                    'OK' => isset($request->production[$shop]['OK'][$index]) ? (float)str_replace(',', '.', $request->production[$shop]['OK'][$index]) : 0, // Handle commas
-                    'manpower' => isset($request->production[$shop]['manpower'][$index]) ? (float)str_replace(',', '.', $request->production[$shop]['manpower'][$index]) : 0, // Handle commas
+                    'plan_prod' => $request->production[$shop]['plan_prod'][$index] ?? 0,
+                    'OK' => $request->production[$shop]['OK'][$index] ?? 0,
+                    'manpower' => $request->production[$shop]['manpower'][$index] ?? 0,
                 ])->id;
-
 
 
                 PressActualFormNg::create([
