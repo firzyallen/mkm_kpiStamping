@@ -359,7 +359,7 @@ planSeries.bullets.push(function(root, series, dataItem) {
                                                                             categoryField: "date",
                                                                             renderer: xRenderer,
                                                                             tooltip: am5.Tooltip.new(root, {
-                                                                                labelText: "Date: {categoryX}" // Correctly display the date in the tooltip
+                                                                                labelText: "Date: {date}" // Correctly display the date in the tooltip
                                                                             })
                                                                         })
                                                                     );
@@ -381,9 +381,9 @@ planSeries.bullets.push(function(root, series, dataItem) {
                                                                             min: 0,
                                                                             max: 100, // Set max based on your needs
                                                                             renderer: am5xy.AxisRendererY.new(root, {}),
-                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                           /*  tooltip: am5.Tooltip.new(root, {
                                                                                 labelText: "Value: {valueY.formatNumber('#.###')}" // Display y-axis value in the tooltip
-                                                                            })
+                                                                            }) */
                                                                         })
                                                                     );
 
