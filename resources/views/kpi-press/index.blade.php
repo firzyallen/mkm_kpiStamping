@@ -125,110 +125,155 @@
                                                             </h3>
                                                         </div>
                                                         <div class="card-body">
-                                                            <div class="chart-container">
-                                                                <canvas id="barChartHpu-{{ $shop->id }}"
-                                                                    class="chart-custom"></canvas>
-                                                            </div>
+                                                            <div id="chartdiv-{{ $shop->id }}" class="chart-custom" style="width: 100%; height: 400px;"></div>
                                                             <script>
-                                                                // Fetch the data from the backend and log it for debugging
-                                                                var hpuData = @json($kpiData[$shop->shop_name]['hpu']);
-                                                                var hpuPlanData = @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan'));
+                                                                am5.ready(function() {
+                                                                    // Create root element
+                                                                    var root = am5.Root.new("chartdiv-{{ $shop->id }}");
 
-                                                                // Generate an array for all dates from 1 to 31
-                                                                var allDates = Array.from({ length: 31 }, (_, i) => i + 1);
+                                                                    // Set themes
+                                                                    root.setThemes([am5themes_Animated.new(root)]);
 
-                                                                // Initialize arrays with nulls for HPU and Plan data
-                                                                var fullHpuData = Array(31).fill(null);
-                                                                var fullHpuPlanData = Array(31).fill(null);
+                                                                    // Create chart
+                                                                    var chart = root.container.children.push(
+                                                                        am5xy.XYChart.new(root, {
+                                                                            panX: false,
+                                                                            panY: false,
+                                                                            wheelX: "none",
+                                                                            wheelY: "none",
+                                                                            layout: root.verticalLayout
+                                                                        })
+                                                                    );
 
-                                                                // Map actual data to the corresponding day
-                                                                hpuData.forEach(item => {
-                                                                    var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                    fullHpuData[day - 1] = item.HPU; // Assign HPU value to the corresponding day
-                                                                });
+                                                                    // Fetch the HPU and Plan data
+                                                                    var hpuData = @json($kpiData[$shop->shop_name]['hpu']);
+                                                                    var hpuPlanData = @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan'));
 
-                                                                hpuPlanData.forEach((value, index) => {
-                                                                    var day = parseInt(hpuData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                    fullHpuPlanData[day - 1] = value; // Assign HPU Plan value to the corresponding day
-                                                                });
+                                                                    // Predefine x-axis categories (1-31)
+                                                                    var allDates = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
-                                                                console.log('Full HPU Data:', fullHpuData);
-                                                                console.log('Full HPU Plan Data:', fullHpuPlanData);
+                                                                    // Initialize data arrays for HPU and Plan
+                                                                    var fullHpuData = Array(31).fill(null);
+                                                                    var fullHpuPlanData = Array(31).fill(0);  // Set default plan values to 0
 
-                                                                var ctxHpu = document.getElementById('barChartHpu-{{ $shop->id }}').getContext('2d');
-                                                                var hpuChart = new Chart(ctxHpu, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: allDates, // Show all dates from 1 to 31
-                                                                        datasets: [
-                                                                            {
-                                                                                label: 'Plan',
-                                                                                data: fullHpuPlanData,
-                                                                                type: 'line',
-                                                                                backgroundColor: '#004355',
-                                                                                borderColor: '#3A7085',
-                                                                                fill: false,
-                                                                            },
-                                                                            {
-                                                                                label: 'Actual',
-                                                                                data: fullHpuData,
-                                                                                backgroundColor: '#A6CAD8',
-                                                                                borderColor: '#007A93',
-                                                                                borderWidth: 2
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            x: {
-                                                                                beginAtZero: true,
-                                                                                ticks: {
-                                                                                    callback: function(value, index, values) {
-                                                                                        // Show labels for dates 1, 4, 8, 12, 16, 20, 24, 28, but also return all dates if needed
-                                                                                        return allDates.includes(value + 1) ? value + 1 : '';
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            y: {
-                                                                                beginAtZero: true,
-                                                                                min: 0, // Force y-axis to start at 0
-                                                                                max: 2, // Set y-axis maximum to 2
-                                                                                ticks: {
-                                                                                    stepSize: 0.1, // Define step size for better readability
-                                                                                    callback: function(value) {
-                                                                                        return value.toFixed(1); // Ensure values are displayed as fixed-point
-                                                                                    }
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'HPU'
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            tooltip: {
-                                                                                callbacks: {
-                                                                                    title: function(tooltipItem) {
-                                                                                        return 'Day ' + tooltipItem[0].label; // Show day number in the tooltip
-                                                                                    },
-                                                                                    label: function(context) {
-                                                                                        return context.dataset.label + ': ' + (context.raw !== null ? context.raw.toFixed(2) : 'N/A');
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            legend: {
-                                                                                display: true,
-                                                                                labels: {
-                                                                                    usePointStyle: true,
-                                                                                    boxWidth: 10
-                                                                                }
-                                                                            }
-                                                                        }
+                                                                    // Map actual data to the corresponding day
+                                                                    hpuData.forEach(item => {
+                                                                        var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                        fullHpuData[day - 1] = item.HPU; // Assign HPU value to the corresponding day
+                                                                    });
+
+                                                                    hpuPlanData.forEach((value, index) => {
+                                                                        var day = parseInt(hpuData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                        fullHpuPlanData[day - 1] = value; // Assign HPU Plan value to the corresponding day
+                                                                    });
+
+                                                                    // Set default y-axis max based on the data
+                                                                    var maxHpuValue = Math.max(...fullHpuData.filter(v => v !== null), 0.2); // Calculate max value, ensuring it's not less than 1
+
+                                                                    // Create x-axis with tooltip for Date
+                                                                    var xRenderer = am5xy.AxisRendererX.new(root, { minGridDistance: 30 });
+                                                                    var xAxis = chart.xAxes.push(
+                                                                        am5xy.CategoryAxis.new(root, {
+                                                                            categoryField: "date",
+                                                                            renderer: xRenderer,
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: " {date}" // Correctly display the date in the tooltip
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    xAxis.data.setAll(allDates.map(date => ({ date })));
+
+                                                                    // Create y-axis with tooltip for Percentage
+                                                                    var yAxis = chart.yAxes.push(
+                                                                        am5xy.ValueAxis.new(root, {
+                                                                            min: 0,
+                                                                            max: maxHpuValue, // Dynamically set the y-axis max value based on actual data
+                                                                            renderer: am5xy.AxisRendererY.new(root, {}),
+                                                                            /* tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: " {valueY}" // Correctly display the percentage in the tooltip
+                                                                            }) */
+                                                                        })
+                                                                    );
+
+                                                                    // Add the 'Plan' series with custom tooltip
+                                                                    var planSeries = chart.series.push(
+                                                                        am5xy.LineSeries.new(root, {
+                                                                            name: "Plan",
+                                                                            xAxis: xAxis,
+                                                                            yAxis: yAxis,
+                                                                            valueYField: "plan",
+                                                                            categoryXField: "date",
+                                                                            stroke: am5.color("#004355"),
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "Plan: {valueY.formatNumber('#.###')}" // Show date and plan percentage
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    planSeries.strokes.template.setAll({ strokeWidth: 6 });
+                                                                    planSeries.data.setAll(
+                                                                        allDates.map((date, i) => ({ date: date, plan: fullHpuPlanData[i] }))
+                                                                    );
+
+                                                                    // Add the 'Actual' series with custom tooltip
+                                                                    var actualSeries = chart.series.push(
+                                                                        am5xy.ColumnSeries.new(root, {
+                                                                            name: "Actual",
+                                                                            xAxis: xAxis,
+                                                                            yAxis: yAxis,
+                                                                            valueYField: "actual",
+                                                                            categoryXField: "date",
+                                                                            fill: am5.color("#A6CAD8"),
+                                                                            stroke: am5.color("#007A93"),
+                                                                            clustered: false, // Ensures that the columns overlap rather than cluster
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "Actual: {valueY.formatNumber('#.###')}" // Show date and actual percentage
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    actualSeries.columns.template.setAll({ width: am5.percent(50) });
+                                                                    actualSeries.data.setAll(
+                                                                        allDates.map((date, i) => ({ date: date, actual: fullHpuData[i] }))
+                                                                    );
+
+                                                                    planSeries.bullets.push(function(root, series, dataItem) {
+                                                                    var actualValue = fullHpuData[parseInt(dataItem.get("categoryX")) - 1];
+                                                                    var planValue = dataItem.get("valueY");
+
+                                                                    if (actualValue !== null && planValue !== null) {
+                                                                        var color = actualValue >= planValue ? am5.color(0x00ff00) : am5.color(0xff0000); // Green if Actual ≥ Plan
+                                                                        return am5.Bullet.new(root, {
+                                                                            sprite: am5.Circle.new(root, {
+                                                                                strokeWidth: 2,
+                                                                                stroke: am5.color(0x000000),
+                                                                                radius: 5,
+                                                                                fill: color // Fill based on comparison
+                                                                            })
+                                                                        });
                                                                     }
+                                                                    return null;
+                                                                });
+
+
+                                                                    // Add a cursor for interactivity
+                                                                    chart.set("cursor", am5xy.XYCursor.new(root, {
+                                                                        behavior: "none",
+                                                                        xAxis: xAxis,
+                                                                        yAxis: yAxis
+                                                                    }));
+
+                                                                    // Add legend
+                                                                    var legend = chart.children.push(am5.Legend.new(root, { centerX: am5.p50, x: am5.p50 }));
+                                                                    legend.data.setAll([planSeries, actualSeries]);
+
+                                                                    // Animate series on appear
+                                                                    planSeries.appear(1000);
+                                                                    actualSeries.appear(1000);
+                                                                    chart.appear(1000, 100);
                                                                 });
                                                             </script>
-
                                                         </div>
+
+
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 mb-4">
@@ -261,110 +306,170 @@
                                                             </h3>
                                                         </div>
                                                         <div class="card-body">
-                                                            <div class="chart-container">
-                                                                <canvas id="barChartDowntime-{{ $shop->id }}"
-                                                                    class="chart-custom"></canvas>
-                                                            </div>
+                                                            <div id="chartdiv-downtime-{{ $shop->id }}" class="chart-custom" style="width: 100%; height: 400px;"></div>
                                                             <script>
-                                                                // Fetch the Downtime data from the backend
-                                                                var downtimeData = @json($kpiData[$shop->shop_name]['downtime']);
-                                                                var downtimePlanData = @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan'));
+                                                                am5.ready(function() {
+                                                                    // Create root element
+                                                                    var root = am5.Root.new("chartdiv-downtime-{{ $shop->id }}");
 
-                                                                // Generate an array for all dates from 1 to 31
-                                                                var allDates = Array.from({ length: 31 }, (_, i) => i + 1);
+                                                                    // Set themes
+                                                                    root.setThemes([am5themes_Animated.new(root)]);
 
-                                                                // Initialize arrays with nulls for Downtime and Plan data
-                                                                var fullDowntimeData = Array(31).fill(null);
-                                                                var fullDowntimePlanData = Array(31).fill(null);
+                                                                    // Create chart
+                                                                    var chart = root.container.children.push(
+                                                                        am5xy.XYChart.new(root, {
+                                                                            panX: false,
+                                                                            panY: false,
+                                                                            wheelX: "none",
+                                                                            wheelY: "none",
+                                                                            layout: root.verticalLayout
+                                                                        })
+                                                                    );
 
-                                                                // Map actual data to the corresponding day
-                                                                downtimeData.forEach(item => {
-                                                                    var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                    fullDowntimeData[day - 1] = item.Downtime; // Assign Downtime value to the corresponding day
-                                                                });
+                                                                    // Fetch the Downtime and Plan data
+                                                                    var downtimeData = @json($kpiData[$shop->shop_name]['downtime']);
+                                                                    var downtimePlanData = @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan'));
 
-                                                                downtimePlanData.forEach((value, index) => {
-                                                                    var day = parseInt(downtimeData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                    fullDowntimePlanData[day - 1] = value; // Assign Downtime Plan value to the corresponding day
-                                                                });
+                                                                    // Predefine x-axis categories (1-31)
+                                                                    var allDates = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
-                                                                console.log('Full Downtime Data:', fullDowntimeData);
-                                                                console.log('Full Downtime Plan Data:', fullDowntimePlanData);
+                                                                    // Initialize data arrays for Downtime and Plan
+                                                                    var fullDowntimeData = Array(31).fill(null);
+                                                                    var fullDowntimePlanData = Array(31).fill(null);
 
-                                                                var ctxDowntime = document.getElementById('barChartDowntime-{{ $shop->id }}').getContext('2d');
-                                                                var downtimeChart = new Chart(ctxDowntime, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: allDates, // Show all dates from 1 to 31
-                                                                        datasets: [
-                                                                            {
-                                                                                label: 'Plan',
-                                                                                data: fullDowntimePlanData,
-                                                                                type: 'line',
-                                                                                backgroundColor: '#004355',
-                                                                                borderColor: '#3A7085',
-                                                                                fill: false,
-                                                                            },
-                                                                            {
-                                                                                label: 'Actual',
-                                                                                data: fullDowntimeData,
-                                                                                backgroundColor: '#A6CAD8',
-                                                                                borderColor: '#007A93',
-                                                                                borderWidth: 2
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            x: {
-                                                                                beginAtZero: true,
-                                                                                ticks: {
-                                                                                    callback: function(value, index, values) {
-                                                                                        // Show all dates or selectively show labels (e.g., every 4th day)
-                                                                                        return allDates.includes(value + 1) ? value + 1 : '';
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            y: {
-                                                                                beginAtZero: true,
-                                                                                max: 100, // Set y-axis max to 100
-                                                                                ticks: {
-                                                                                    steps: 10,
-                                                                                    stepSize: 10,
-                                                                                    callback: function(value) {
-                                                                                        return value.toFixed(0); // Ensure values are displayed as whole numbers
-                                                                                    }
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'Downtime (in minutes)' // Adjusted title for clarity
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            tooltip: {
-                                                                                callbacks: {
-                                                                                    title: function(tooltipItem) {
-                                                                                        return 'Day ' + tooltipItem[0].label; // Show the day in the tooltip
-                                                                                    },
-                                                                                    label: function(context) {
-                                                                                        return context.dataset.label + ': ' + (context.raw !== null ? context.raw.toFixed(2) : 'N/A');
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            legend: {
-                                                                                display: true,
-                                                                                labels: {
-                                                                                    usePointStyle: true,
-                                                                                    boxWidth: 10
-                                                                                }
-                                                                            }
+                                                                    // Map actual data to the corresponding day
+                                                                    downtimeData.forEach(item => {
+                                                                        var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                        fullDowntimeData[day - 1] = item.Downtime; // Assign Downtime value to the corresponding day
+                                                                    });
+
+                                                                    downtimePlanData.forEach((value, index) => {
+                                                                        var day = parseInt(downtimeData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                        fullDowntimePlanData[day - 1] = value; // Assign Downtime Plan value to the corresponding day
+                                                                    });
+
+                                                                    // Create x-axis with tooltip for Date
+                                                                    var xRenderer = am5xy.AxisRendererX.new(root, { minGridDistance: 30 });
+                                                                    var xAxis = chart.xAxes.push(
+                                                                        am5xy.CategoryAxis.new(root, {
+                                                                            categoryField: "date",
+                                                                            renderer: xRenderer,
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "Date: {categoryX}" // Correctly display the date in the tooltip
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    xAxis.data.setAll(allDates.map(date => ({ date })));
+
+                                                                    // Add label for x-axis (Days)
+                                                                    xAxis.children.moveValue(
+                                                                        am5.Label.new(root, {
+                                                                            x: am5.p50,
+                                                                            centerX: am5.p50,
+                                                                            y: am5.p100,
+                                                                            centerY: am5.p100
+                                                                        }), 0
+                                                                    );
+
+                                                                    // Create y-axis with max value and label
+                                                                    var yAxis = chart.yAxes.push(
+                                                                        am5xy.ValueAxis.new(root, {
+                                                                            min: 0,
+                                                                            max: 100, // Set max based on your needs
+                                                                            renderer: am5xy.AxisRendererY.new(root, {}),
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "Value: {valueY.formatNumber('#.###')}" // Display y-axis value in the tooltip
+                                                                            })
+                                                                        })
+                                                                    );
+
+                                                                    // Add label for y-axis (Percentage)
+                                                                    yAxis.children.moveValue(
+                                                                        am5.Label.new(root, {
+                                                                            rotation: -90,
+                                                                            text: "Percentage (%)", // Y-axis label
+                                                                            y: am5.p50,
+                                                                            centerX: am5.p50
+                                                                        }), 0
+                                                                    );
+
+                                                                    // Add the 'Plan' series with tooltip
+                                                                    var planSeries = chart.series.push(
+                                                                        am5xy.LineSeries.new(root, {
+                                                                            name: "Plan",
+                                                                            xAxis: xAxis,
+                                                                            yAxis: yAxis,
+                                                                            valueYField: "plan",
+                                                                            categoryXField: "date",
+                                                                            stroke: am5.color("#004355"),
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    planSeries.strokes.template.setAll({ strokeWidth: 6 });
+                                                                    planSeries.data.setAll(
+                                                                        allDates.map((date, i) => ({ date: date, plan: fullDowntimePlanData[i] }))
+                                                                    );
+
+                                                                    // Add the 'Actual' series with tooltip
+                                                                    var actualSeries = chart.series.push(
+                                                                        am5xy.ColumnSeries.new(root, {
+                                                                            name: "Actual",
+                                                                            xAxis: xAxis,
+                                                                            yAxis: yAxis,
+                                                                            valueYField: "actual",
+                                                                            categoryXField: "date",
+                                                                            fill: am5.color("#A6CAD8"),
+                                                                            stroke: am5.color("#007A93"),
+                                                                            clustered: false, // Ensures that the columns overlap rather than cluster
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    actualSeries.columns.template.setAll({ width: am5.percent(50) });
+                                                                    actualSeries.data.setAll(
+                                                                        allDates.map((date, i) => ({ date: date, actual: fullDowntimeData[i] }))
+                                                                    );
+
+                                                                    planSeries.bullets.push(function(root, series, dataItem) {
+                                                                        var actualValue = fullDowntimeData[parseInt(dataItem.get("categoryX")) - 1];
+                                                                        var planValue = dataItem.get("valueY");
+
+                                                                        if (actualValue !== null && planValue !== null) {
+                                                                            var color = actualValue >= planValue ? am5.color(0x00ff00) : am5.color(0xff0000); // Green if Actual ≥ Plan
+                                                                            return am5.Bullet.new(root, {
+                                                                                sprite: am5.Circle.new(root, {
+                                                                                    strokeWidth: 2,
+                                                                                    stroke: am5.color(0x000000),
+                                                                                    radius: 5,
+                                                                                    fill: color // Fill based on comparison
+                                                                                })
+                                                                            });
                                                                         }
-                                                                    }
+                                                                        return null;
+                                                                    });
+
+
+                                                                    // Add a cursor for interactivity
+                                                                    chart.set("cursor", am5xy.XYCursor.new(root, { behavior: "none", xAxis: xAxis, yAxis: yAxis }));
+
+                                                                    // Add legend
+                                                                    var legend = chart.children.push(am5.Legend.new(root, { centerX: am5.p50, x: am5.p50 }));
+                                                                    legend.data.setAll([planSeries, actualSeries]);
+
+                                                                    // Animate series on appear
+                                                                    planSeries.appear(1000);
+                                                                    actualSeries.appear(1000);
+                                                                    chart.appear(1000, 100);
                                                                 });
                                                             </script>
-
                                                         </div>
+
+
+
+
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 mb-4">
@@ -394,109 +499,175 @@
                                                             </h3>
                                                         </div>
                                                         <div class="card-body">
-                                                            <div class="chart-container">
-                                                                <canvas id="barChartOtdp-{{ $shop->id }}"
-                                                                    class="chart-custom"></canvas>
-                                                            </div>
+                                                            <div id="chartdiv-otdp-{{ $shop->id }}" class="chart-custom" style="width: 100%; height: 400px;"></div>
                                                             <script>
-                                                                // Fetch the OTDP data from the backend
-                                                                var otdpData = @json($kpiData[$shop->shop_name]['otdp']);
-                                                                var otdpPlanData = @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan'));
+                                                                am5.ready(function() {
+                                                                    // Create root element
+                                                                    var root = am5.Root.new("chartdiv-otdp-{{ $shop->id }}");
 
-                                                                // Generate an array for all dates from 1 to 31
-                                                                var allDates = Array.from({ length: 31 }, (_, i) => i + 1);
+                                                                    // Set themes
+                                                                    root.setThemes([am5themes_Animated.new(root)]);
 
-                                                                // Initialize arrays with nulls for OTDP and Plan data
-                                                                var fullOtdpData = Array(31).fill(null);
-                                                                var fullOtdpPlanData = Array(31).fill(null);
+                                                                    // Create chart
+                                                                    var chart = root.container.children.push(
+                                                                        am5xy.XYChart.new(root, {
+                                                                            panX: false,
+                                                                            panY: false,
+                                                                            wheelX: "none",
+                                                                            wheelY: "none",
+                                                                            layout: root.verticalLayout
+                                                                        })
+                                                                    );
 
-                                                                // Map actual data to the corresponding day
-                                                                otdpData.forEach(item => {
-                                                                    var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                    fullOtdpData[day - 1] = item.OTDP; // Assign OTDP value to the corresponding day
-                                                                });
+                                                                    // Fetch the OTDP and Plan data
+                                                                    var otdpData = @json($kpiData[$shop->shop_name]['otdp']);
+                                                                    var otdpPlanData = @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan'));
 
-                                                                otdpPlanData.forEach((value, index) => {
-                                                                    var day = parseInt(otdpData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                    fullOtdpPlanData[day - 1] = value; // Assign OTDP Plan value to the corresponding day
-                                                                });
+                                                                    // Define threshold for green color (e.g., 98%)
+                                                                    var threshold = 98;
 
-                                                                console.log('Full OTDP Data:', fullOtdpData);
-                                                                console.log('Full OTDP Plan Data:', fullOtdpPlanData);
+                                                                    // Predefine x-axis categories (1-31)
+                                                                    var allDates = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
-                                                                var ctxOtdp = document.getElementById('barChartOtdp-{{ $shop->id }}').getContext('2d');
-                                                                var otdpChart = new Chart(ctxOtdp, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: allDates, // Show all dates from 1 to 31
-                                                                        datasets: [
-                                                                            {
-                                                                                label: 'Plan',
-                                                                                data: fullOtdpPlanData,
-                                                                                type: 'line',
-                                                                                backgroundColor: '#004355',
-                                                                                borderColor: '#3A7085',
-                                                                                fill: false,
-                                                                            },
-                                                                            {
-                                                                                label: 'Actual',
-                                                                                data: fullOtdpData,
-                                                                                backgroundColor: '#A6CAD8',
-                                                                                borderColor: '#007A93',
-                                                                                borderWidth: 2
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            x: {
-                                                                                beginAtZero: true,
-                                                                                ticks: {
-                                                                                    callback: function(value, index, values) {
-                                                                                        // Show all dates or selectively show labels (e.g., every 4th day)
-                                                                                        return allDates.includes(value + 1) ? value + 1 : '';
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            y: {
-                                                                                beginAtZero: true,
-                                                                                min: 0,
-                                                                                ticks: {
-                                                                                    stepSize: 0.1,
-                                                                                    callback: function(value) {
-                                                                                        return value.toFixed(2); // Ensure values are displayed as fixed-point
-                                                                                    }
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'OTDP'
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            tooltip: {
-                                                                                callbacks: {
-                                                                                    title: function(tooltipItem) {
-                                                                                        return 'Day ' + tooltipItem[0].label; // Show the day in the tooltip
-                                                                                    },
-                                                                                    label: function(context) {
-                                                                                        return context.dataset.label + ': ' + (context.raw !== null ? context.raw.toFixed(2) : 'N/A');
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            legend: {
-                                                                                display: true,
-                                                                                labels: {
-                                                                                    usePointStyle: true,
-                                                                                    boxWidth: 10
-                                                                                }
-                                                                            }
-                                                                        }
+                                                                    // Initialize data arrays for OTDP and Plan
+                                                                    var fullOtdpData = Array(31).fill(null);
+                                                                    var fullOtdpPlanData = Array(31).fill(0); // Set default plan values to 0
+
+                                                                    // Map actual data to the corresponding day
+                                                                    otdpData.forEach(item => {
+                                                                        var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                        fullOtdpData[day - 1] = item.OTDP; // Assign OTDP value to the corresponding day
+                                                                    });
+
+                                                                    otdpPlanData.forEach((value, index) => {
+                                                                        var day = parseInt(otdpData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                        fullOtdpPlanData[day - 1] = value; // Assign OTDP Plan value to the corresponding day
+                                                                    });
+
+                                                                    // Create x-axis with tooltip for Date
+                                                                    var xRenderer = am5xy.AxisRendererX.new(root, { minGridDistance: 30 });
+                                                                    var xAxis = chart.xAxes.push(
+                                                                        am5xy.CategoryAxis.new(root, {
+                                                                            categoryField: "date",
+                                                                            renderer: xRenderer,
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "{date}" // Correctly display the date in the tooltip
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    xAxis.data.setAll(allDates.map(date => ({ date })));
+
+                                                                    // Add label for x-axis (Day)
+                                                                    xAxis.children.moveValue(
+                                                                        am5.Label.new(root, {
+                                                                            x: am5.p50,
+                                                                            centerX: am5.p50,
+                                                                            y: am5.p100,
+                                                                            centerY: am5.p100
+                                                                        }), 0
+                                                                    );
+
+                                                                    // Create y-axis with max 120
+                                                                    var yAxis = chart.yAxes.push(
+                                                                        am5xy.ValueAxis.new(root, {
+                                                                            min: 0,
+                                                                            max: 120, // Set max to 120
+                                                                            renderer: am5xy.AxisRendererY.new(root, {}),
+                                                                            /* tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "Value: {valueY.formatNumber('#.###')}" // Correctly display the y-axis value in the tooltip
+                                                                            }) */
+                                                                        })
+                                                                    );
+
+                                                                    // Add label for y-axis (Percentage)
+                                                                    yAxis.children.moveValue(
+                                                                        am5.Label.new(root, {
+                                                                            rotation: -90,
+                                                                            text: "Percentage (%)", // Y-axis label
+                                                                            y: am5.p50,
+                                                                            centerX: am5.p50
+                                                                        }), 0
+                                                                    );
+
+                                                                    // Add the 'Plan' series
+                                                                    var planSeries = chart.series.push(
+                                                                        am5xy.LineSeries.new(root, {
+                                                                            name: "Plan",
+                                                                            xAxis: xAxis,
+                                                                            yAxis: yAxis,
+                                                                            valueYField: "plan",
+                                                                            categoryXField: "date",
+                                                                            stroke: am5.color("#004355"),
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    planSeries.strokes.template.setAll({ strokeWidth: 6 });
+                                                                    planSeries.data.setAll(
+                                                                        allDates.map((date, i) => ({ date: date, plan: fullOtdpPlanData[i] }))
+                                                                    );
+
+                                                                    // Add the 'Actual' series
+                                                                    var actualSeries = chart.series.push(
+                                                                        am5xy.ColumnSeries.new(root, {
+                                                                            name: "Actual",
+                                                                            xAxis: xAxis,
+                                                                            yAxis: yAxis,
+                                                                            valueYField: "actual",
+                                                                            categoryXField: "date",
+                                                                            fill: am5.color("#A6CAD8"),
+                                                                            stroke: am5.color("#007A93"),
+                                                                            clustered: false, // Ensures that the columns overlap rather than cluster
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    actualSeries.columns.template.setAll({ width: am5.percent(50) });
+                                                                    actualSeries.data.setAll(
+                                                                        allDates.map((date, i) => ({ date: date, actual: fullOtdpData[i] }))
+                                                                    );
+
+                                                                    planSeries.bullets.push(function(root, series, dataItem) {
+                                                                    var actualValue = fullOtdpData[parseInt(dataItem.get("categoryX")) - 1];
+                                                                    var planValue = dataItem.get("valueY");
+                                                                    var threshold = 98; // Set OTDP threshold
+
+                                                                    if (actualValue !== null && planValue !== null) {
+                                                                        var color = actualValue >= threshold ? am5.color(0x00ff00) : am5.color(0xff0000); // Green if Actual ≥ 98
+                                                                        return am5.Bullet.new(root, {
+                                                                            sprite: am5.Circle.new(root, {
+                                                                                strokeWidth: 2,
+                                                                                stroke: am5.color(0x000000),
+                                                                                radius: 5,
+                                                                                fill: color // Fill based on comparison to threshold
+                                                                            })
+                                                                        });
                                                                     }
+                                                                    return null;
+                                                                });
+
+
+                                                                    // Add a cursor for interactivity
+                                                                    chart.set("cursor", am5xy.XYCursor.new(root, { behavior: "none", xAxis: xAxis, yAxis: yAxis }));
+
+                                                                    // Add legend
+                                                                    var legend = chart.children.push(am5.Legend.new(root, { centerX: am5.p50, x: am5.p50 }));
+                                                                    legend.data.setAll([planSeries, actualSeries]);
+
+                                                                    // Animate series on appear
+                                                                    planSeries.appear(1000);
+                                                                    actualSeries.appear(1000);
+                                                                    chart.appear(1000, 100);
                                                                 });
                                                             </script>
-
                                                         </div>
+
+
+
+
+
                                                     </div>
 
                                                 </div>
@@ -527,110 +698,170 @@
                                                             </h3>
                                                         </div>
                                                         <div class="card-body">
-                                                            <div class="chart-container">
-                                                                <canvas id="barChartFtt-{{ $shop->id }}"
-                                                                    class="chart-custom"></canvas>
-                                                            </div>
+                                                            <div id="chartdiv-ftt-{{ $shop->id }}" class="chart-custom" style="width: 100%; height: 400px;"></div>
                                                             <script>
-                                                                // Fetch the FTT data from the backend
-                                                                var fttData = @json($kpiData[$shop->shop_name]['ftt']);
-                                                                var fttPlanData = @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan'));
+                                                                am5.ready(function() {
+                                                                    // Create root element
+                                                                    var root = am5.Root.new("chartdiv-ftt-{{ $shop->id }}");
 
-                                                                // Generate an array for all dates from 1 to 31
-                                                                var allDates = Array.from({ length: 31 }, (_, i) => i + 1);
+                                                                    // Set themes
+                                                                    root.setThemes([am5themes_Animated.new(root)]);
 
-                                                                // Initialize arrays with nulls for FTT and Plan data
-                                                                var fullFttData = Array(31).fill(null);
-                                                                var fullFttPlanData = Array(31).fill(null);
+                                                                    // Create chart
+                                                                    var chart = root.container.children.push(
+                                                                        am5xy.XYChart.new(root, {
+                                                                            panX: false,
+                                                                            panY: false,
+                                                                            wheelX: "none",
+                                                                            wheelY: "none",
+                                                                            layout: root.verticalLayout
+                                                                        })
+                                                                    );
 
-                                                                // Map actual data to the corresponding day
-                                                                fttData.forEach(item => {
-                                                                    var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                    fullFttData[day - 1] = item.FTT; // Assign FTT value to the corresponding day
-                                                                });
+                                                                    // Fetch the FTT and Plan data
+                                                                    var fttData = @json($kpiData[$shop->shop_name]['ftt']);
+                                                                    var fttPlanData = @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan'));
 
-                                                                fttPlanData.forEach((value, index) => {
-                                                                    var day = parseInt(fttData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                    fullFttPlanData[day - 1] = value; // Assign FTT Plan value to the corresponding day
-                                                                });
+                                                                    // Predefine x-axis categories (1-31)
+                                                                    var allDates = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
 
-                                                                console.log('Full FTT Data:', fullFttData);
-                                                                console.log('Full FTT Plan Data:', fullFttPlanData);
+                                                                    // Initialize data arrays for FTT and Plan
+                                                                    var fullFttData = Array(31).fill(null);
+                                                                    var fullFttPlanData = Array(31).fill(0);  // Set default plan values to 0
 
-                                                                var ctxFtt = document.getElementById('barChartFtt-{{ $shop->id }}').getContext('2d');
-                                                                var fttChart = new Chart(ctxFtt, {
-                                                                    type: 'bar',
-                                                                    data: {
-                                                                        labels: allDates, // Show all dates from 1 to 31
-                                                                        datasets: [
-                                                                            {
-                                                                                label: 'Plan',
-                                                                                data: fullFttPlanData,
-                                                                                type: 'line',
-                                                                                backgroundColor: '#004355',
-                                                                                borderColor: '#3A7085',
-                                                                                fill: false,
-                                                                            },
-                                                                            {
-                                                                                label: 'Actual',
-                                                                                data: fullFttData,
-                                                                                backgroundColor: '#A6CAD8',
-                                                                                borderColor: '#007A93',
-                                                                                borderWidth: 2
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    options: {
-                                                                        scales: {
-                                                                            x: {
-                                                                                beginAtZero: true,
-                                                                                ticks: {
-                                                                                    callback: function(value, index, values) {
-                                                                                        // Show all dates or selectively show labels (e.g., every 4th day)
-                                                                                        return allDates.includes(value + 1) ? value + 1 : '';
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            y: {
-                                                                                beginAtZero: true,
-                                                                                max: 100, // Set y-axis max to 100
-                                                                                ticks: {
-                                                                                    steps: 10,
-                                                                                    stepSize: 10,
-                                                                                    callback: function(value) {
-                                                                                        return value.toFixed(0); // Ensure values are displayed as whole numbers
-                                                                                    }
-                                                                                },
-                                                                                title: {
-                                                                                    display: true,
-                                                                                    text: 'FTT'
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        plugins: {
-                                                                            tooltip: {
-                                                                                callbacks: {
-                                                                                    title: function(tooltipItem) {
-                                                                                        return 'Day ' + tooltipItem[0].label; // Show the day in the tooltip
-                                                                                    },
-                                                                                    label: function(context) {
-                                                                                        return context.dataset.label + ': ' + (context.raw !== null ? context.raw.toFixed(2) : 'N/A');
-                                                                                    }
-                                                                                }
-                                                                            },
-                                                                            legend: {
-                                                                                display: true,
-                                                                                labels: {
-                                                                                    usePointStyle: true,
-                                                                                    boxWidth: 10
-                                                                                }
-                                                                            }
-                                                                        }
+                                                                    // Map actual data to the corresponding day
+                                                                    fttData.forEach(item => {
+                                                                        var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                        fullFttData[day - 1] = item.FTT; // Assign FTT value to the corresponding day
+                                                                    });
+
+                                                                    fttPlanData.forEach((value, index) => {
+                                                                        var day = parseInt(fttData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                        fullFttPlanData[day - 1] = value; // Assign FTT Plan value to the corresponding day
+                                                                    });
+
+                                                                    // Create x-axis with tooltip for Date
+                                                                    var xRenderer = am5xy.AxisRendererX.new(root, { minGridDistance: 30 });
+                                                                    var xAxis = chart.xAxes.push(
+                                                                        am5xy.CategoryAxis.new(root, {
+                                                                            categoryField: "date",
+                                                                            renderer: xRenderer,
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "{date}" // Correctly display the date in the tooltip
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    xAxis.data.setAll(allDates.map(date => ({ date })));
+
+                                                                    // Add label for x-axis (Day)
+                                                                    xAxis.children.moveValue(
+                                                                        am5.Label.new(root, {
+                                                                            x: am5.p50,
+                                                                            centerX: am5.p50,
+                                                                            y: am5.p100,
+                                                                            centerY: am5.p100
+                                                                        }), 0
+                                                                    );
+
+                                                                    // Create y-axis with max value set to 120
+                                                                    var yAxis = chart.yAxes.push(
+                                                                        am5xy.ValueAxis.new(root, {
+                                                                            min: 0,
+                                                                            max: 120, // Default y-axis value is 120
+                                                                            renderer: am5xy.AxisRendererY.new(root, {}),
+                                                                            /* tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "Value: {valueY.formatNumber('#.###')}" // Display y-axis value in tooltip
+                                                                            }) */
+                                                                        })
+                                                                    );
+
+                                                                    // Add label for y-axis (FTT)
+                                                                    yAxis.children.moveValue(
+                                                                        am5.Label.new(root, {
+                                                                            rotation: -90,
+                                                                            text: "FTT (%)", // Y-axis label
+                                                                            y: am5.p50,
+                                                                            centerX: am5.p50
+                                                                        }), 0
+                                                                    );
+
+                                                                    // Add the 'Plan' series with thicker line and higher zIndex
+                                                                    var planSeries = chart.series.push(
+                                                                        am5xy.LineSeries.new(root, {
+                                                                            name: "Plan",
+                                                                            xAxis: xAxis,
+                                                                            yAxis: yAxis,
+                                                                            valueYField: "plan",
+                                                                            categoryXField: "date",
+                                                                            stroke: am5.color("#004355"),
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    planSeries.strokes.template.setAll({ strokeWidth: 6, zIndex: 10 }); // Thicker line for Plan series, higher zIndex for above bars
+                                                                    planSeries.data.setAll(
+                                                                        allDates.map((date, i) => ({ date: date, plan: fullFttPlanData[i] }))
+                                                                    );
+
+                                                                    // Add the 'Actual' series with lower zIndex
+                                                                    var actualSeries = chart.series.push(
+                                                                        am5xy.ColumnSeries.new(root, {
+                                                                            name: "Actual",
+                                                                            xAxis: xAxis,
+                                                                            yAxis: yAxis,
+                                                                            valueYField: "actual",
+                                                                            categoryXField: "date",
+                                                                            fill: am5.color("#A6CAD8"),
+                                                                            stroke: am5.color("#007A93"),
+                                                                            clustered: false, // Ensures that the columns overlap rather than cluster
+                                                                            tooltip: am5.Tooltip.new(root, {
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                            })
+                                                                        })
+                                                                    );
+                                                                    actualSeries.columns.template.setAll({ width: am5.percent(50), zIndex: 5 }); // Actual bars with lower zIndex than Plan line
+                                                                    actualSeries.data.setAll(
+                                                                        allDates.map((date, i) => ({ date: date, actual: fullFttData[i] }))
+                                                                    );
+
+                                                                    planSeries.bullets.push(function(root, series, dataItem) {
+                                                                    var actualValue = fullFttData[parseInt(dataItem.get("categoryX")) - 1];
+                                                                    var planValue = dataItem.get("valueY");
+
+                                                                    if (actualValue !== null && planValue !== null) {
+                                                                        var color = actualValue >= 98 ? am5.color(0x00ff00) : am5.color(0xff0000); // Green if Actual ≥ 98
+                                                                        return am5.Bullet.new(root, {
+                                                                            sprite: am5.Circle.new(root, {
+                                                                                strokeWidth: 2,
+                                                                                stroke: am5.color(0x000000),
+                                                                                radius: 5,
+                                                                                fill: color // Fill based on comparison to 98
+                                                                            })
+                                                                        });
                                                                     }
+                                                                    return null;
+                                                                });
+
+
+                                                                    // Add a cursor for interactivity
+                                                                    chart.set("cursor", am5xy.XYCursor.new(root, { behavior: "none", xAxis: xAxis, yAxis: yAxis }));
+
+                                                                    // Add legend
+                                                                    var legend = chart.children.push(am5.Legend.new(root, { centerX: am5.p50, x: am5.p50 }));
+                                                                    legend.data.setAll([planSeries, actualSeries]);
+
+                                                                    // Animate series on appear
+                                                                    planSeries.appear(1000);
+                                                                    actualSeries.appear(1000);
+                                                                    chart.appear(1000, 100);
                                                                 });
                                                             </script>
-
                                                         </div>
+
+
+
+
                                                     </div>
                                                 </div>
 
