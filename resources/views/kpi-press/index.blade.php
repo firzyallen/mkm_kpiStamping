@@ -131,39 +131,51 @@
                                                             </div>
                                                             <script>
                                                                 // Fetch the data from the backend and log it for debugging
-                                                                var hpuData = @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU'));
+                                                                var hpuData = @json($kpiData[$shop->shop_name]['hpu']);
                                                                 var hpuPlanData = @json($kpiData[$shop->shop_name]['hpu']->pluck('HPU_Plan'));
-                                                                console.log('HPU Data:', hpuData);
-                                                                console.log('HPU Plan Data:', hpuPlanData);
 
-                                                                // Check for any negative values
-                                                                var hasNegativeValues = hpuData.some(value => value < 0) || hpuPlanData.some(value => value < 0);
-                                                                if (hasNegativeValues) {
-                                                                    console.warn('There are negative values in the data.');
-                                                                }
+                                                                // Generate an array for all dates from 1 to 31
+                                                                var allDates = Array.from({ length: 31 }, (_, i) => i + 1);
+
+                                                                // Initialize arrays with nulls for HPU and Plan data
+                                                                var fullHpuData = Array(31).fill(null);
+                                                                var fullHpuPlanData = Array(31).fill(null);
+
+                                                                // Map actual data to the corresponding day
+                                                                hpuData.forEach(item => {
+                                                                    var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                    fullHpuData[day - 1] = item.HPU; // Assign HPU value to the corresponding day
+                                                                });
+
+                                                                hpuPlanData.forEach((value, index) => {
+                                                                    var day = parseInt(hpuData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                    fullHpuPlanData[day - 1] = value; // Assign HPU Plan value to the corresponding day
+                                                                });
+
+                                                                console.log('Full HPU Data:', fullHpuData);
+                                                                console.log('Full HPU Plan Data:', fullHpuPlanData);
 
                                                                 var ctxHpu = document.getElementById('barChartHpu-{{ $shop->id }}').getContext('2d');
                                                                 var hpuChart = new Chart(ctxHpu, {
                                                                     type: 'bar',
                                                                     data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
+                                                                        labels: allDates, // Show all dates from 1 to 31
+                                                                        datasets: [
+                                                                            {
                                                                                 label: 'Plan',
-                                                                                data: hpuPlanData,
+                                                                                data: fullHpuPlanData,
                                                                                 type: 'line',
                                                                                 backgroundColor: '#004355',
                                                                                 borderColor: '#3A7085',
                                                                                 fill: false,
-                                                                            }, {
+                                                                            },
+                                                                            {
                                                                                 label: 'Actual',
-                                                                                data: hpuData,
+                                                                                data: fullHpuData,
                                                                                 backgroundColor: '#A6CAD8',
                                                                                 borderColor: '#007A93',
                                                                                 borderWidth: 2
-                                                                            },
-
+                                                                            }
                                                                         ]
                                                                     },
                                                                     options: {
@@ -172,11 +184,11 @@
                                                                                 beginAtZero: true,
                                                                                 ticks: {
                                                                                     callback: function(value, index, values) {
-                                                                                        // Show labels for dates 1, 4, 8, 12, 16, 20, 24, 28
-                                                                                        return [1, 4, 8, 12, 16, 20, 24, 28].includes(value) ? value : '';
+                                                                                        // Show labels for dates 1, 4, 8, 12, 16, 20, 24, 28, but also return all dates if needed
+                                                                                        return allDates.includes(value + 1) ? value + 1 : '';
                                                                                     }
                                                                                 }
-                                                                            }, // diapus gpp ini si x biar labelnya ga muncul
+                                                                            },
                                                                             y: {
                                                                                 beginAtZero: true,
                                                                                 min: 0, // Force y-axis to start at 0
@@ -185,12 +197,7 @@
                                                                                     stepSize: 0.1, // Define step size for better readability
                                                                                     callback: function(value) {
                                                                                         return value.toFixed(1); // Ensure values are displayed as fixed-point
-                                                                                    },
-                                                                                    // Added line to force y-axis to start at 0
-                                                                                    beginAtZero: true,
-                                                                                    // Custom tick function to ignore negative values
-                                                                                    min: 0,
-                                                                                    max: 2
+                                                                                    }
                                                                                 },
                                                                                 title: {
                                                                                     display: true,
@@ -202,10 +209,10 @@
                                                                             tooltip: {
                                                                                 callbacks: {
                                                                                     title: function(tooltipItem) {
-                                                                                        return tooltipItem[0].label;
+                                                                                        return 'Day ' + tooltipItem[0].label; // Show day number in the tooltip
                                                                                     },
                                                                                     label: function(context) {
-                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                                                        return context.dataset.label + ': ' + (context.raw !== null ? context.raw.toFixed(2) : 'N/A');
                                                                                     }
                                                                                 }
                                                                             },
@@ -220,6 +227,7 @@
                                                                     }
                                                                 });
                                                             </script>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -258,28 +266,52 @@
                                                                     class="chart-custom"></canvas>
                                                             </div>
                                                             <script>
+                                                                // Fetch the Downtime data from the backend
+                                                                var downtimeData = @json($kpiData[$shop->shop_name]['downtime']);
+                                                                var downtimePlanData = @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan'));
+
+                                                                // Generate an array for all dates from 1 to 31
+                                                                var allDates = Array.from({ length: 31 }, (_, i) => i + 1);
+
+                                                                // Initialize arrays with nulls for Downtime and Plan data
+                                                                var fullDowntimeData = Array(31).fill(null);
+                                                                var fullDowntimePlanData = Array(31).fill(null);
+
+                                                                // Map actual data to the corresponding day
+                                                                downtimeData.forEach(item => {
+                                                                    var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                    fullDowntimeData[day - 1] = item.Downtime; // Assign Downtime value to the corresponding day
+                                                                });
+
+                                                                downtimePlanData.forEach((value, index) => {
+                                                                    var day = parseInt(downtimeData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                    fullDowntimePlanData[day - 1] = value; // Assign Downtime Plan value to the corresponding day
+                                                                });
+
+                                                                console.log('Full Downtime Data:', fullDowntimeData);
+                                                                console.log('Full Downtime Plan Data:', fullDowntimePlanData);
+
                                                                 var ctxDowntime = document.getElementById('barChartDowntime-{{ $shop->id }}').getContext('2d');
                                                                 var downtimeChart = new Chart(ctxDowntime, {
                                                                     type: 'bar',
                                                                     data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
+                                                                        labels: allDates, // Show all dates from 1 to 31
+                                                                        datasets: [
+                                                                            {
                                                                                 label: 'Plan',
-                                                                                data: @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime_Plan')),
+                                                                                data: fullDowntimePlanData,
                                                                                 type: 'line',
                                                                                 backgroundColor: '#004355',
                                                                                 borderColor: '#3A7085',
                                                                                 fill: false,
-                                                                            }, {
+                                                                            },
+                                                                            {
                                                                                 label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['downtime']->pluck('Downtime')),
+                                                                                data: fullDowntimeData,
                                                                                 backgroundColor: '#A6CAD8',
                                                                                 borderColor: '#007A93',
                                                                                 borderWidth: 2
-                                                                            },
-
+                                                                            }
                                                                         ]
                                                                     },
                                                                     options: {
@@ -288,21 +320,24 @@
                                                                                 beginAtZero: true,
                                                                                 ticks: {
                                                                                     callback: function(value, index, values) {
-                                                                                        // Show labels for dates 1, 4, 8, 12, 16, 20, 24, 28
-                                                                                        return [1, 4, 8, 12, 16, 20, 24, 28].includes(value) ? value : '';
+                                                                                        // Show all dates or selectively show labels (e.g., every 4th day)
+                                                                                        return allDates.includes(value + 1) ? value + 1 : '';
                                                                                     }
                                                                                 }
                                                                             },
                                                                             y: {
                                                                                 beginAtZero: true,
+                                                                                max: 100, // Set y-axis max to 100
                                                                                 ticks: {
                                                                                     steps: 10,
                                                                                     stepSize: 10,
-                                                                                    max: 100
+                                                                                    callback: function(value) {
+                                                                                        return value.toFixed(0); // Ensure values are displayed as whole numbers
+                                                                                    }
                                                                                 },
                                                                                 title: {
                                                                                     display: true,
-                                                                                    text: 'Downtime'
+                                                                                    text: 'Downtime (in minutes)' // Adjusted title for clarity
                                                                                 }
                                                                             }
                                                                         },
@@ -310,10 +345,10 @@
                                                                             tooltip: {
                                                                                 callbacks: {
                                                                                     title: function(tooltipItem) {
-                                                                                        return tooltipItem[0].label;
+                                                                                        return 'Day ' + tooltipItem[0].label; // Show the day in the tooltip
                                                                                     },
                                                                                     label: function(context) {
-                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                                                        return context.dataset.label + ': ' + (context.raw !== null ? context.raw.toFixed(2) : 'N/A');
                                                                                     }
                                                                                 }
                                                                             },
@@ -328,6 +363,7 @@
                                                                     }
                                                                 });
                                                             </script>
+
                                                         </div>
                                                     </div>
                                                 </div>
@@ -363,28 +399,52 @@
                                                                     class="chart-custom"></canvas>
                                                             </div>
                                                             <script>
+                                                                // Fetch the OTDP data from the backend
+                                                                var otdpData = @json($kpiData[$shop->shop_name]['otdp']);
+                                                                var otdpPlanData = @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan'));
+
+                                                                // Generate an array for all dates from 1 to 31
+                                                                var allDates = Array.from({ length: 31 }, (_, i) => i + 1);
+
+                                                                // Initialize arrays with nulls for OTDP and Plan data
+                                                                var fullOtdpData = Array(31).fill(null);
+                                                                var fullOtdpPlanData = Array(31).fill(null);
+
+                                                                // Map actual data to the corresponding day
+                                                                otdpData.forEach(item => {
+                                                                    var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                    fullOtdpData[day - 1] = item.OTDP; // Assign OTDP value to the corresponding day
+                                                                });
+
+                                                                otdpPlanData.forEach((value, index) => {
+                                                                    var day = parseInt(otdpData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                    fullOtdpPlanData[day - 1] = value; // Assign OTDP Plan value to the corresponding day
+                                                                });
+
+                                                                console.log('Full OTDP Data:', fullOtdpData);
+                                                                console.log('Full OTDP Plan Data:', fullOtdpPlanData);
+
                                                                 var ctxOtdp = document.getElementById('barChartOtdp-{{ $shop->id }}').getContext('2d');
                                                                 var otdpChart = new Chart(ctxOtdp, {
                                                                     type: 'bar',
                                                                     data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
+                                                                        labels: allDates, // Show all dates from 1 to 31
+                                                                        datasets: [
+                                                                            {
                                                                                 label: 'Plan',
-                                                                                data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP_Plan')),
+                                                                                data: fullOtdpPlanData,
                                                                                 type: 'line',
                                                                                 backgroundColor: '#004355',
                                                                                 borderColor: '#3A7085',
                                                                                 fill: false,
-                                                                            }, {
+                                                                            },
+                                                                            {
                                                                                 label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['otdp']->pluck('OTDP')),
+                                                                                data: fullOtdpData,
                                                                                 backgroundColor: '#A6CAD8',
                                                                                 borderColor: '#007A93',
                                                                                 borderWidth: 2
                                                                             }
-
                                                                         ]
                                                                     },
                                                                     options: {
@@ -393,24 +453,34 @@
                                                                                 beginAtZero: true,
                                                                                 ticks: {
                                                                                     callback: function(value, index, values) {
-                                                                                        // Show labels for dates 1, 4, 8, 12, 16, 20, 24, 28
-                                                                                        return [1, 4, 8, 12, 16, 20, 24, 28].includes(value) ? value : '';
+                                                                                        // Show all dates or selectively show labels (e.g., every 4th day)
+                                                                                        return allDates.includes(value + 1) ? value + 1 : '';
                                                                                     }
                                                                                 }
                                                                             },
                                                                             y: {
                                                                                 beginAtZero: true,
-                                                                                min: 0
+                                                                                min: 0,
+                                                                                ticks: {
+                                                                                    stepSize: 0.1,
+                                                                                    callback: function(value) {
+                                                                                        return value.toFixed(2); // Ensure values are displayed as fixed-point
+                                                                                    }
+                                                                                },
+                                                                                title: {
+                                                                                    display: true,
+                                                                                    text: 'OTDP'
+                                                                                }
                                                                             }
                                                                         },
                                                                         plugins: {
                                                                             tooltip: {
                                                                                 callbacks: {
                                                                                     title: function(tooltipItem) {
-                                                                                        return tooltipItem[0].label;
+                                                                                        return 'Day ' + tooltipItem[0].label; // Show the day in the tooltip
                                                                                     },
                                                                                     label: function(context) {
-                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                                                        return context.dataset.label + ': ' + (context.raw !== null ? context.raw.toFixed(2) : 'N/A');
                                                                                     }
                                                                                 }
                                                                             },
@@ -425,6 +495,7 @@
                                                                     }
                                                                 });
                                                             </script>
+
                                                         </div>
                                                     </div>
 
@@ -461,28 +532,52 @@
                                                                     class="chart-custom"></canvas>
                                                             </div>
                                                             <script>
+                                                                // Fetch the FTT data from the backend
+                                                                var fttData = @json($kpiData[$shop->shop_name]['ftt']);
+                                                                var fttPlanData = @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan'));
+
+                                                                // Generate an array for all dates from 1 to 31
+                                                                var allDates = Array.from({ length: 31 }, (_, i) => i + 1);
+
+                                                                // Initialize arrays with nulls for FTT and Plan data
+                                                                var fullFttData = Array(31).fill(null);
+                                                                var fullFttPlanData = Array(31).fill(null);
+
+                                                                // Map actual data to the corresponding day
+                                                                fttData.forEach(item => {
+                                                                    var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                    fullFttData[day - 1] = item.FTT; // Assign FTT value to the corresponding day
+                                                                });
+
+                                                                fttPlanData.forEach((value, index) => {
+                                                                    var day = parseInt(fttData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
+                                                                    fullFttPlanData[day - 1] = value; // Assign FTT Plan value to the corresponding day
+                                                                });
+
+                                                                console.log('Full FTT Data:', fullFttData);
+                                                                console.log('Full FTT Plan Data:', fullFttPlanData);
+
                                                                 var ctxFtt = document.getElementById('barChartFtt-{{ $shop->id }}').getContext('2d');
                                                                 var fttChart = new Chart(ctxFtt, {
                                                                     type: 'bar',
                                                                     data: {
-                                                                        labels: Array.from({
-                                                                            length: 31
-                                                                        }, (_, i) => i + 1), // Generate array [1, 2, ..., 31]
-                                                                        datasets: [{
+                                                                        labels: allDates, // Show all dates from 1 to 31
+                                                                        datasets: [
+                                                                            {
                                                                                 label: 'Plan',
-                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT_Plan')),
+                                                                                data: fullFttPlanData,
                                                                                 type: 'line',
                                                                                 backgroundColor: '#004355',
                                                                                 borderColor: '#3A7085',
                                                                                 fill: false,
-                                                                            }, {
+                                                                            },
+                                                                            {
                                                                                 label: 'Actual',
-                                                                                data: @json($kpiData[$shop->shop_name]['ftt']->pluck('FTT')),
+                                                                                data: fullFttData,
                                                                                 backgroundColor: '#A6CAD8',
                                                                                 borderColor: '#007A93',
                                                                                 borderWidth: 2
-                                                                            },
-
+                                                                            }
                                                                         ]
                                                                     },
                                                                     options: {
@@ -491,17 +586,20 @@
                                                                                 beginAtZero: true,
                                                                                 ticks: {
                                                                                     callback: function(value, index, values) {
-                                                                                        // Show labels for dates 1, 4, 8, 12, 16, 20, 24, 28
-                                                                                        return [1, 4, 8, 12, 16, 20, 24, 28].includes(value) ? value : '';
+                                                                                        // Show all dates or selectively show labels (e.g., every 4th day)
+                                                                                        return allDates.includes(value + 1) ? value + 1 : '';
                                                                                     }
                                                                                 }
                                                                             },
                                                                             y: {
                                                                                 beginAtZero: true,
+                                                                                max: 100, // Set y-axis max to 100
                                                                                 ticks: {
                                                                                     steps: 10,
                                                                                     stepSize: 10,
-                                                                                    max: 100
+                                                                                    callback: function(value) {
+                                                                                        return value.toFixed(0); // Ensure values are displayed as whole numbers
+                                                                                    }
                                                                                 },
                                                                                 title: {
                                                                                     display: true,
@@ -513,10 +611,10 @@
                                                                             tooltip: {
                                                                                 callbacks: {
                                                                                     title: function(tooltipItem) {
-                                                                                        return tooltipItem[0].label;
+                                                                                        return 'Day ' + tooltipItem[0].label; // Show the day in the tooltip
                                                                                     },
                                                                                     label: function(context) {
-                                                                                        return context.dataset.label + ': ' + context.raw.toFixed(2);
+                                                                                        return context.dataset.label + ': ' + (context.raw !== null ? context.raw.toFixed(2) : 'N/A');
                                                                                     }
                                                                                 }
                                                                             },
@@ -531,6 +629,7 @@
                                                                     }
                                                                 });
                                                             </script>
+
                                                         </div>
                                                     </div>
                                                 </div>
