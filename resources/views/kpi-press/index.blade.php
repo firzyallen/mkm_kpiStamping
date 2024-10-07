@@ -235,23 +235,27 @@
                                                                         allDates.map((date, i) => ({ date: date, actual: fullHpuData[i] }))
                                                                     );
 
-                                                                    planSeries.bullets.push(function(root, series, dataItem) {
-                                                                    var actualValue = fullHpuData[parseInt(dataItem.get("categoryX")) - 1];
-                                                                    var planValue = dataItem.get("valueY");
+                                                                    // Add bullets (dots) for matching dates with both Plan and Actual
+planSeries.bullets.push(function(root, series, dataItem) {
+    var actualValue = fullHpuData[parseInt(dataItem.get("categoryX")) - 1];
+    var planValue = dataItem.get("valueY");
 
-                                                                    if (actualValue !== null && planValue !== null) {
-                                                                        var color = actualValue >= planValue ? am5.color(0x00ff00) : am5.color(0xff0000); // Green if Actual ≥ Plan
-                                                                        return am5.Bullet.new(root, {
-                                                                            sprite: am5.Circle.new(root, {
-                                                                                strokeWidth: 2,
-                                                                                stroke: am5.color(0x000000),
-                                                                                radius: 5,
-                                                                                fill: color // Fill based on comparison
-                                                                            })
-                                                                        });
-                                                                    }
-                                                                    return null;
-                                                                });
+    if (actualValue !== null && planValue !== null) {
+        var color = actualValue < planValue ? am5.color(0xff0000) : am5.color(0x00ff00); // Red if Actual ≥ Plan, Green otherwise
+
+        return am5.Bullet.new(root, {
+            sprite: am5.Circle.new(root, {
+                strokeWidth: 2,
+                stroke: am5.color(0x000000),
+                radius: 5,
+                fill: color
+            })
+        });
+    }
+    return null;
+});
+
+
 
 
                                                                     // Add a cursor for interactivity
@@ -438,7 +442,8 @@
                                                                         var planValue = dataItem.get("valueY");
 
                                                                         if (actualValue !== null && planValue !== null) {
-                                                                            var color = actualValue >= planValue ? am5.color(0x00ff00) : am5.color(0xff0000); // Green if Actual ≥ Plan
+                                                                            var color = actualValue < planValue ? am5.color(0xff0000) : am5.color(0x00ff00); // Red if Actual < Plan, Green if Actual ≥ Plan
+
                                                                             return am5.Bullet.new(root, {
                                                                                 sprite: am5.Circle.new(root, {
                                                                                     strokeWidth: 2,
@@ -629,24 +634,33 @@
                                                                         allDates.map((date, i) => ({ date: date, actual: fullOtdpData[i] }))
                                                                     );
 
-                                                                    planSeries.bullets.push(function(root, series, dataItem) {
-                                                                    var actualValue = fullOtdpData[parseInt(dataItem.get("categoryX")) - 1];
-                                                                    var planValue = dataItem.get("valueY");
-                                                                    var threshold = 98; // Set OTDP threshold
+                                                                    // Add bullets (dots) for matching dates with both Plan and Actual
+                                                                        planSeries.bullets.push(function(root, series, dataItem) {
+                                                                            var actualValue = fullOtdpData[parseInt(dataItem.get("categoryX")) - 1];
+                                                                            var planValue = dataItem.get("valueY");
+                                                                            var threshold = 98; // Set OTDP threshold
 
-                                                                    if (actualValue !== null && planValue !== null) {
-                                                                        var color = actualValue >= threshold ? am5.color(0x00ff00) : am5.color(0xff0000); // Green if Actual ≥ 98
-                                                                        return am5.Bullet.new(root, {
-                                                                            sprite: am5.Circle.new(root, {
-                                                                                strokeWidth: 2,
-                                                                                stroke: am5.color(0x000000),
-                                                                                radius: 5,
-                                                                                fill: color // Fill based on comparison to threshold
-                                                                            })
+                                                                            if (actualValue !== null && planValue !== null) {
+                                                                                var color = actualValue < threshold ? am5.color(0xff0000) : am5.color(0x00ff00); // Red if Actual < Threshold, Green if Actual >= Threshold
+
+                                                                                return am5.Bullet.new(root, {
+                                                                                    sprite: am5.Circle.new(root, {
+                                                                                        strokeWidth: 2,
+                                                                                        stroke: am5.color(0x000000),
+                                                                                        radius: 5,
+                                                                                        fill: color
+                                                                                    })
+                                                                                });
+                                                                            }
+                                                                            return null;
                                                                         });
-                                                                    }
-                                                                    return null;
-                                                                });
+
+                                                                        // Ensure the default legend fill color is green
+                                                                        planSeries.strokes.template.setAll({
+                                                                            stroke: am5.color(0x00ff00), // Green stroke for the Plan series
+                                                                            strokeWidth: 6
+                                                                        });
+
 
 
                                                                     // Add a cursor for interactivity
@@ -825,23 +839,26 @@
                                                                         allDates.map((date, i) => ({ date: date, actual: fullFttData[i] }))
                                                                     );
 
-                                                                    planSeries.bullets.push(function(root, series, dataItem) {
-                                                                    var actualValue = fullFttData[parseInt(dataItem.get("categoryX")) - 1];
-                                                                    var planValue = dataItem.get("valueY");
+                                                                    // Add bullets (dots) for matching dates with both Plan and Actual
+planSeries.bullets.push(function(root, series, dataItem) {
+    var actualValue = fullFttData[parseInt(dataItem.get("categoryX")) - 1];
+    var planValue = dataItem.get("valueY");
 
-                                                                    if (actualValue !== null && planValue !== null) {
-                                                                        var color = actualValue >= 98 ? am5.color(0x00ff00) : am5.color(0xff0000); // Green if Actual ≥ 98
-                                                                        return am5.Bullet.new(root, {
-                                                                            sprite: am5.Circle.new(root, {
-                                                                                strokeWidth: 2,
-                                                                                stroke: am5.color(0x000000),
-                                                                                radius: 5,
-                                                                                fill: color // Fill based on comparison to 98
-                                                                            })
-                                                                        });
-                                                                    }
-                                                                    return null;
-                                                                });
+    if (actualValue !== null && planValue !== null) {
+        var color = actualValue < 98 ? am5.color(0xff0000) : am5.color(0x00ff00); // Green if Actual ≥ 98
+        return am5.Bullet.new(root, {
+            sprite: am5.Circle.new(root, {
+                strokeWidth: 2,
+                stroke: am5.color(0x000000),
+                radius: 5,
+                fill: color
+            })
+        });
+    }
+    return null;
+});
+
+
 
 
                                                                     // Add a cursor for interactivity
