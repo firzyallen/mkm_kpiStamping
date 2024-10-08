@@ -79,11 +79,25 @@ class PressKPIController extends Controller
             $kpiStatuses[$shop->shop_name]['otdp'] = $this->computeKpiOTDPStatus($otdpData->whereBetween('date', [$startDate, $endDate]));
             $kpiStatuses[$shop->shop_name]['ftt'] = $this->computeKpiFTTStatus($fttData->whereBetween('date', [$startDate, $endDate]));
             $kpiStatuses[$shop->shop_name]['downtime'] = $this->computeKpiDowntimeStatus($downtimeData->whereBetween('date', [$startDate, $endDate]));
+            $kpiData[$shop->shop_name]['hpu']->transform(function ($item) {
+                $item->header_id = encrypt($item->header_id); // Encrypt the header_id
+                return $item;
+            });
+            $kpiData[$shop->shop_name]['otdp']->transform(function ($item) {
+                $item->header_id = encrypt($item->header_id); // Encrypt the header_id
+                return $item;
+            });
+            $kpiData[$shop->shop_name]['ftt']->transform(function ($item) {
+                $item->header_id = encrypt($item->header_id); // Encrypt the header_id
+                return $item;
+            });
+
         }
         $shopDetails = PressShopDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
         $ngDetails = PressNgDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
         $downtimeDetails = PressDowntimeDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
         $monthName = Carbon::createFromDate(null, $currentMonth)->format('F');
+
 /* dd($shops,$kpiData,$shopDetails,$kpiStatuses,$ngDetails,$monthName,$currentYear,$currentMonth,$downtimeDetails,$previousDay,$startDate,$endDate); */
         return view('kpi-press.index', compact('shops', 'kpiData', 'shopDetails', 'kpiStatuses', 'ngDetails', 'monthName', 'currentYear', 'currentMonth', 'downtimeDetails', 'previousDay', 'startDate', 'endDate'));
     }
