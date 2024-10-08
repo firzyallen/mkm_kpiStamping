@@ -443,7 +443,7 @@
                                                                             categoryXField: "date",
                                                                             stroke: am5.color("#004355"),
                                                                             tooltip: am5.Tooltip.new(root, {
-                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}%" // Format to 3 decimal places
                                                                             })
                                                                         })
                                                                     );
@@ -464,7 +464,7 @@
                                                                             stroke: am5.color("#007A93"),
                                                                             clustered: false, // Ensures that the columns overlap rather than cluster
                                                                             tooltip: am5.Tooltip.new(root, {
-                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}%" // Format to 3 decimal places
                                                                             })
                                                                         })
                                                                     );
@@ -637,7 +637,7 @@
                                                                             categoryXField: "date",
                                                                             stroke: am5.color("#004355"),
                                                                             tooltip: am5.Tooltip.new(root, {
-                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}%" // Format to 3 decimal places
                                                                             })
                                                                         })
                                                                     );
@@ -658,7 +658,7 @@
                                                                             stroke: am5.color("#007A93"),
                                                                             clustered: false, // Ensures that the columns overlap rather than cluster
                                                                             tooltip: am5.Tooltip.new(root, {
-                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}%" // Format to 3 decimal places
                                                                             })
                                                                         })
                                                                     );
@@ -866,7 +866,7 @@
                                                                             categoryXField: "date",
                                                                             stroke: am5.color("#004355"),
                                                                             tooltip: am5.Tooltip.new(root, {
-                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}%" // Format to 3 decimal places
                                                                             })
                                                                         })
                                                                     );
@@ -887,7 +887,7 @@
                                                                             stroke: am5.color("#007A93"),
                                                                             clustered: false, // Ensures that the columns overlap rather than cluster
                                                                             tooltip: am5.Tooltip.new(root, {
-                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}" // Format to 3 decimal places
+                                                                                labelText: "{name}: {valueY.formatNumber('#.###')}%" // Format to 3 decimal places
                                                                             })
                                                                         })
                                                                     );
