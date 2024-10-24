@@ -118,6 +118,14 @@ class DowntimeFormController extends Controller
 
                 $detailId = $details->id;
 
+                // Sanitize percentage input
+                $percentage = $request->percentage[$index] ?? null;
+                if (!is_null($percentage)) {
+                    // Remove percentage symbol if present and convert to float
+                    $percentage = str_replace('%', '', $percentage);
+                    $percentage = (float)$percentage; // Ensure it's a float
+                }
+
                 // Create actual record
                 DowntimeFormActual::create([
                     'details_id' => $detailId,
@@ -132,7 +140,7 @@ class DowntimeFormController extends Controller
                     'start_time' => $request->start_time[$index],
                     'end_time' => $request->end_time[$index] ?? null,
                     'balance' => $request->balance[$index] ?? null,
-                    'percentage' => $request->percentage[$index] ?? null,
+                    'percentage' => $percentage, // Insert sanitized percentage
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
@@ -145,6 +153,7 @@ class DowntimeFormController extends Controller
             return redirect('/downtime-report')->with('failed', 'Failed to save downtime report. Please try again. Error: ' . $e->getMessage());
         }
     }
+
 
     /**
      * Display the specified downtime report.
