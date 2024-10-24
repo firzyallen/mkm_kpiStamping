@@ -46,11 +46,30 @@ class FormPressController extends Controller
             ->where('shift', $request->shift)
             ->first();
 
+        // If the record exists, handle the PIC field logic
         if ($existingHeader) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Daily Report for this date and shift already exists.']);
+            // Split existing PICs into an array
+            $existingPics = explode(',', $existingHeader->pic);
+
+            // Split new PIC input into an array (in case user inputs multiple)
+            $newPics = explode(',', $request->pic);
+
+            // Filter out new PICs that already exist in the existing list
+            $picsToAdd = array_diff($newPics, $existingPics);
+
+            // If there are new PICs to add, append them to the existing list
+            if (!empty($picsToAdd)) {
+                $existingHeader->pic = implode(',', array_merge($existingPics, $picsToAdd));
+                $existingHeader->save(); // Save the updated record
+            }
+
+            // Redirect to the existing report with the updated PICs
+            $encryptedId = encrypt($existingHeader->id);
+            return redirect()->route('form.daily-report.press', ['id' => $encryptedId])
+                ->with('status', 'Daily Report header already exists. PIC updated if necessary.');
         }
 
-        // Create a new instance of the PressActualHeader model
+        // If it does not exist, create a new instance of the PressActualHeader model
         $header = new PressActualHeader();
         $header->date = $request->date;
         $header->shift = $request->shift;
@@ -61,10 +80,12 @@ class FormPressController extends Controller
         // Save the new PressActualHeader record to the database
         $header->save();
 
-        // Redirect back or return a response as needed
+        // Redirect with the newly created record's encrypted ID
         $encryptedId = encrypt($header->id);
-        return redirect()->route('form.daily-report.press', ['id' => $encryptedId])->with('status', 'Daily Report header created successfully.');
+        return redirect()->route('form.daily-report.press', ['id' => $encryptedId])
+            ->with('status', 'Daily Report header created successfully.');
     }
+
 
     /**
      * Show the form for creating a new press daily report.
@@ -123,26 +144,45 @@ class FormPressController extends Controller
             Log::info("Manpower: " . print_r($request->manpower[$shop], true));
             Log::info("Production data: " . print_r($request->production[$shop], true));
 
-            $imgPath = null;
+            $shopId = PressMstShop::where('shop_name', $shop)->value('id');
+
+            // Check if the detail record for the shop and header already exists
+            $detail = PressActualFormDetail::where('header_id', $headerId)
+                ->where('shop_id', $shopId)
+                ->first();
+
+            $imgPath = $detail->photo_shop ?? null; // Retain the existing image path if no new image is uploaded
             if ($request->hasFile("photo_shop.$shop.0")) {
                 $file = $request->file("photo_shop.$shop.0");
                 $fileName = uniqid() . '_' . $file->getClientOriginalName();
                 $destinationPath = public_path('assets/img/photo_shop/press/shop/');
                 $file->move($destinationPath, $fileName);
-                $imgPath = 'assets/img/photo_shop/press/shop/' . $fileName;
+                $imgPath = 'assets/img/photo_shop/press/shop/' . $fileName; // Update image path only when a new image is uploaded
             }
 
-            $shopId = PressMstShop::where('shop_name', $shop)->value('id');
-
-            $detail = PressActualFormDetail::create([
-                'header_id' => $headerId,
-                'shop_id' => $shopId,
-                'manpower' => $request->manpower[$shop][0],
-                'manpower_plan' => $request->manpower_plan[$shop][0],
-                'working_hour' => $request->working_hour[$shop][0],
-                'notes' => $request->notes[$shop][0] ?? null,
-                'photo_shop' => $imgPath,
-            ]);
+            if ($detail) {
+                // Update the existing detail record
+                $detail->manpower = $request->manpower[$shop][0];
+                $detail->manpower_plan = $request->manpower_plan[$shop][0];
+                $detail->working_hour = $request->working_hour[$shop][0];
+                $detail->notes = $request->notes[$shop][0] ?? null;
+                $detail->photo_shop = $imgPath;
+                $detail->updated_at = now();
+                $detail->save();
+            } else {
+                // Create a new detail record if not already present
+                $detail = PressActualFormDetail::create([
+                    'header_id' => $headerId,
+                    'shop_id' => $shopId,
+                    'manpower' => $request->manpower[$shop][0],
+                    'manpower_plan' => $request->manpower_plan[$shop][0],
+                    'working_hour' => $request->working_hour[$shop][0],
+                    'notes' => $request->notes[$shop][0] ?? null,
+                    'photo_shop' => $imgPath,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
             $detailId = $detail->id;
 
@@ -152,6 +192,7 @@ class FormPressController extends Controller
                 continue; // Skip to the next shop
             }
 
+            // Process production data
             foreach ($request->production[$shop]['model'] as $index => $model) {
                 $imgPathNG = null;
                 if ($request->hasFile("ng.$shop.photo_ng.$index")) {
@@ -163,33 +204,42 @@ class FormPressController extends Controller
                 }
                 $modelId = PressMstModel::where('model_name', $model)->value('id');
 
-                $productionId = PressActualFormProduction::create([
-                    'details_id' => $detailId,
-                    'model_id' => $modelId,
-                    'prod_process' => $request->production[$shop]['production_process'][$index],
-                    'status' => $request->production[$shop]['status'][$index],
-                    'type' => $request->production[$shop]['type'][$index],
-                    'inc_material' => is_numeric($request->production[$shop]['inc_material'][$index]) ? $request->production[$shop]['inc_material'][$index] : null, // Cast or set as null
-                    'machine' => $request->production[$shop]['machine'][$index] ?? 0,
-                    'setting' => $request->production[$shop]['setting'][$index] ?? 0,
-                    'hour_from' => $request->production[$shop]['hour_from'][$index] ?? null,
-                    'hour_to' => $request->production[$shop]['hour_to'][$index] ?? null,
-                    'plan_prod' => $request->production[$shop]['plan_prod'][$index] ?? 0,
-                    'OK' => $request->production[$shop]['OK'][$index] ?? 0,
-                    'manpower' => $request->production[$shop]['manpower'][$index] ?? 0,
-                ])->id;
+                // Update or create production record
+                $production = PressActualFormProduction::updateOrCreate(
+                    [
+                        'details_id' => $detailId,
+                        'model_id' => $modelId,
+                    ],
+                    [
+                        'prod_process' => $request->production[$shop]['production_process'][$index],
+                        'status' => $request->production[$shop]['status'][$index],
+                        'type' => $request->production[$shop]['type'][$index],
+                        'inc_material' => is_numeric($request->production[$shop]['inc_material'][$index]) ? $request->production[$shop]['inc_material'][$index] : null, // Cast or set as null
+                        'machine' => $request->production[$shop]['machine'][$index] ?? 0,
+                        'setting' => $request->production[$shop]['setting'][$index] ?? 0,
+                        'hour_from' => $request->production[$shop]['hour_from'][$index] ?? null,
+                        'hour_to' => $request->production[$shop]['hour_to'][$index] ?? null,
+                        'plan_prod' => $request->production[$shop]['plan_prod'][$index] ?? 0,
+                        'OK' => $request->production[$shop]['OK'][$index] ?? 0,
+                        'manpower' => $request->production[$shop]['manpower'][$index] ?? 0,
+                    ]
+                );
 
-
-                PressActualFormNg::create([
-                    'production_id' => $productionId,
-                    'model_id' => $modelId,
-                    'OK' => $request->production[$shop]['OK'][$index] ?? 0,
-                    'rework' => $request->ng[$shop]['rework'][$index] ?? 0,
-                    'dmg_part' => $request->ng[$shop]['dmg_part'][$index] ?? 0,
-                    'dmg_rm' => $request->ng[$shop]['dmg_rm'][$index] ?? 0,
-                    'remarks' => $request->ng[$shop]['remarks'][$index] ?? null,
-                    'photo_ng' => $imgPathNG,
-                ]);
+                // Update or create NG record
+                PressActualFormNg::updateOrCreate(
+                    [
+                        'production_id' => $production->id,
+                        'model_id' => $modelId,
+                    ],
+                    [
+                        'OK' => $request->production[$shop]['OK'][$index] ?? 0,
+                        'rework' => $request->ng[$shop]['rework'][$index] ?? 0,
+                        'dmg_part' => $request->ng[$shop]['dmg_part'][$index] ?? 0,
+                        'dmg_rm' => $request->ng[$shop]['dmg_rm'][$index] ?? 0,
+                        'remarks' => $request->ng[$shop]['remarks'][$index] ?? null,
+                        'photo_ng' => $imgPathNG,
+                    ]
+                );
             }
         }
 
@@ -201,6 +251,7 @@ class FormPressController extends Controller
         return redirect('/daily-report/press')->with('failed', 'Failed to save daily report data. Please try again. Error: ' . $e->getMessage());
     }
 }
+
 
 
     /**
