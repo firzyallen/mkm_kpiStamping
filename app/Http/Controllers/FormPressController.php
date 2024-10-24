@@ -48,19 +48,22 @@ class FormPressController extends Controller
 
         // If the record exists, handle the PIC field logic
         if ($existingHeader) {
-            // Split existing PICs into an array
-            $existingPics = explode(',', $existingHeader->pic);
+            // Split existing PICs into an array, trimming whitespace and removing empty values
+            $existingPics = array_filter(array_map('trim', explode(',', $existingHeader->pic)));
 
-            // Split new PIC input into an array (in case user inputs multiple)
-            $newPics = explode(',', $request->pic);
+            // Split new PIC input into an array, trimming whitespace and removing empty values
+            $newPics = array_filter(array_map('trim', explode(',', $request->pic)));
 
             // Filter out new PICs that already exist in the existing list
             $picsToAdd = array_diff($newPics, $existingPics);
 
             // If there are new PICs to add, append them to the existing list
             if (!empty($picsToAdd)) {
+                // Merge existing PICs with the new ones to add, and then implode back into a string
                 $existingHeader->pic = implode(',', array_merge($existingPics, $picsToAdd));
-                $existingHeader->save(); // Save the updated record
+
+                // Save the updated record in the database
+                $existingHeader->save();
             }
 
             // Redirect to the existing report with the updated PICs
