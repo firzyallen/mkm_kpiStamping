@@ -478,7 +478,7 @@
                                                                         var planValue = dataItem.get("valueY");
 
                                                                         if (actualValue !== null && planValue !== null) {
-                                                                            var color = actualValue < planValue ? am5.color(0xff0000) : am5.color(0x00ff00); // Red if Actual < Plan, Green if Actual ≥ Plan
+                                                                            var color = actualValue > planValue ? am5.color(0xff0000) : am5.color(0x00ff00); // Red if Actual < Plan, Green if Actual ≥ Plan
 
                                                                             return am5.Bullet.new(root, {
                                                                                 sprite: am5.Circle.new(root, {
