@@ -63,6 +63,7 @@
         <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline"></script>
         <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
 
     </head>
