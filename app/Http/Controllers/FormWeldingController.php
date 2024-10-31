@@ -110,24 +110,42 @@ class FormWeldingController extends Controller
     }
 
     public function storeForm(Request $request)
-    {
-        DB::beginTransaction();
+{
+    DB::beginTransaction();
 
-        try {
-            $headerId = $request->id;
+    try {
+        $headerId = $request->id;
 
-            // Insert data into welding_actual_details table
-            foreach ($request->shop as $shop) {
-                $imgPath = null;
-                if ($request->hasFile("photo_shop.$shop.0")) {
-                    $file = $request->file("photo_shop.$shop.0");
-                    $fileName = uniqid() . '_' . $file->getClientOriginalName();
-                    $destinationPath = public_path('assets/img/photo_shop/welding/shop/');
-                    $file->move($destinationPath, $fileName);
-                    $imgPath = 'assets/img/photo_shop/welding/shop/' . $fileName;
-                }
-                $shopId = WeldingMstShop::where('shop_name', $shop)->value('id');
+        // Insert or update data into welding_actual_details table
+        foreach ($request->shop as $shop) {
+            $imgPath = null;
+            if ($request->hasFile("photo_shop.$shop.0")) {
+                $file = $request->file("photo_shop.$shop.0");
+                $fileName = uniqid() . '_' . $file->getClientOriginalName();
+                $destinationPath = public_path('assets/img/photo_shop/welding/shop/');
+                $file->move($destinationPath, $fileName);
+                $imgPath = 'assets/img/photo_shop/welding/shop/' . $fileName;
+            }
+            $shopId = WeldingMstShop::where('shop_name', $shop)->value('id');
 
+            // Check if detail record already exists
+            $detail = WeldingActualDetail::where('header_id', $headerId)
+                ->where('shop_id', $shopId)
+                ->first();
+
+            if ($detail) {
+                // Update existing record
+                $detail->update([
+                    'manpower' => $request->manpower[$shop][0] ?? 0,
+                    'manpower_plan' => $request->manpower_plan[$shop][0] ?? 0,
+                    'working_hour' => $request->working_hour[$shop][0] ?? 0,
+                    'ot_hour' => $request->ot_hour[$shop][0] ?? 0,
+                    'ot_hour_plan' => $request->ot_hour_plan[$shop][0] ?? 0,
+                    'notes' => $request->notes[$shop][0] ?? null,
+                    'photo_shop' => $imgPath ?? $detail->photo_shop,
+                ]);
+            } else {
+                // Create new detail record if not found
                 $detail = WeldingActualDetail::create([
                     'header_id' => $headerId,
                     'shop_id' => $shopId,
@@ -138,101 +156,106 @@ class FormWeldingController extends Controller
                     'ot_hour_plan' => $request->ot_hour_plan[$shop][0] ?? 0,
                     'notes' => $request->notes[$shop][0] ?? null,
                     'photo_shop' => $imgPath,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
+            }
 
-                $detailId = $detail->id;
+            $detailId = $detail->id;
 
-                // Retrieve all stations for the current shop
-                $stations = WeldingMstStation::where('shop_id', $shopId)->get();
+            // Process stations for the current shop
+            $stations = WeldingMstStation::where('shop_id', $shopId)->get();
+            foreach ($stations as $station) {
+                $stationName = $station->station_name;
 
-                foreach ($stations as $station) {
-                    $stationName = $station->station_name;
+                // Check if station manpower data is provided
+                if (!isset($request->manpower_station[$stationName])) {
+                    throw new \Exception('Manpower data is missing for station: ' . $stationName);
+                }
 
-                    if (!isset($request->manpower_station[$stationName])) {
-                        throw new \Exception('Manpower data is missing for station: ' . $stationName);
-                    }
-
-                    $stationDetail = WeldingActualStationDetail::create([
+                // Update or create station detail record
+                $stationDetail = WeldingActualStationDetail::updateOrCreate(
+                    [
                         'details_id' => $detailId,
                         'station_id' => $station->id,
+                    ],
+                    [
                         'manpower_station' => $request->manpower_station[$stationName] ?? 0,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                    ]
+                );
 
-                    $stationDetailId = $stationDetail->id;
+                $stationDetailId = $stationDetail->id;
 
-                    // Ensure production data is available for the station
-                    if (!isset($request->production)) {
-                        throw new \Exception('Production data is missing for station: ' . $stationName);
-                    }
-                    $imgPathNG = [];
-                    foreach ($request->production as $modelName => $production) {
+                // Check if production data exists for this station
+                if (!isset($request->production)) {
+                    throw new \Exception('Production data is missing for station: ' . $stationName);
+                }
 
-                        $output8 = $production['output8'][0] ?? 0;
-                        $output2 = $production['output2'][0] ?? 0;
-                        $output1 = $production['output1'][0] ?? 0;
-                        $total_prod = $output8 + $output2 + $output1;
+                foreach ($request->production as $modelName => $production) {
+                    // Compute production and plan values
+                    $output8 = $production['output8'][0] ?? 0;
+                    $output2 = $production['output2'][0] ?? 0;
+                    $output1 = $production['output1'][0] ?? 0;
+                    $total_prod = $output8 + $output2 + $output1;
+                    $plan_prod = $production['plan_prod'][0] ?? $total_prod;
 
-                        $plan_prod = $production['plan_prod'][0] ?? $total_prod;
-                        if ($plan_prod == 0) {
-                            $plan_prod = $total_prod;
-                        }
-                        $modelId = WeldingMstModel::where('model_name', $modelName)->value('id');
-                        $modelStationId = WeldingMstModel::where('model_name', $modelName)->value('station_id');
+                    $modelId = WeldingMstModel::where('model_name', $modelName)->value('id');
+                    $modelStationId = WeldingMstModel::where('model_name', $modelName)->value('station_id');
 
-                        if ($modelStationId == $station->id) {
-                            $productionRecord = WeldingActualFormProduction::create([
+                    // Check if model belongs to the current station
+                    if ($modelStationId == $station->id) {
+                        $productionRecord = WeldingActualFormProduction::updateOrCreate(
+                            [
                                 'station_details_id' => $stationDetailId,
                                 'model_id' => $modelId,
+                            ],
+                            [
                                 'hour' => $production['hour'][0] ?? null,
-                                'output8' => $production['output8'][0] ?? null,
-                                'output2' => $production['output2'][0] ?? null,
-                                'output1' => $production['output1'][0] ?? null,
+                                'output8' => $output8,
+                                'output2' => $output2,
+                                'output1' => $output1,
                                 'plan_prod' => $plan_prod,
                                 'cabin' => $production['cabin'][0] ?? null,
                                 'PPM' => $production['PPM'][0] ?? null,
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ]);
+                            ]
+                        );
 
-                            // Insert NG data into welding_actual_form_ngs table
-                            $imgPathNG = [];
-                            if ($request->hasFile("photo_ng.$modelName.0")) {
-                                foreach ($request->photo_ng[$modelName] as $ngFile) {
-                                    if ($ngFile) {
-                                        $ngFileName = uniqid() . '_' . $ngFile->getClientOriginalName();
-                                        $ngDestinationPath = public_path('assets/img/photo_shop/welding/ng/');
-                                        $ngFile->move($ngDestinationPath, $ngFileName);
-                                        $imgPathNG[] = 'assets/img/photo_shop/welding/ng/' . $ngFileName;
-                                    }
+                        // Handle NG data
+                        $imgPathNG = [];
+                        if ($request->hasFile("photo_ng.$modelName.0")) {
+                            foreach ($request->photo_ng[$modelName] as $ngFile) {
+                                if ($ngFile) {
+                                    $ngFileName = uniqid() . '_' . $ngFile->getClientOriginalName();
+                                    $ngDestinationPath = public_path('assets/img/photo_shop/welding/ng/');
+                                    $ngFile->move($ngDestinationPath, $ngFileName);
+                                    $imgPathNG[] = 'assets/img/photo_shop/welding/ng/' . $ngFileName;
                                 }
                             }
-                            WeldingActualFormNg::create([
+                        }
+
+                        WeldingActualFormNg::updateOrCreate(
+                            [
                                 'production_id' => $productionRecord->id,
-                                'total_prod' => ($production['output8'][0] ?? 0) + ($production['output2'][0] ?? 0) + ($production['output1'][0] ?? 0),
+                            ],
+                            [
+                                'total_prod' => $total_prod,
                                 'reject' => $production['reject'][0] ?? null,
                                 'rework' => $production['rework'][0] ?? null,
                                 'remarks' => $production['remarks'][0] ?? null,
                                 'photo_ng' => json_encode($imgPathNG),
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ]);
-                        }
+                            ]
+                        );
                     }
                 }
             }
-
-            DB::commit();
-            return redirect('/daily-report/welding')->with('status', 'Daily report data saved successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            dd($e->getMessage());
-            return redirect()->back()->withInput()->withErrors(['failed' => 'Failed to save daily report data. Please try again. Error: ' . $e->getMessage()]);
         }
+
+        DB::commit();
+        return redirect('/daily-report/welding')->with('status', 'Daily report data saved successfully.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->withInput()->withErrors(['failed' => 'Failed to save daily report data. Please try again. Error: ' . $e->getMessage()]);
     }
+}
+
 
     public function showDetail($id)
     {

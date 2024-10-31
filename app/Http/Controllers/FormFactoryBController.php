@@ -97,7 +97,7 @@ class FormFactoryBController extends Controller
         try {
             $headerId = $request->id;
 
-            // Insert data into factb_actual_details table
+            // Insert or update data into factb_actual_details table
             foreach ($request->shop as $shop) {
                 $imgPath = null;
                 if ($request->hasFile("photo_shop.$shop.0")) {
@@ -109,35 +109,36 @@ class FormFactoryBController extends Controller
                 }
                 $shopId = FactbMstShop::where('shop_name', $shop)->value('id');
 
-                $detail = FactbActualDetail::create([
-                    'header_id' => $headerId,
-                    'shop_id' => $shopId,
-                    'manpower' => $request->manpower[$shop][0],
-                    'manpower_plan' => $request->manpower_plan[$shop][0],
-                    'working_hour' => $request->working_hour[$shop][0],
-                    'ot_hour' => $request->ot_hour[$shop][0],
-                    'ot_hour_plan' => $request->ot_hour_plan[$shop][0],
-                    'notes' => $request->notes[$shop][0] ?? null,
-                    'photo_shop' => $imgPath,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                // Update or create detail record
+                $detail = FactbActualDetail::updateOrCreate(
+                    [
+                        'header_id' => $headerId,
+                        'shop_id' => $shopId,
+                    ],
+                    [
+                        'manpower' => $request->manpower[$shop][0] ?? 0,
+                        'manpower_plan' => $request->manpower_plan[$shop][0] ?? 0,
+                        'working_hour' => $request->working_hour[$shop][0] ?? 0,
+                        'ot_hour' => $request->ot_hour[$shop][0] ?? 0,
+                        'ot_hour_plan' => $request->ot_hour_plan[$shop][0] ?? 0,
+                        'notes' => $request->notes[$shop][0] ?? null,
+                        'photo_shop' => $imgPath ?? $detail->photo_shop ?? null,
+                    ]
+                );
 
                 $detailId = $detail->id;
-                $imgPathNG = [];
-                $filteredModels = [];
                 $filteredModels = $models->filter(function ($model) use ($shopId) {
                     return $model->shop_id == $shopId;
                 });
 
-                // Insert data into factb_actual_form_productions table for each model in the shop
+                // Insert or update data into factb_actual_form_productions table for each model in the shop
                 foreach ($request->production as $modelName => $production) {
-
                     $modelId = FactbMstModel::where('model_name', $modelName)->value('id');
                     $modelShopId = FactbMstModel::where('model_name', $modelName)->value('shop_id');
+
                     if ($modelShopId == $shopId) {
+                        // Handle image upload for NG
                         $imgPathNG = [];
-                        //isset($request->photo_ng[$modelName])
                         if ($request->hasFile("photo_ng.$modelName.0")) {
                             foreach ($request->photo_ng[$modelName] as $ngFile) {
                                 if ($ngFile) {
@@ -148,42 +149,45 @@ class FormFactoryBController extends Controller
                                 }
                             }
                         }
+
+                        // Calculate total production and plan production values
                         $output8 = $production['output8'][0] ?? 0;
                         $output2 = $production['output2'][0] ?? 0;
                         $output1 = $production['output1'][0] ?? 0;
                         $total_prod = $output8 + $output2 + $output1;
-
                         $plan_prod = $production['plan_prod'][0] ?? $total_prod;
-                        if ($plan_prod == 0) {
-                            $plan_prod = $total_prod;
-                        }
-                        $productionId = FactbActualFormProduction::create([
-                            'details_id' => $detailId,
-                            'model_id' => $modelId,
-                            'hour' => $production['hour'][0] ?? null,
-                            'output8' => $production['output8'][0] ?? null,
-                            'output2' => $production['output2'][0] ?? null,
-                            'output1' => $production['output1'][0] ?? null,
-                            'plan_prod' => $plan_prod,
-                            'cabin' => $production['cabin'][0] ?? null,
-                            'PPM' => $production['PPM'][0] ?? null,
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ])->id;
 
-                        // Insert NG data into factb_actual_form_ngs table
+                        // Update or create production record
+                        $productionRecord = FactbActualFormProduction::updateOrCreate(
+                            [
+                                'details_id' => $detailId,
+                                'model_id' => $modelId,
+                            ],
+                            [
+                                'hour' => $production['hour'][0] ?? null,
+                                'output8' => $output8,
+                                'output2' => $output2,
+                                'output1' => $output1,
+                                'plan_prod' => $plan_prod,
+                                'cabin' => $production['cabin'][0] ?? null,
+                                'PPM' => $production['PPM'][0] ?? null,
+                            ]
+                        );
 
-                        FactbActualFormNg::create([
-                            'production_id' => $productionId,
-                            'model_id' => $modelId,
-                            'total_prod' => ($production['output8'][0] ?? 0) + ($production['output2'][0] ?? 0) + ($production['output1'][0] ?? 0),
-                            'reject' => $production['reject'][0] ?? null,
-                            'rework' => $production['rework'][0] ?? null,
-                            'remarks' => $production['remarks'][0] ?? null,
-                            'photo_ng' => json_encode($imgPathNG),
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]);
+                        // Update or create NG data
+                        FactbActualFormNg::updateOrCreate(
+                            [
+                                'production_id' => $productionRecord->id,
+                                'model_id' => $modelId,
+                            ],
+                            [
+                                'total_prod' => $total_prod,
+                                'reject' => $production['reject'][0] ?? null,
+                                'rework' => $production['rework'][0] ?? null,
+                                'remarks' => $production['remarks'][0] ?? null,
+                                'photo_ng' => json_encode($imgPathNG),
+                            ]
+                        );
                     }
                 }
             }
@@ -195,6 +199,7 @@ class FormFactoryBController extends Controller
             return redirect('/daily-report/factoryb')->with('failed', 'Failed to save daily report data. Please try again. Error: ' . $e->getMessage());
         }
     }
+
 
 
     public function showDetail($id)
