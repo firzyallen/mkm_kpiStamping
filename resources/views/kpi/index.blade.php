@@ -1413,60 +1413,65 @@
                         </div>
                         <div class="card mt-4 settings-card">
                             <div class="card-header d-flex justify-content-between align-items-center"
-                                id="settingsCardHeader" style="cursor: pointer;">
+                                id="settingsCardHeader" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#settingsCardBody">
                                 <h3 class="card-title">Settings</h3>
                                 <i style="color: black; margin-right: 10px;" class="fas fa-chevron-down"></i>
                             </div>
-                            <div class="card-body d-none" id="settingsCardBody">
-                                <form action="{{ url('kpi-monitoring/factoryb') }}" method="GET">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="month">Month</label>
-                                                <select name="month" id="month" class="form-control">
-                                                    @foreach (range(1, 12) as $month)
-                                                        <option value="{{ $month }}"
-                                                            {{ $currentMonth == $month ? 'selected' : '' }}>
-                                                            {{ date('F', mktime(0, 0, 0, $month, 10)) }}</option>
-                                                    @endforeach
-                                                </select>
+                            <div class="collapse" id="settingsCardBody">
+                                <div class="card-body">
+                                    <form action="{{ url('kpi-monitoring/factoryb') }}" method="GET">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="month">Month</label>
+                                                    <select name="month" id="month" class="form-control">
+                                                        @foreach (range(1, 12) as $month)
+                                                            <option value="{{ $month }}"
+                                                                {{ $currentMonth == $month ? 'selected' : '' }}>
+                                                                {{ date('F', mktime(0, 0, 0, $month, 10)) }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="year">Year</label>
+                                                    <select name="year" id="year" class="form-control">
+                                                        @foreach (range(date('Y'), date('Y') - 5) as $year)
+                                                            <option value="{{ $year }}"
+                                                                {{ $currentYear == $year ? 'selected' : '' }}>
+                                                                {{ $year }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="start_date">Status Start Date</label>
+                                                    <input type="date" name="start_date" id="start_date"
+                                                        class="form-control"
+                                                        value="{{ $startDate ?? $previousDay->format('Y-m-d') }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label for="end_date">Status End Date</label>
+                                                    <input type="date" name="end_date" id="end_date"
+                                                        class="form-control"
+                                                        value="{{ $endDate ?? $previousDay->format('Y-m-d') }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 mt-3">
+                                                <button type="submit" class="btn btn-primary">Apply</button>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="year">Year</label>
-                                                <select name="year" id="year" class="form-control">
-                                                    @foreach (range(date('Y'), date('Y') - 5) as $year)
-                                                        <option value="{{ $year }}"
-                                                            {{ $currentYear == $year ? 'selected' : '' }}>
-                                                            {{ $year }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="start_date">Status Start Date</label>
-                                                <input type="date" name="start_date" id="start_date"
-                                                    class="form-control"
-                                                    value="{{ $startDate ?? $previousDay->format('Y-m-d') }}">
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="end_date"> Status End Date</label>
-                                                <input type="date" name="end_date" id="end_date"
-                                                    class="form-control"
-                                                    value="{{ $endDate ?? $previousDay->format('Y-m-d') }}">
-                                            </div>
-                                        </div>
-                                        <div class="col-12 mt-3">
-                                            <button type="submit" class="btn btn-primary">Apply</button>
-                                        </div>
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
                             </div>
                         </div>
+
 
                         <script>
                             // Trigger chart creation when the tab becomes visible

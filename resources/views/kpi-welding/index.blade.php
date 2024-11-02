@@ -1397,12 +1397,13 @@
                         </div>
                         <div class="card mt-4 settings-card">
                             <div class="card-header d-flex justify-content-between align-items-center"
-                                id="settingsCardHeader" style="cursor: pointer;">
+                                id="settingsCardHeader" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#settingsCardBody">
                                 <h3 class="card-title">Settings</h3>
                                 <i style="color: black; margin-right: 10px;" class="fas fa-chevron-down"></i>
                             </div>
-                            <div class="card-body d-none" id="settingsCardBody">
-                                <form action="{{ url('kpi-monitoring/welding') }}" method="GET">
+                            <div class="collapse" id="settingsCardBody">
+                                <div class="card-body">
+                                    <form action="{{ url('kpi-monitoring/welding') }}" method="GET">
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
