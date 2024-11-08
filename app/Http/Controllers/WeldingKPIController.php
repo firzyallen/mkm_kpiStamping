@@ -74,9 +74,12 @@ class WeldingKPIController extends Controller
                     ->get()
                     ->map(function ($item) {
                         $item->formatted_date = Carbon::parse($item->date)->format('D j');
+                        // Ensure OTDP_Plan displays with one decimal place and defaults to 98.5 if not set
+                        $item->OTDP_Plan = $item->OTDP_Plan != 0 ? number_format((float) $item->OTDP_Plan, 1) : '98.5';
                         return $item;
                     });
             }
+
 
 
             $fttData = DB::table('welding_ftts')
@@ -118,6 +121,7 @@ class WeldingKPIController extends Controller
         $ngDetails = WeldingNgDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
         $monthName = Carbon::createFromDate(null, $currentMonth)->format('F');
         $downtimeDetails = WeldingDowntimeDetail::whereMonth('date', $currentMonth)->whereYear('date', $currentYear)->get();
+
         return view('kpi-welding.index', compact('shops', 'kpiData', 'shopDetails', 'kpiStatuses', 'ngDetails', 'monthName', 'currentYear', 'currentMonth', 'models', 'stations', 'downtimeDetails', 'previousDay', 'startDate', 'endDate'));
     }
 

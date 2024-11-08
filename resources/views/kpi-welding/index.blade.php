@@ -234,7 +234,11 @@
                                                                         });
 
                                                                         // Set default y-axis max based on the data
-                                                                        var maxHpuValue = Math.max(...fullHpuData.filter(v => v !== null), 0.2);
+                                                                        var maxHpuValue = Math.max(
+                                                                            ...fullHpuData.filter(v => v !== null),
+                                                                            ...fullHpuPlanData.filter(v => v !== null),
+                                                                            0.2
+                                                                        ) + 0.5;
 
                                                                         // Create x-axis with tooltip for Date
                                                                         var xRenderer = am5xy.AxisRendererX.new(root, { minGridDistance: 30 });
@@ -863,16 +867,18 @@
                                                                         var fullOtdpPlanData = Array(31).fill(0); // Set default plan values to 0
                                                                         var fullHeaderIds = Array(31).fill(null); // Initialize array for header IDs
 
-                                                                        // Map actual data and header IDs to the corresponding day
+                                                                        // Map actual data and header IDs to the corresponding day, capping at 100% if the value exceeds 100
                                                                         otdpData.forEach((item, index) => {
                                                                             var day = parseInt(item.formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                            fullOtdpData[day - 1] = item.OTDP; // Assign OTDP value to the corresponding day
+                                                                            fullOtdpData[day - 1] = Math.min(item.OTDP, 100); // Set OTDP value to a maximum of 100
                                                                             fullHeaderIds[day - 1] = headerIds[index]; // Assign encrypted header_id to the corresponding day
                                                                         });
 
+
+                                                                       // Map plan data and apply condition if actual is 0, then set plan to 0
                                                                         otdpPlanData.forEach((value, index) => {
                                                                             var day = parseInt(otdpData[index].formatted_date.split(' ')[1]); // Extract day from 'D j'
-                                                                            fullOtdpPlanData[day - 1] = value; // Assign OTDP Plan value to the corresponding day
+                                                                            fullOtdpPlanData[day - 1] = fullOtdpData[day - 1] === 0 ? 0 : value; // Set OTDP Plan to 0 if Actual is 0
                                                                         });
 
                                                                         // Create x-axis with tooltip for Date
@@ -957,14 +963,15 @@
                                                                             allDates.map((date, i) => ({ date: date, actual: fullOtdpData[i], header_id: fullHeaderIds[i] }))
                                                                         );
 
-                                                                        // Add bullets (dots) for matching dates with both Plan and Actual
+                                                                        // Add bullets (dots) for matching dates with both Plan and Actual only when plan and actual are non-zero
                                                                         planSeries.bullets.push(function(root, series, dataItem) {
                                                                             var actualValue = fullOtdpData[parseInt(dataItem.get("categoryX")) - 1];
                                                                             var planValue = dataItem.get("valueY");
-                                                                            var headerId = fullHeaderIds[dataItem.index];  // Correctly map header_id
+                                                                            var headerId = fullHeaderIds[dataItem.index]; // Correctly map header_id
                                                                             var threshold = 98; // Set OTDP threshold
 
-                                                                            if (actualValue !== null && planValue !== null) {
+                                                                            // Only add a bullet if both actual and plan are non-zero
+                                                                            if (actualValue !== null && actualValue !== 0 && planValue !== null && planValue !== 0) {
                                                                                 var color = actualValue < threshold ? am5.color(0xff0000) : am5.color(0x00ff00); // Red if Actual < Threshold, Green if Actual ≥ Threshold
 
                                                                                 var bullet = am5.Bullet.new(root, {
@@ -988,8 +995,9 @@
 
                                                                                 return bullet;
                                                                             }
-                                                                            return null;
+                                                                            return null; // Do not add a bullet if actual or plan is 0
                                                                         });
+
 
                                                                         // Make columns (bars) clickable
                                                                         actualSeries.columns.template.events.on("click", function(ev) {
