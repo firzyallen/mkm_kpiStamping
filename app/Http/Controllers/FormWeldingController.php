@@ -257,69 +257,77 @@ class FormWeldingController extends Controller
 }
 
 
-    public function showDetail($id)
-    {
+public function showDetail($id)
+{
+    try {
+        // Try to decrypt the ID, but if it fails, assume it's not encrypted
         $id = decrypt($id);
+    } catch (\Exception $e) {
+        // If decryption fails, leave the ID as it is
+        // Optionally, log the exception or handle it in some other way
+    }
 
-        $header = WeldingActualHeader::findOrFail($id);
-        $details = WeldingActualDetail::where('header_id', $id)->get();
-        $stationDetails = WeldingActualStationDetail::whereIn('details_id', $details->pluck('id'))->get();
-        $productions = WeldingActualFormProduction::whereIn('station_details_id', $stationDetails->pluck('id'))->get();
-        $notGoods = WeldingActualFormNg::whereIn('production_id', $productions->pluck('id'))->get();
+    // Now we can safely use $id whether it was encrypted or not
+    $header = WeldingActualHeader::findOrFail($id);
+    $details = WeldingActualDetail::where('header_id', $id)->get();
+    $stationDetails = WeldingActualStationDetail::whereIn('details_id', $details->pluck('id'))->get();
+    $productions = WeldingActualFormProduction::whereIn('station_details_id', $stationDetails->pluck('id'))->get();
+    $notGoods = WeldingActualFormNg::whereIn('production_id', $productions->pluck('id'))->get();
 
-        $formattedData = [];
-        foreach ($details as $detail) {
-            $shop = WeldingMstShop::find($detail->shop_id);
+    $formattedData = [];
+    foreach ($details as $detail) {
+        $shop = WeldingMstShop::find($detail->shop_id);
 
-            $shopData = [
-                'shop_name' => $shop->shop_name,
-                'manpower' => $detail->manpower,
-                'manpower_plan' => $detail->manpower_plan,
-                'working_hour' => $detail->working_hour,
-                'ot_hour' => $detail->ot_hour,
-                'ot_hour_plan' => $detail->ot_hour_plan,
-                'notes' => $detail->notes,
-                'photo_shop' => $detail->photo_shop,
-                'stations' => [],
+        $shopData = [
+            'shop_name' => $shop->shop_name,
+            'manpower' => $detail->manpower,
+            'manpower_plan' => $detail->manpower_plan,
+            'working_hour' => $detail->working_hour,
+            'ot_hour' => $detail->ot_hour,
+            'ot_hour_plan' => $detail->ot_hour_plan,
+            'notes' => $detail->notes,
+            'photo_shop' => $detail->photo_shop,
+            'stations' => [],
+        ];
+
+        $shopStations = $stationDetails->where('details_id', $detail->id);
+        foreach ($shopStations as $stationDetail) {
+            $station = WeldingMstStation::find($stationDetail->station_id);
+            $models = $productions->where('station_details_id', $stationDetail->id);
+
+            $stationData = [
+                'station_name' => $station->station_name,
+                'manpower_station' => $stationDetail->manpower_station,
+                'models' => [],
             ];
 
-            $shopStations = $stationDetails->where('details_id', $detail->id);
-            foreach ($shopStations as $stationDetail) {
-                $station = WeldingMstStation::find($stationDetail->station_id);
-                $models = $productions->where('station_details_id', $stationDetail->id);
-
-                $stationData = [
-                    'station_name' => $station->station_name,
-                    'manpower_station' => $stationDetail->manpower_station,
-                    'models' => [],
+            foreach ($models as $model) {
+                $stationData['models'][] = [
+                    'model_id' => $model->model_id,
+                    'model_name' => WeldingMstModel::where('id', $model->model_id)->value('model_name'),
+                    'hour' => $model->hour,
+                    'output8' => $model->output8,
+                    'output2' => $model->output2,
+                    'output1' => $model->output1,
+                    'plan_prod' => $model->plan_prod,
+                    'cabin' => $model->cabin,
+                    'PPM' => $model->PPM,
+                    'reject' => $notGoods->where('production_id', $model->id)->first()->reject ?? null,
+                    'rework' => $notGoods->where('production_id', $model->id)->first()->rework ?? null,
+                    'remarks' => $notGoods->where('production_id', $model->id)->first()->remarks ?? null,
+                    'photo_ng' => $notGoods->where('production_id', $model->id)->first()->photo_ng ?? null,
                 ];
-
-                foreach ($models as $model) {
-                    $stationData['models'][] = [
-                        'model_id' => $model->model_id,
-                        'model_name' => WeldingMstModel::where('id', $model->model_id)->value('model_name'),
-                        'hour' => $model->hour,
-                        'output8' => $model->output8,
-                        'output2' => $model->output2,
-                        'output1' => $model->output1,
-                        'plan_prod' => $model->plan_prod,
-                        'cabin' => $model->cabin,
-                        'PPM' => $model->PPM,
-                        'reject' => $notGoods->where('production_id', $model->id)->first()->reject ?? null,
-                        'rework' => $notGoods->where('production_id', $model->id)->first()->rework ?? null,
-                        'remarks' => $notGoods->where('production_id', $model->id)->first()->remarks ?? null,
-                        'photo_ng' => $notGoods->where('production_id', $model->id)->first()->photo_ng ?? null,
-                    ];
-                }
-
-                $shopData['stations'][] = $stationData;
             }
 
-            $formattedData[] = $shopData;
+            $shopData['stations'][] = $stationData;
         }
 
-        return view('daily-report.welding.show', compact('header', 'formattedData', 'id'));
+        $formattedData[] = $shopData;
     }
+
+    return view('daily-report.welding.show', compact('header', 'formattedData', 'id'));
+}
+
 
     public function updateDetail($id)
     {

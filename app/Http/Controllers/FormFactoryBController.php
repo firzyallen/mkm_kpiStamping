@@ -204,7 +204,13 @@ class FormFactoryBController extends Controller
 
     public function showDetail($id)
     {
-        $id = decrypt($id);
+        try {
+            // Try to decrypt the ID, but if it fails, assume it's not encrypted
+            $id = decrypt($id);
+        } catch (\Exception $e) {
+            // If decryption fails, leave the ID as it is
+            // Optionally, log the exception or handle it in some other way
+        }
 
         $header = FactbActualHeader::findOrFail($id);
         $details = FactbActualDetail::where('header_id', $id)->get();
