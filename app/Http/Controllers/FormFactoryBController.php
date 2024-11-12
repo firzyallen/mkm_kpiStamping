@@ -40,25 +40,49 @@ class FormFactoryBController extends Controller
             ->where('shift', $request->shift)
             ->first();
 
+        // If the record exists, handle the PIC field logic
         if ($existingHeader) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Daily Report for this date and shift already exists.']);
+            // Split existing PICs into an array, trimming whitespace and removing empty values
+            $existingPics = array_filter(array_map('trim', explode(',', $existingHeader->pic)));
+
+            // Split new PIC input into an array, trimming whitespace and removing empty values
+            $newPics = array_filter(array_map('trim', explode(',', $request->pic)));
+
+            // Filter out new PICs that already exist in the existing list
+            $picsToAdd = array_diff($newPics, $existingPics);
+
+            // If there are new PICs to add, append them to the existing list
+            if (!empty($picsToAdd)) {
+                // Merge existing PICs with the new ones to add, and then implode back into a string
+                $existingHeader->pic = implode(',', array_merge($existingPics, $picsToAdd));
+
+                // Save the updated record in the database
+                $existingHeader->save();
+            }
+
+            // Redirect to the existing report with the updated PICs
+            $encryptedId = encrypt($existingHeader->id);
+            return redirect()->route('form.daily-report.factoryb', ['id' => $encryptedId])
+                ->with('status', 'Daily Report header already exists. PIC updated if necessary.');
         }
 
-        // Create a new instance of the FactbActualHeader model
+        // If it does not exist, create a new instance of the FactbActualHeader model
         $header = new FactbActualHeader();
         $header->date = $request->date;
         $header->shift = $request->shift;
-        $header->pic = $request->pic;
         $header->revision = 0;
         $header->created_by = auth()->user()->name;
+        $header->pic = $request->pic;
 
         // Save the new FactbActualHeader record to the database
         $header->save();
 
-        // Redirect back or return a response as needed
+        // Redirect with the newly created record's encrypted ID
         $encryptedId = encrypt($header->id);
-        return redirect()->route('form.daily-report.factoryb', ['id' => $encryptedId])->with('status', 'Daily Report header created successfully.');
+        return redirect()->route('form.daily-report.factoryb', ['id' => $encryptedId])
+            ->with('status', 'Daily Report header created successfully.');
     }
+
 
 
     public function formChecksheet($id)
