@@ -168,6 +168,7 @@
                                                                                                 @else
                                                                                                 <option value="Blank">Blank</option>
                                                                                                 <option value="Flow">Flow</option>
+                                                                                                <option value="STP/PI">STP/PI</option>
                                                                                                 @endif
 
                                                                                             </select>
