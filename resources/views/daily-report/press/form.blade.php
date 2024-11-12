@@ -161,9 +161,15 @@
                                                                                             <label>Production Process</label>
                                                                                             <select name="production[{{ $data['shop_name'] }}][production_process][]" class="form-control form-control-sm">
                                                                                                 <option value="">Select Production Process</option>
+                                                                                                @if ($data['shop_name'] == 'Handwork')
+                                                                                                <option value="FINISHING">FINISHING</option>
+                                                                                                <option value="H. DRILL">H. DRILL</option>
+                                                                                                <option value="KET. SEND">KET. SEND</option>
+                                                                                                @else
                                                                                                 <option value="Blank">Blank</option>
                                                                                                 <option value="Flow">Flow</option>
-                                                                                                <option value="STP/PI">STP/PI</option>
+                                                                                                @endif
+
                                                                                             </select>
                                                                                         </div>
 
