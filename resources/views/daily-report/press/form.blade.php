@@ -369,121 +369,7 @@
         }
     });
 
-    // Add new row logic with event listener for dynamic rows
-    $(document).on('click', '.add-production-row', function() {
-        var shopName = $(this).closest('.tab-pane').find('.production-rows').data('shop');
-        var modelsOptions = '';
 
-        formattedData.forEach(function(model) {
-            if (model.shop_name === shopName) {
-                modelsOptions += `<option value="${model.model_name}">${model.model_name}</option>`;
-            }
-        });
-
-        var productionRow = `
-        <tr class="production-row">
-            <td>
-                <label>Status <span class="required">*</span></label>
-                <select name="production[${shopName}][status][]" class="form-control form-control-sm status-select" >
-                    <option value="" disabled selected>Select Status</option>
-                    <option value="f">Finished</option>
-                    <option value="n">Not Finished</option>
-                </select>
-                <label>Model <span class="required">*</span></label>
-                <select name="production[${shopName}][model][]" class="form-control form-control-sm model-select" >
-                    <option value="" disabled selected>Select Model</option>
-                    ${modelsOptions}
-                </select>
-                <label>Incoming Material</label>
-                <input type="text" name="production[${shopName}][inc_material][]" class="form-control form-control-sm" placeholder="Incoming Material">
-            </td>
-            <td>
-                <div class="row">
-                    <div class="col-md-4">
-                        <label>Production Process</label>
-                        <select name="production[${shopName}][production_process][]" class="form-control form-control-sm">
-                            <option value="">Select Production Process</option>
-                            <option value="Blank">Blank</option>
-                            <option value="Flow">Flow</option>
-                            <option value="STP/PI">STP/PI</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label>Type <span class="required">*</span></label>
-                        <select name="production[${shopName}][type][]" class="form-control form-control-sm" >
-                            <option value="" disabled selected>Select Type</option>
-                            <option value="OEM">OEM</option>
-                            <option value="Part">Part</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label>Manpower</label>
-                        <input type="text" inputmode="numeric" step="0.01" name="production[${shopName}][manpower][]" class="form-control form-control-sm" value="0" min="0">
-                    </div>
-                    <div class="col-md-4">
-                        <label>Machine</label>
-                        <select name="production[${shopName}][machine][]" class="form-control form-control-sm">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label>Setting</label>
-                        <input type="text" inputmode="numeric" step="0.01" name="production[${shopName}][setting][]" class="form-control form-control-sm" value="0" min="0">
-                    </div>
-                    <div class="col-md-4">
-                        <label>Plan Production</label>
-                        <input type="text" inputmode="numeric" name="production[${shopName}][plan_prod][]" class="form-control form-control-sm" value="0" min="0">
-                    </div>
-                    <div class="col-md-4">
-                        <label>Hour From</label>
-                        <input type="time" name="production[${shopName}][hour_from][]" class="form-control form-control-sm">
-                    </div>
-                    <div class="col-md-4">
-                        <label>Hour To</label>
-                        <input type="time" name="production[${shopName}][hour_to][]" class="form-control form-control-sm">
-                    </div>
-                    <div class="col-md-4">
-                        <label>OK</label>
-                        <input type="text" inputmode="numeric" name="production[${shopName}][OK][]" class="form-control form-control-sm" value="0" min="0">
-                    </div>
-                </div>
-            </td>
-            <td>
-                <div class="row">
-                    <div class="col-md-4">
-                        <label>Rework</label>
-                        <input type="text" inputmode="numeric" name="ng[${shopName}][rework][]" class="form-control form-control-sm" value="0" min="0">
-                    </div>
-                    <div class="col-md-4">
-                        <label>DMG Part</label>
-                        <input type="text" inputmode="numeric" name="ng[${shopName}][dmg_part][]" class="form-control form-control-sm" value="0" min="0">
-                    </div>
-                    <div class="col-md-4">
-                        <label>DMG RM</label>
-                        <input type="text" inputmode="numeric" name="ng[${shopName}][dmg_rm][]" class="form-control form-control-sm" value="0" min="0">
-                    </div>
-                    <div class="col-md-4">
-                        <label>Remarks</label>
-                        <textarea name="ng[${shopName}][remarks][]" class="form-control form-control-sm" rows="2"></textarea>
-                    </div>
-                    <div class="col-md-8">
-                        <label>Photo NG</label>
-                        <input type="file" name="ng[${shopName}][photo_ng][]" class="form-control form-control-sm">
-                    </div>
-                </div>
-            </td>
-            <td>
-                <button type="button" class="btn btn-danger btn-sm remove-row">
-                    <i class="fas fa-minus-circle"></i>
-                </button>
-            </td>
-        </tr>
-        `;
-        $(this).closest('.production-rows').append(productionRow);
-    });
 
     // Remove production row
     $(document).on('click', '.remove-row', function() {
@@ -493,10 +379,24 @@
 $(document).ready(function() {
             var formattedData = @json($formattedData);
 
+
             $(document).on('click', '.add-production-row', function() {
                 var shopName = $(this).closest('.tab-pane').find('.production-rows').data('shop');
                 var modelsOptions = '';
-
+                var productionProcessOptions = '';
+if (shopName === 'Handwork') {
+    productionProcessOptions = `
+        <option value="FINISHING">FINISHING</option>
+        <option value="H. DRILL">H. DRILL</option>
+        <option value="KET. SEND">KET. SEND</option>
+    `;
+} else {
+    productionProcessOptions = `
+        <option value="Blank">Blank</option>
+        <option value="Flow">Flow</option>
+        <option value="STP/PI">STP/PI</option>
+    `;
+}
                 formattedData.forEach(function(model) {
                     if (model.shop_name === shopName) {
                         modelsOptions +=
@@ -523,13 +423,11 @@ $(document).ready(function() {
                     </td>
                     <td>
                         <div class="row">
-                            <div class="col-md-4">
+                             <div class="col-md-4">
                                 <label>Production Process</label>
                                 <select name="production[${shopName}][production_process][]" class="form-control form-control-sm">
                                     <option value="">Select Production Process</option>
-                                    <option value="Blank">Blank</option>
-                                    <option value="Flow">Flow</option>
-                                    <option value="STP/PI">STP/PI</option>
+                                    ${productionProcessOptions}
                                 </select>
                             </div>
 
